@@ -1,0 +1,82 @@
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+
+create sequence corporate_user_seq;
+create table corporate_user(
+	"version" bigint default nextval('corporate_user_seq'),
+	"creation_date" timestamp without time zone,
+	"last_modified_date" timestamp without time zone,
+	"id" bigserial not null primary key ,
+	user_password character varying(128) COLLATE pg_catalog."default",
+    "username" character varying(30) COLLATE pg_catalog."default",
+	unique("username")
+);
+
+create sequence event_seq;
+create table "event"(
+	"id" bigint not null default nextval('event_seq'),
+    creation_date timestamp without time zone,
+    last_modified_date timestamp without time zone,
+    "version" bigint,
+    address character varying(255) COLLATE pg_catalog."default",
+    end_date timestamp without time zone,
+    latitude double precision,
+    longitude double precision,
+    notes character varying(255) COLLATE pg_catalog."default",
+    quota bigint,
+    start_date timestamp without time zone,
+    title character varying(255) COLLATE pg_catalog."default",
+    unique_name character varying(255) COLLATE pg_catalog."default",
+    corporate_user_id bigint,
+    CONSTRAINT event_pkey PRIMARY KEY ("id"),
+    CONSTRAINT uk_ongq5tqf9lhtpkl15amne1ity UNIQUE (unique_name),
+    CONSTRAINT fkkmy8n86qb64v2wvv3bymgn4sl FOREIGN KEY (corporate_user_id)
+        REFERENCES public.corporate_user ("id") MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+create sequence question_seq;
+create table question(
+	"id" bigint not null primary key  default nextval('question_seq'),
+	event_id bigint references "event"("id") on delete cascade on update cascade,
+	question_content varchar(255) not null,
+	creation_date timestamp without time zone,
+    last_modified_date timestamp without time zone,
+    "version" bigint,
+	unique(event_id, question_content)
+);
+create sequence participant_seq;
+create table participant(
+	"id" bigint primary key default nextval('participant_seq'),
+	ssn varchar(11) not null COLLATE pg_catalog."default",
+	"name" varchar(50) COLLATE pg_catalog."default",
+	surname varchar(50) COLLATE pg_catalog."default",
+	phone_id varchar(255) not null COLLATE pg_catalog."default",
+	creation_date timestamp without time zone,
+    last_modified_date timestamp without time zone,
+    "version" bigint,
+    "mail" character varying(255) COLLATE pg_catalog."default",
+	CONSTRAINT uk_5ikk6kqv8v93wl5jyerp3n5j1 UNIQUE (ssn),
+    CONSTRAINT uk_c553ttm8arlm9g9i36s66amhw UNIQUE ("mail"),
+    CONSTRAINT uk_qhchj2auq9wtdgv2aopagvun5 UNIQUE (phone_id)
+);
+create sequence application_seq;
+create table application(
+	"id" bigint primary key default nextval('application_seq'),
+	participant_id bigint references participant("id") on delete cascade on update cascade,
+	event_id bigint references "event"("id") on delete cascade on update cascade,
+	unique (participant_id, event_id)
+);
+create sequence answer_seq;
+create table answer(
+	"id" bigint primary key default nextval('answer_seq'),
+	creation_date timestamp without time zone,
+    last_modified_date timestamp without time zone,
+    "version" bigint,
+ 	participant_id bigint not null references participant("id") ON DELETE CASCADE ON UPDATE CASCADE,
+	question_id bigint not null references question("id") ON DELETE CASCADE ON UPDATE CASCADE,
+	"content" character varying(255) COLLATE pg_catalog."default", 
+	unique(participant_id, question_id)
+);
+ 
+ 
