@@ -27,8 +27,10 @@ public class DatabasePopulator {
     public void insertEvent(){
         // List<Authority> savedAuthorities = authorityRepository.saveAll(Set.of(new Authority(null, "READ"), new Authority(null, "WRITE")));
         CorporateUser corporateUser =new CorporateUser("admin", "1234",Set.of());
+        CorporateUser corporateUser1 =new CorporateUser("admin1", "admin",Set.of());
 
         customUserDetailsManager.createUser(corporateUser);
+        customUserDetailsManager.createUser(corporateUser1);
 
         eventRepository.save(new Event(
                 "event11",
@@ -36,8 +38,8 @@ public class DatabasePopulator {
                 23.0,
                 23.0,
                 corporateUser,
-                LocalDateTime.of(LocalDate.of(2020,11,1), LocalTime.of(12,10)),
-                LocalDateTime.of(LocalDate.of(2020,12,1), LocalTime.of(12,10)),
+                LocalDateTime.of(LocalDate.of(2020,5,1), LocalTime.of(12,10)),
+                LocalDateTime.of(LocalDate.of(2020,6,1), LocalTime.of(12,10)),
                 2L,
                 "Lütfen zamanında gelin!!!",
                 "Çukurambar. Çukurambar Mahallesi, 1111. Sokak, X Blok, No 22, Çankaya,",
@@ -89,8 +91,8 @@ public class DatabasePopulator {
         eventRepository.save(new Event(
                 "event15",
                 "Mangal Partisi",
-                23.0,
-                23.0,
+                32.80259817838669,
+                39.907433959775034,
                 corporateUser,
                 LocalDateTime.of(LocalDate.of(2020,11,1), LocalTime.of(12,10)),
                 LocalDateTime.of(LocalDate.of(2020,12,1), LocalTime.of(12,10)),

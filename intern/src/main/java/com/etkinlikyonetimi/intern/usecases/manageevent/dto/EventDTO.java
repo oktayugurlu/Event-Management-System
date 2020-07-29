@@ -63,12 +63,16 @@ public class EventDTO {
 
     private List<QuestionDTO> questionSet;
 
-    @AssertTrue(message = "Katılımcı sayısı kotadan fazla olamaz!")
+    @AssertTrue(message = "Number of participants can't be bigger than quota!")
     public boolean isLessThanOrEqualQuota(){
         return this.appliedParticipantSet.size()<=this.quota;
     }
+    @AssertTrue(message = "The start date can't come after end date!")
+    public boolean isStartDateBeforeEndDate(){
+        return this.startDateTime.isBefore(this.endDateTime);
+    }
 
-    @AssertTrue(message = "Aynı etkinlikte aynı içerikli soru olamaz!")
+    @AssertTrue(message = "Contents of questions should be unique for each event!")
     public boolean isThereSameContent(){
         HashMap<String, Integer> counts = new HashMap<>();
         if(this.questionSet != null && !this.questionSet.isEmpty()){

@@ -30,8 +30,7 @@ public class ManageEventController {
     @GetMapping("/allevents/createdevents")
     public List<EventDTO> getCreatedEvents(){
         System.out.println("helloo");
-        System.out.println( eventMapper.mapToDto(manageEventService.listAllCreatedEvents()));
-        return eventMapper.mapToDto(manageEventService.listAllCreatedEvents());
+        return eventMapper.mapToDto(manageEventService.listAllCreatedEventsByUser());
     }
 
     @GetMapping("/getevent/{uniqueName}")
@@ -46,9 +45,9 @@ public class ManageEventController {
     }
 
     @PutMapping("/updateevent")
-    public void updateEvent(@Valid @RequestBody EventDTO updatedEvent){
+    public String updateEvent(@Valid @RequestBody EventDTO updatedEvent){
         System.out.println("updatedEvent:"+updatedEvent.toString());
-        manageEventService.updateEvent(eventMapper.mapToEntity(updatedEvent));
+        return manageEventService.updateEvent(eventMapper.mapToEntity(updatedEvent));
     }
 
     @PostMapping("/deleteevent/{uniqueName}")

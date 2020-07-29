@@ -115,16 +115,15 @@ export default function EventsList(props) {
         axios.put("/manageevent/updateevent", eventObject, {
             headers:headers
         })
-            .then(() => {
-                props.snackbarOpen(eventObject.uniqueName+" updated successfully", "success")
+            .then((response) => {
+                if(response.data==='') props.snackbarOpen(eventObject.uniqueName+" updated successfully", "success");
+                else props.snackbarOpen(response.data, "error");
                 props.getAllEvents();
-            })
-            .catch(error => {
-                if (error.response.status === 400) {
-                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
-                }
-                console.log(error.response);
-            })
+            }).catch(error => {
+                if(error.response.status === 500)
+                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
+            console.log(error.response);
+            });
     }
     // UPDATE EVENT FUNCTIONS end //
 
@@ -185,7 +184,7 @@ export default function EventsList(props) {
     const handleSubmitAssignEvent = (participant, eventObject) => {
         setAssignEventDialogElement(<div/>);
         setIsOpenAssignEventDialog(false);
-        axios.put("/assignevent/assign", participant)
+        axios.post("/assignevent/assign", participant)
             .then(() => {
                 props.snackbarOpen("You assign to "+eventObject.title+" event successfully", "success")
                 props.getAllEvents();
@@ -194,9 +193,13 @@ export default function EventsList(props) {
                 if (error.response.status === 400) {
                     props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
                 }
+                else if(error.response.status === 500){
+                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
+                }
                 console.log(error.response);
-            })
+            });
     }
+
     const handleCloseAssignEventDialog = () => {
         console.log("adasdsadasdasdasdsda")
         setAssignEventDialogElement(<div/>);

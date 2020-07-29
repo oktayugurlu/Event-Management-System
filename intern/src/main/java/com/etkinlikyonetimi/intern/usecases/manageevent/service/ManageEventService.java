@@ -12,8 +12,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,10 @@ public class ManageEventService {
     private final CorporateUserRepository corporateUserRepository;
 
     public List<Event> listAllEvents(){
-        return eventRepository.findAllByOrderByTitleAsc();
+        return eventRepository.findAllByOrderByTitleAsc()
+                .stream()
+                .filter(event -> event.getEndDateTime().isAfter(LocalDateTime.now()))
+                .collect(Collectors.toList());
     }
 
     public Event addEvent(Event event){
@@ -45,11 +50,18 @@ public class ManageEventService {
     }
 
     @Transactional
-    public void updateEvent(Event requestEvent) {
+    public String updateEvent(Event requestEvent) {
+
         Event updatedEvent = eventRepository.findByUniqueName(requestEvent.getUniqueName());
-        updateEventFields(requestEvent,updatedEvent);
-        updatedEvent = eventRepository.save(updatedEvent);
-        setQuestionsEventFieldAndSave(requestEvent, updatedEvent);
+        if(updatedEvent.getEndDateTime().isBefore(LocalDateTime.now()))
+            return "The event can't be updated due to end date is out of date!";
+        else{
+            updateEventFields(requestEvent,updatedEvent);
+            updatedEvent = eventRepository.save(updatedEvent);
+            setQuestionsEventFieldAndSave(requestEvent, updatedEvent);
+            return "";
+        }
+
     }
 
     //After update event, set all question's event field to their related event
@@ -100,7 +112,7 @@ public class ManageEventService {
 
     public String deleteEvent(String uniqueName){
         Event deletedEvent = eventRepository.findByUniqueName(uniqueName);
-        if(deletedEvent ==null)
+        if(deletedEvent ==null || deletedEvent.getEndDateTime().isBefore(LocalDateTime.now()))
             return "Invalid delete request!";
         else{
             eventRepository.delete(deletedEvent);
@@ -108,7 +120,7 @@ public class ManageEventService {
         }
     }
 
-    public List<Event> listAllCreatedEvents() {
+    public List<Event> listAllCreatedEventsByUser() {
         Optional<CorporateUser> user = getAuthenticatedUserFromPrincipal();
         return user.isPresent()
                 ? List.copyOf(user.get().getEventSet())
