@@ -24,13 +24,12 @@ public class ParticipantDTO {
     @Size(max = 11, min = 11)
     private String ssn;
 
-    @Size(max = 1, min = 50)
+    @Size(min = 1, max = 50)
     private String name;
 
-    @Size(max = 1, min = 50)
+    @Size(min = 1, max = 50)
     private String surname;
 
-    @NotNull
     private Set<EventDTO> appliedEvents;
 /*
     // @Size(max = 1, min = 50)

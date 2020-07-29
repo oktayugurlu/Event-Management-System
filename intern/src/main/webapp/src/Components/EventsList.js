@@ -104,8 +104,7 @@ export default function EventsList(props) {
     };
 
     const handleSubmitUpdateEvent = (eventObject) => {
-        setUpdatedDialogElement(<div/>);
-        setOpenUpdateDialog(false);
+
         console.log("eventObject: ");
         console.log(eventObject);
         let headers = {
@@ -124,6 +123,8 @@ export default function EventsList(props) {
                     props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
             console.log(error.response);
             });
+        setUpdatedDialogElement(<div/>);
+        setOpenUpdateDialog(false);
     }
     // UPDATE EVENT FUNCTIONS end //
 
@@ -181,10 +182,13 @@ export default function EventsList(props) {
         ));
     }
 
-    const handleSubmitAssignEvent = (participant, eventObject) => {
+    const handleSubmitAssignEvent = (participant, eventUniqueName) => {
         setAssignEventDialogElement(<div/>);
         setIsOpenAssignEventDialog(false);
-        axios.post("/assignevent/assign", participant)
+        console.log("---------------CHECK----------------");
+        console.log(participant);
+        console.log(eventUniqueName);
+        axios.post("/assignevent/assign/"+eventUniqueName.toString(), participant)
             .then(() => {
                 props.snackbarOpen("You assign to "+eventObject.title+" event successfully", "success")
                 props.getAllEvents();

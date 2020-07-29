@@ -3,9 +3,11 @@ package com.etkinlikyonetimi.intern.usecases.security.util;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Authority;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.CorporateUser;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
+import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Question;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.AuthorityRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.CorporateUserRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.EventRepository;
+import com.etkinlikyonetimi.intern.usecases.manageevent.repository.QuestionRepository;
 import com.etkinlikyonetimi.intern.usecases.security.CustomUserDetailsManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class DatabasePopulator {
     private final CorporateUserRepository corporateUserRepository;
     private final AuthorityRepository authorityRepository;
     private final CustomUserDetailsManager customUserDetailsManager;
+    private final QuestionRepository questionRepository;
 
     public void insertEvent(){
         // List<Authority> savedAuthorities = authorityRepository.saveAll(Set.of(new Authority(null, "READ"), new Authority(null, "WRITE")));
@@ -88,7 +91,7 @@ public class DatabasePopulator {
                 Set.of(),
                 List.of()
         ));
-        eventRepository.save(new Event(
+        Event event = eventRepository.save(new Event(
                 "event15",
                 "Mangal Partisi",
                 32.80259817838669,
@@ -102,5 +105,7 @@ public class DatabasePopulator {
                 Set.of(),
                 List.of()
         ));
+        questionRepository.save(new Question(event ,"aaaa",List.of()));
+        questionRepository.save(new Question(event ,"bbbb",List.of()));
     }
 }

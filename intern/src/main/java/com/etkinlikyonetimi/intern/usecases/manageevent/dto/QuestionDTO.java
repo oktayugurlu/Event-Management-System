@@ -16,12 +16,9 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuestionDTO {
-    private EventDTO eventDTO;
 
     @NotBlank
     @NotNull
     @Size(min = 1, max = 255, message = "Sorularda karakter sayısı 1 ile 255 arasında olmalı")
     private String content;
-
-    private List<Answer> answerSet;
 }

@@ -215,8 +215,7 @@ class AddEventDialog extends Component{
 
     createQuestionObject = (item) =>{
         return {
-            content: item,
-            answerSet: []
+            content: item
         };
     }
 
