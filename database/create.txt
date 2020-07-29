@@ -1,7 +1,7 @@
 DROP SCHEMA public CASCADE;
 CREATE SCHEMA public;
 
-create sequence corporate_user_seq;
+create sequence corporate_user_seq START 1;
 create table corporate_user(
 	"version" bigint default nextval('corporate_user_seq'),
 	"creation_date" timestamp without time zone,
@@ -12,7 +12,7 @@ create table corporate_user(
 	unique("username")
 );
 
-create sequence event_seq;
+create sequence event_seq START 1;
 create table "event"(
 	"id" bigint not null default nextval('event_seq'),
     creation_date timestamp without time zone,
@@ -35,7 +35,7 @@ create table "event"(
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
-create sequence question_seq;
+create sequence question_seq START 1;
 create table question(
 	"id" bigint not null primary key  default nextval('question_seq'),
 	event_id bigint references "event"("id") on delete cascade on update cascade,
@@ -45,7 +45,7 @@ create table question(
     "version" bigint,
 	unique(event_id, question_content)
 );
-create sequence participant_seq;
+create sequence participant_seq START 1;
 create table participant(
 	"id" bigint primary key default nextval('participant_seq'),
 	ssn varchar(11) not null COLLATE pg_catalog."default",
@@ -60,14 +60,14 @@ create table participant(
     CONSTRAINT uk_c553ttm8arlm9g9i36s66amhw UNIQUE ("mail"),
     CONSTRAINT uk_qhchj2auq9wtdgv2aopagvun5 UNIQUE (phone_id)
 );
-create sequence application_seq;
+create sequence application_seq START 1;
 create table application(
 	"id" bigint primary key default nextval('application_seq'),
 	participant_id bigint references participant("id") on delete cascade on update cascade,
 	event_id bigint references "event"("id") on delete cascade on update cascade,
 	unique (participant_id, event_id)
 );
-create sequence answer_seq;
+create sequence answer_seq START 1;
 create table answer(
 	"id" bigint primary key default nextval('answer_seq'),
 	creation_date timestamp without time zone,
