@@ -199,7 +199,7 @@ export default class AssignEventDialog extends Component{
 
     handleSubmit = ()=>{
         if(this.checkIsFormValid()){
-            let participantCopy = {...this.state.participant};
+            let participantCopy = Object.assign({},this.state.participant);
             participantCopy['answerSet'] = [...this.setAnswerSetForParticipantDTO()];
             this.props.handleSubmitAssignEvent(participantCopy, this.props.assignedEvent.uniqueName);
         }

@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "\"event\"")
-@SequenceGenerator(name = "idgen", sequenceName = "event_seq")
+@SequenceGenerator(name = "idgen", sequenceName = "event_seq", initialValue = 1, allocationSize = 1)
 @ToString
 public class Event extends BaseEntity {
 

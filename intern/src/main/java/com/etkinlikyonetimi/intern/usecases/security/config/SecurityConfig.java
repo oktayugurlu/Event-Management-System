@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/manageevent/allevents/createdevents").authenticated()
                 .antMatchers("/manageevent/addevent").authenticated()
-                .antMatchers("/manageevent/deleteevent").authenticated()
+                .antMatchers("/manageevent/deleteevent/{uniqueName}").authenticated()
                 .antMatchers("/manageevent/updateevent").authenticated()
                 .and()
                 .sessionManagement()

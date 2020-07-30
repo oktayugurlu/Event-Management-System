@@ -37,6 +37,8 @@ public class Participant extends BaseEntity {
     @Column(name = "mail", unique = true)
     private String mail;
 
+    @Column(name = "")
+
     //Bi-directional fields
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
     private Set<Answer> answerSet;

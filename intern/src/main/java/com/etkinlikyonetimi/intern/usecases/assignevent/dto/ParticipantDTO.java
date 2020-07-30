@@ -30,7 +30,6 @@ public class ParticipantDTO {
     @Size(min = 1, max = 50)
     private String surname;
 
-    private Set<EventDTO> appliedEvents;
 /*
     // @Size(max = 1, min = 50)
     private String phoneId;*/

@@ -11,9 +11,13 @@ import com.etkinlikyonetimi.intern.usecases.manageevent.repository.QuestionRepos
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import javax.mail.MessagingException;
 import javax.transaction.Transactional;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,7 @@ public class AssignEventService {
     private final ParticipantRepository participantRepository;
     private final EventRepository eventRepository;
     private final QuestionRepository questionRepository;
+    private final MailSenderService mailSenderService;
 
     @Transactional
     public String assign(Participant participantFromRequest, String eventUniqueName, List<Answer> answerList){
@@ -71,5 +76,31 @@ public class AssignEventService {
 
     public List<Answer> findAnswerByQuestionAndParticipant(Question question, Participant participant){
         return answerRepository.findByQuestionAndParticipant(question, participant);
+    }
+
+    public BufferedImage createQrCode(String barcode, String mail) throws Exception {
+
+        BufferedImage bufferedImage= QrCodeGeneratorService.generateQRCodeImage(barcode);
+        String fileName = "./src/main/resources/static/qrcodes/oktay.ugurlu98@gmail.com"+"event13.png";
+        saveImageAsPng(bufferedImage, fileName);
+        sendMail(fileName, mail);
+        return bufferedImage;
+    }
+    public void saveImageAsPng(BufferedImage bufferedImage, String fileName){
+        try {
+            // retrieve image
+            File outputfile = new File(fileName);
+            ImageIO.write(bufferedImage, "png", outputfile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMail(String fileName, String email) throws IOException, MessagingException {
+        mailSenderService.sendmail("etkinlikyonetimi1234@gmail.com",
+                "etkin.turkay@outlook.com",
+                "hello word",
+                "subject",
+                fileName);
     }
 }

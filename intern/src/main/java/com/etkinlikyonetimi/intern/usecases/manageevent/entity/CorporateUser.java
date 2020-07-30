@@ -19,7 +19,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "corporate_user")
-@SequenceGenerator(name = "idgen", sequenceName = "corporate_user_seq")
+@SequenceGenerator(name = "idgen", sequenceName = "corporate_user_seq", initialValue = 1, allocationSize = 1)
 public class CorporateUser extends BaseEntity implements UserDetails, CredentialsContainer {
 
     @Column(name = "username", unique = true)

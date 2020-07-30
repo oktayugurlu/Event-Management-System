@@ -156,7 +156,12 @@ export default function EventsList(props) {
     }
 
     const handleClickDeleteEventButton = (uniqueName)=>{
-        axios.post("/manageevent/deleteevent/"+uniqueName)
+        let headers = {
+            'Authorization': `Bearer ${getJwsToken()}`
+        };
+        axios.post("/manageevent/deleteevent/"+uniqueName,{},{
+            headers:headers
+        })
             .then((response) => {
                 props.snackbarOpen(response.data, response.data==="Invalid delete request!" ? "error":"success")
                 props.getAllEvents();
@@ -189,19 +194,14 @@ export default function EventsList(props) {
         console.log(participant);
         console.log(eventUniqueName);
         axios.post("/assignevent/assign/"+eventUniqueName.toString(), participant)
-            .then(() => {
-                props.snackbarOpen("You assign to "+eventObject.title+" event successfully", "success")
+            .then((response) => {
+                if(response.data==="You can't assign a event with same TC ID!")
+                    props.snackbarOpen(response.data, "error");
+                else
+                    props.snackbarOpen(response.data, "success");
                 props.getAllEvents();
-            })
-            .catch(error => {
-                if (error.response.status === 400) {
-                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
-                }
-                else if(error.response.status === 500){
-                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
-                }
-                console.log(error.response);
             });
+        axios.post();
     }
 
     const handleCloseAssignEventDialog = () => {

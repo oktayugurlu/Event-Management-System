@@ -270,7 +270,12 @@ class App extends Component{
                 <Switch>
                   <Route path="/allevents" component={() => (<EventsList allEvents={this.state.allEvents}
                                                                          pageTitle={'All Events'}
-                                                                         whichPage={this.ALL_EVENTS_PAGE}/>)
+                                                                         whichPage={this.ALL_EVENTS_PAGE}
+                                                                         snackbarOpen={this.snackbarOpen}
+                                                                         snackbarClose={this.snackbarClose}
+                                                                         getAllEvents={this.getAllEvents}
+
+                                                              />)
                   }/>
                   <Route path="/manageevents" component={() => this.routeManageEventPageIfAuthorized()}/>
                   <Route path="/" component={() => <Login snackbarOpen={this.snackbarOpen}

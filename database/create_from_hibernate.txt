@@ -1,0 +1,240 @@
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+
+
+-- Table: public.corporate_user
+
+-- DROP TABLE public.corporate_user;
+
+-- SEQUENCE: public.corporate_user_seq
+
+-- DROP SEQUENCE public.corporate_user_seq;
+
+CREATE SEQUENCE public.corporate_user_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE public.corporate_user_seq
+    OWNER TO postgres;
+	
+	
+-- SEQUENCE: public.event_seq
+
+-- DROP SEQUENCE public.event_seq;
+
+CREATE SEQUENCE public.event_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE public.event_seq
+    OWNER TO postgres;
+	
+-- SEQUENCE: public.question_seq
+
+-- DROP SEQUENCE public.question_seq;
+
+CREATE SEQUENCE public.question_seq
+    INCREMENT 50
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE public.question_seq
+    OWNER TO postgres;
+	
+-- SEQUENCE: public.participant_seq
+
+-- DROP SEQUENCE public.participant_seq;
+
+CREATE SEQUENCE public.participant_seq
+    INCREMENT 50
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE public.participant_seq
+    OWNER TO postgres;
+	
+-- SEQUENCE: public.answer_seq
+
+-- DROP SEQUENCE public.answer_seq;
+
+CREATE SEQUENCE public.answer_seq
+    INCREMENT 50
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+
+ALTER SEQUENCE public.answer_seq
+    OWNER TO postgres;
+
+CREATE TABLE public.corporate_user
+(
+    "id" bigint NOT NULL default nextval('corporate_user_seq'),
+    creation_date timestamp without time zone,
+    last_modified_date timestamp without time zone,
+    "version" bigint,
+    user_password character varying(255) COLLATE pg_catalog."default",
+    username character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT corporate_user_pkey PRIMARY KEY ("id"),
+    CONSTRAINT uk_t8k9db7gyng0vcj15wx7roecw UNIQUE (username)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.corporate_user
+    OWNER to postgres;
+
+
+-- Table: public.event
+
+-- DROP TABLE public.event;
+
+CREATE TABLE public.event
+(
+    "id" bigint NOT NULL default nextval('event_seq'),
+    creation_date timestamp without time zone,
+    last_modified_date timestamp without time zone,
+    "version" bigint,
+    address character varying(255) COLLATE pg_catalog."default",
+    end_date timestamp without time zone,
+    latitude double precision,
+    longitude double precision,
+    notes character varying(255) COLLATE pg_catalog."default",
+    quota bigint,
+    start_date timestamp without time zone,
+    title character varying(255) COLLATE pg_catalog."default",
+    unique_name character varying(255) COLLATE pg_catalog."default",
+    corporate_user_id bigint,
+    CONSTRAINT event_pkey PRIMARY KEY (id),
+    CONSTRAINT uk_ongq5tqf9lhtpkl15amne1ity UNIQUE (unique_name),
+    CONSTRAINT fkkmy8n86qb64v2wvv3bymgn4sl FOREIGN KEY (corporate_user_id)
+        REFERENCES public.corporate_user ("id") MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.event
+    OWNER to postgres;
+
+
+-- Table: public.question
+
+-- DROP TABLE public.question;
+
+CREATE TABLE public.question
+(
+    "id" bigint NOT NULL  default nextval('question_seq'),
+    creation_date timestamp without time zone,
+    last_modified_date timestamp without time zone,
+    "version" bigint,
+    question_content character varying(255) COLLATE pg_catalog."default",
+    event_id bigint,
+    CONSTRAINT question_pkey PRIMARY KEY ("id"),
+    CONSTRAINT uklrr0w2tr0b7cy3g9cqpgmq54w UNIQUE (event_id, question_content),
+    CONSTRAINT fk109lj89hyx7v8d96cuvvwhpni FOREIGN KEY (event_id)
+        REFERENCES public."event" (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.question
+    OWNER to postgres;
+
+
+
+-- Table: public.participant
+
+-- DROP TABLE public.participant;
+
+CREATE TABLE public.participant
+(
+    "id" bigint NOT NULL default nextval('participant_seq'),
+    creation_date timestamp without time zone,
+    last_modified_date timestamp without time zone,
+    "version" bigint,
+    mail character varying(255) COLLATE pg_catalog."default",
+    "name" character varying(255) COLLATE pg_catalog."default",
+    phone_id character varying(255) COLLATE pg_catalog."default",
+    ssn character varying(255) COLLATE pg_catalog."default",
+    surname character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT participant_pkey PRIMARY KEY ("id"),
+    CONSTRAINT uk_5ikk6kqv8v93wl5jyerp3n5j1 UNIQUE (ssn),
+    CONSTRAINT uk_c553ttm8arlm9g9i36s66amhw UNIQUE (mail),
+    CONSTRAINT uk_qhchj2auq9wtdgv2aopagvun5 UNIQUE (phone_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.participant
+    OWNER to postgres;
+
+
+-- Table: public.application
+
+-- DROP TABLE public.application;
+
+CREATE TABLE public.application
+(
+    event_id bigint NOT NULL,
+    participant_id bigint NOT NULL,
+    CONSTRAINT application_pkey PRIMARY KEY (event_id, participant_id),
+    CONSTRAINT fk2prhul2pm68wtkiolj5vvifn0 FOREIGN KEY (event_id)
+        REFERENCES public."event" ("id") MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fkgp8tq3gl64vxrxgn9ow4p1mef FOREIGN KEY (participant_id)
+        REFERENCES public.participant ("id") MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.application
+    OWNER to postgres;
+
+
+
+-- Table: public.answer
+
+-- DROP TABLE public.answer;
+
+CREATE TABLE public.answer
+(
+    id bigint NOT NULL default nextval('answer_seq'),
+    creation_date timestamp without time zone,
+    last_modified_date timestamp without time zone,
+    version bigint,
+    content character varying(255) COLLATE pg_catalog."default",
+    participant_id bigint,
+    question_id bigint,
+    CONSTRAINT answer_pkey PRIMARY KEY (id),
+    CONSTRAINT ukd84cedg8uhrlkajjd2jqnxicv UNIQUE (question_id, participant_id),
+    CONSTRAINT fkhb8yanasi8joh2sn4ckfbdwqx FOREIGN KEY (participant_id)
+        REFERENCES public.participant (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fkkgexwltdgrob09af19etqp89f FOREIGN KEY (question_id)
+        REFERENCES public.question (id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.answer
+    OWNER to postgres;

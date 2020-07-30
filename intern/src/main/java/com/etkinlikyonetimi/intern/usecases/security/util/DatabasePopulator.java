@@ -1,10 +1,8 @@
 package com.etkinlikyonetimi.intern.usecases.security.util;
 
-import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Authority;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.CorporateUser;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Question;
-import com.etkinlikyonetimi.intern.usecases.manageevent.repository.AuthorityRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.CorporateUserRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.EventRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.QuestionRepository;
@@ -23,7 +21,6 @@ import java.util.Set;
 public class DatabasePopulator {
     private final EventRepository eventRepository;
     private final CorporateUserRepository corporateUserRepository;
-    private final AuthorityRepository authorityRepository;
     private final CustomUserDetailsManager customUserDetailsManager;
     private final QuestionRepository questionRepository;
 
@@ -31,9 +28,13 @@ public class DatabasePopulator {
         // List<Authority> savedAuthorities = authorityRepository.saveAll(Set.of(new Authority(null, "READ"), new Authority(null, "WRITE")));
         CorporateUser corporateUser =new CorporateUser("admin", "1234",Set.of());
         CorporateUser corporateUser1 =new CorporateUser("admin1", "admin",Set.of());
+        CorporateUser corporateUser2 =new CorporateUser("admin2", "admin",Set.of());
+        CorporateUser corporateUser3 =new CorporateUser("admin3", "admin",Set.of());
 
         customUserDetailsManager.createUser(corporateUser);
         customUserDetailsManager.createUser(corporateUser1);
+        customUserDetailsManager.createUser(corporateUser2);
+        customUserDetailsManager.createUser(corporateUser3);
 
         eventRepository.save(new Event(
                 "event11",
