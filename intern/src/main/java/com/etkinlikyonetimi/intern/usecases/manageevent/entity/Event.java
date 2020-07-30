@@ -60,5 +60,4 @@ public class Event extends BaseEntity {
     //BI-DIRECTIONAL FIELD
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Question> questionSet;
-
 }

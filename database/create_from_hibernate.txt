@@ -40,7 +40,7 @@ ALTER SEQUENCE public.event_seq
 -- DROP SEQUENCE public.question_seq;
 
 CREATE SEQUENCE public.question_seq
-    INCREMENT 50
+    INCREMENT 1
     START 1
     MINVALUE 1
     MAXVALUE 9223372036854775807
@@ -54,7 +54,7 @@ ALTER SEQUENCE public.question_seq
 -- DROP SEQUENCE public.participant_seq;
 
 CREATE SEQUENCE public.participant_seq
-    INCREMENT 50
+    INCREMENT 1
     START 1
     MINVALUE 1
     MAXVALUE 9223372036854775807
@@ -68,7 +68,7 @@ ALTER SEQUENCE public.participant_seq
 -- DROP SEQUENCE public.answer_seq;
 
 CREATE SEQUENCE public.answer_seq
-    INCREMENT 50
+    INCREMENT 1
     START 1
     MINVALUE 1
     MAXVALUE 9223372036854775807

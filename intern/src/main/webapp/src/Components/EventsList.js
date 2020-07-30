@@ -12,6 +12,7 @@ import AddEventDialog from "./AddEventDialog";
 import {getCreatedItemsByUser, getJwsToken} from "./authentication/LocalStorageService";
 import {} from "./authentication/LocalStorageService";
 import AssignEventDialog from "./AssignEventDialog";
+import QrCodeDialog from "./QrCodeDialog";
 
 export default function EventsList(props) {
     const [page, setPage] = React.useState(0);
@@ -21,6 +22,9 @@ export default function EventsList(props) {
 
     const [assignEventDialogElement, setAssignEventDialogElement] = React.useState(<div/>);
     const [isOpenAssignEventDialog, setIsOpenAssignEventDialog] = React.useState(false);
+    const [qrCodeDialogElement, setQrCodeDialogElement] = React.useState(<></>);
+    const [qrImage, setQrImage] = React.useState("");
+
     const ITEMS_PER_PAGE = 3;
     const CARD_IMAGE_URL='https://images.all-free-download.com/images/graphiclarge/team_meeting_background_table_stationery_gathering_people_icons_6838493.jpg';
 
@@ -170,7 +174,6 @@ export default function EventsList(props) {
                 if (error.response.status === 400) {
                     props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
                 }
-                console.log(error.response);
             })
     }
 
@@ -187,33 +190,46 @@ export default function EventsList(props) {
         ));
     }
 
-    const handleSubmitAssignEvent = (participant, eventUniqueName) => {
+    const handleSubmitAssignEvent = (participant, eventUniqueName, title) => {
         setAssignEventDialogElement(<div/>);
         setIsOpenAssignEventDialog(false);
-        console.log("---------------CHECK----------------");
-        console.log(participant);
-        console.log(eventUniqueName);
-        axios.post("/assignevent/assign/"+eventUniqueName.toString(), participant)
+        let qrCode='';
+        let open=false;
+        axios.post("/assignevent/assign/"+eventUniqueName.toString(), participant,{responseType: 'blob'})
             .then((response) => {
-                if(response.data==="You can't assign a event with same TC ID!")
-                    props.snackbarOpen(response.data, "error");
-                else
-                    props.snackbarOpen(response.data, "success");
-                props.getAllEvents();
+                qrCode = response.data;
+                setQrCodeDialogElement(<QrCodeDialog open={true}
+                                                     qrCodeImage={response.data}
+                                                     handleClose={handleCloseQrCodeDialog}
+                                                     title={title}
+                />);
+            }).catch( error => {
+                if(error.response.status === 500){
+                    props.snackbarOpen("You can't assign a event with same TC ID!", "error");
+                }
             });
-        axios.post();
     }
-
     const handleCloseAssignEventDialog = () => {
         console.log("adasdsadasdasdasdsda")
         setAssignEventDialogElement(<div/>);
         setIsOpenAssignEventDialog(false);
+        props.getAllEvents();
     }
+
+    const handleCloseQrCodeDialog = (title) => {
+        // qrCodeImage="";
+        setQrCodeDialogElement(<></>);
+        props.snackbarOpen("You assign to "+title+" successfully", "success");
+    };
     //**** ASSIGN EVENT FUNCTIONS END ****//
+
+
 
     return (
         <Grid item md={7} style={{backgroundColor:'#FBF4ED'}}>
+
             <Grid container direction="column" alignItems="stretch" >
+                {qrCodeDialogElement}
                 <h1 style={titleStyle}>{props.pageTitle}</h1>
                 {updatedDialogElement}
                 {assignEventDialogElement}

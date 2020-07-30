@@ -16,7 +16,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "participant")
-@SequenceGenerator(name = "idgen", sequenceName = "participant_seq")
+@SequenceGenerator(name = "idgen", sequenceName = "participant_seq", initialValue = 1, allocationSize = 1)
 public class Participant extends BaseEntity {
 
     @Column(name= "\"ssn\"", unique = true)
@@ -36,8 +36,6 @@ public class Participant extends BaseEntity {
 
     @Column(name = "mail", unique = true)
     private String mail;
-
-    @Column(name = "")
 
     //Bi-directional fields
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)

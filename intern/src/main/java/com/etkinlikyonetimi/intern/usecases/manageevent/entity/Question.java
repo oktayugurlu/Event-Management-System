@@ -17,7 +17,7 @@ import java.util.Set;
 @Setter
 @Getter
 @Table(name = "\"question\"",uniqueConstraints = { @UniqueConstraint( columnNames = { "event_id", "question_content" } ) } )
-@SequenceGenerator(name = "idgen", sequenceName = "question_seq")
+@SequenceGenerator(name = "idgen", sequenceName = "question_seq", initialValue = 1, allocationSize = 1)
 public class Question extends BaseEntity {
 
     @ManyToOne

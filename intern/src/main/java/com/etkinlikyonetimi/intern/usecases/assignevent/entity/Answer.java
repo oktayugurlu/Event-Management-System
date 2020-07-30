@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Setter
 @Getter
 @Table(name = "answer", uniqueConstraints = { @UniqueConstraint( columnNames = { "question_id", "participant_id" } ) })
-@SequenceGenerator(name = "idgen", sequenceName = "answer_seq")
+@SequenceGenerator(name = "idgen", sequenceName = "answer_seq", initialValue = 1, allocationSize = 1)
 public class Answer extends BaseEntity {
 
     @Column(name = "content")

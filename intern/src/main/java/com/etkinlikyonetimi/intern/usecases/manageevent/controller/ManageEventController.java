@@ -33,10 +33,6 @@ public class ManageEventController {
         return eventMapper.mapToDto(manageEventService.listAllCreatedEventsByUser());
     }
 
-    @GetMapping("/getevent/{uniqueName}")
-    public EventDTO getEvent(@PathVariable @Size(max = 50, min = 1) String uniqueName){
-        return eventMapper.mapToDto(manageEventService.findEvent(uniqueName));
-    }
 
     @PostMapping("/addevent")
     public EventDTO addEvent(@Valid @RequestBody EventDTO eventDTO){

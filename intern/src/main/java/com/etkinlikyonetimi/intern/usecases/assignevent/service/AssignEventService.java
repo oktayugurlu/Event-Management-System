@@ -15,6 +15,7 @@ import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.transaction.Transactional;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -30,27 +31,34 @@ public class AssignEventService {
     private final MailSenderService mailSenderService;
 
     @Transactional
-    public String assign(Participant participantFromRequest, String eventUniqueName, List<Answer> answerList){
-        Event event = eventRepository.findByUniqueName(eventUniqueName);
-        if(!checkIfParticipantNotAssignSameEvent(participantFromRequest, event))
-            return "You can't assign a event with same TC ID!";
+    public BufferedImage assign(Participant participantFromRequest, String eventUniqueName, List<Answer> answerList) throws Exception {
+        Optional<Event> event = eventRepository.findByUniqueName(eventUniqueName);
+        if(!checkIfParticipantNotAssignSameEvent(participantFromRequest, event.get()))
+            throw new IllegalStateException();;
 
         participantFromRequest.getAnswerSet().clear();
         Participant participant = setIfParticipantIsNotExist(participantFromRequest);
 
-        if(!event.getAppliedParticipantSet().isEmpty()){
-            Set<Participant> appliedParticipants = new java.util.HashSet<>(event.getAppliedParticipantSet());
+        if(!event.get().getAppliedParticipantSet().isEmpty()){
+            Set<Participant> appliedParticipants = new java.util.HashSet<>(event.get().getAppliedParticipantSet());
             appliedParticipants.add(participant);
-            event.setAppliedParticipantSet(appliedParticipants);
+            event.get().setAppliedParticipantSet(appliedParticipants);
         }
         else{
             Set<Participant> participantSet = new HashSet<>();
             participantSet.add(participant);
-            event.setAppliedParticipantSet(participantSet);
+            event.get().setAppliedParticipantSet(participantSet);
         }
-        eventRepository.save(event);
-        saveAnswerBySettingQuestionAndOfAnswersOfParticipants(participant, event,answerList);
-        return "You assign to "+ event.getTitle()+" successfully";
+        event.get().setQuota(event.get().getQuota()-1);
+        eventRepository.save(event.get());
+        saveAnswerBySettingQuestionAndOfAnswersOfParticipants(participant, event.get(),answerList);
+
+        // QR CODE CREATION START//
+        BufferedImage bufferedImage = createQrCode(participant.getMail(),eventUniqueName);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(bufferedImage , "png", byteArrayOutputStream);
+        byte[] imageInByte = byteArrayOutputStream.toByteArray();
+        return bufferedImage;
     }
     private Participant setIfParticipantIsNotExist(Participant participantFromRequest){
         Optional<Participant> participantFromDB = participantRepository.findParticipantBySsn(participantFromRequest.getSsn());
@@ -78,14 +86,35 @@ public class AssignEventService {
         return answerRepository.findByQuestionAndParticipant(question, participant);
     }
 
-    public BufferedImage createQrCode(String barcode, String mail) throws Exception {
-
-        BufferedImage bufferedImage= QrCodeGeneratorService.generateQRCodeImage(barcode);
-        String fileName = "./src/main/resources/static/qrcodes/oktay.ugurlu98@gmail.com"+"event13.png";
-        saveImageAsPng(bufferedImage, fileName);
-        sendMail(fileName, mail);
-        return bufferedImage;
+    public BufferedImage createQrCode(String mail, String eventUniqueName) throws Exception {
+        Optional<Event> event = eventRepository.findByUniqueName(eventUniqueName);
+        Optional<Participant> participant = participantRepository.findParticipantByMail(mail);
+        if(participant.isPresent() && event.isPresent()) {
+            String qrContent = createQrCodeContent(event.get(), participant.get());
+            BufferedImage bufferedImage = QrCodeGeneratorService.generateQRCodeImage(qrContent);
+            String fileName = "./src/main/resources/static/qrcodes/" + mail + eventUniqueName + ".png";
+            saveImageAsPng(bufferedImage, fileName);
+            sendMail(fileName, mail, event.get().getTitle());
+            return bufferedImage;
+        }
+        else return null;
     }
+    public String createQrCodeContent(Event event, Participant participant){
+        String content = "****KATILIMCI BILGILERI****"+"\n";
+        content += "-Katilimci TC Kimlik numarasi: " + participant.getSsn()+"\n";
+        content += "Katilimcı Adi: " + participant.getName()+"\n";
+        content += "Katilimci Soyadi: " + participant.getSurname()+"\n";
+        content += "Katılımcı Emaili: " + participant.getMail()+"\n\n";
+        content += "****ETKINLIK BILGILERI****"+"\n";
+        content += "Etkinlik ID: " + event.getUniqueName()+"\n";
+        content += "Etkinlik Basligi: " + event.getTitle()+"\n";
+        content += "Etkinlik Baslama Zamani: " + event.getStartDateTime()+"\n";
+        content += "Etkinlik Bitis Zamani: " + event.getEndDateTime()+"\n";
+        content += "Etkinlik Adresi: " + event.getAddress()+"\n";
+        content += "Etkinlik Detaylari: " + event.getNotes()+"\n";
+        return content;
+    }
+
     public void saveImageAsPng(BufferedImage bufferedImage, String fileName){
         try {
             // retrieve image
@@ -96,11 +125,12 @@ public class AssignEventService {
         }
     }
 
-    public void sendMail(String fileName, String email) throws IOException, MessagingException {
+    public void sendMail(String fileName, String email, String eventTitle) throws IOException, MessagingException {
         mailSenderService.sendmail("etkinlikyonetimi1234@gmail.com",
-                "etkin.turkay@outlook.com",
-                "hello word",
-                "subject",
-                fileName);
+                email,
+                "Bu QR kodu telefondan okutarak kayıt bilgilerine erişebilirsiniz.",
+                "Katıldğınız "+eventTitle+" etkinliği hakkında",
+                fileName
+        );
     }
 }

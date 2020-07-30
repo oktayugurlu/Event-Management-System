@@ -45,14 +45,11 @@ public class ManageEventService {
         });
     }
 
-    public Event findEvent(String uniqueName){
-        return eventRepository.findByUniqueName(uniqueName);
-    }
 
     @Transactional
     public String updateEvent(Event requestEvent) {
 
-        Event updatedEvent = eventRepository.findByUniqueName(requestEvent.getUniqueName());
+        Event updatedEvent = eventRepository.findByUniqueName(requestEvent.getUniqueName()).get();
         if(updatedEvent.getEndDateTime().isBefore(LocalDateTime.now()))
             return "The event can't be updated due to end date is out of date!";
         else{
@@ -111,11 +108,11 @@ public class ManageEventService {
     }
 
     public String deleteEvent(String uniqueName){
-        Event deletedEvent = eventRepository.findByUniqueName(uniqueName);
-        if(deletedEvent ==null || deletedEvent.getEndDateTime().isBefore(LocalDateTime.now()))
+        Optional<Event> deletedEvent = eventRepository.findByUniqueName(uniqueName);
+        if(deletedEvent.isEmpty() || deletedEvent.get().getEndDateTime().isBefore(LocalDateTime.now()))
             return "Invalid delete request!";
         else{
-            eventRepository.delete(deletedEvent);
+            eventRepository.delete(deletedEvent.get());
             return "Successfully deleted!";
         }
     }
