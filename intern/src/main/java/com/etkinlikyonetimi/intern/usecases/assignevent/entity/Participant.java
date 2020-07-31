@@ -34,7 +34,7 @@ public class Participant extends BaseEntity {
     @Column(name = "phone_id", unique = true)
     private String phoneId;
 
-    @Column(name = "mail", unique = true)
+    @Column(name = "mail")
     private String mail;
 
     //Bi-directional fields
