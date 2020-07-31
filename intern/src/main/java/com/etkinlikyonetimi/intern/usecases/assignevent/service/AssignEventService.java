@@ -2,6 +2,8 @@ package com.etkinlikyonetimi.intern.usecases.assignevent.service;
 
 import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Answer;
 import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Participant;
+import com.etkinlikyonetimi.intern.usecases.assignevent.exception.QuotaIsFullException;
+import com.etkinlikyonetimi.intern.usecases.assignevent.exception.SameTCIDException;
 import com.etkinlikyonetimi.intern.usecases.assignevent.repository.AnswerRepository;
 import com.etkinlikyonetimi.intern.usecases.assignevent.repository.ParticipantRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
@@ -34,7 +36,7 @@ public class AssignEventService {
     public BufferedImage assign(Participant participantFromRequest, String eventUniqueName, List<Answer> answerList) throws Exception {
         Optional<Event> event = eventRepository.findByUniqueName(eventUniqueName);
         if(!checkIfParticipantNotAssignSameEvent(participantFromRequest, event.get()))
-            throw new IllegalStateException();;
+            throw new SameTCIDException("Bir etkinliğe birden fazla aynı TC Kimlik numarası ile başvuramazsınız!", 500);
 
         participantFromRequest.getAnswerSet().clear();
         Participant participant = setIfParticipantIsNotExist(participantFromRequest);
@@ -50,6 +52,8 @@ public class AssignEventService {
             event.get().setAppliedParticipantSet(participantSet);
         }
         event.get().setQuota(event.get().getQuota()-1);
+        if(event.get().getQuota()<0)
+            throw new QuotaIsFullException("Bu etkinliğin kotası dolmuştur!", 500);
         eventRepository.save(event.get());
         saveAnswerBySettingQuestionAndOfAnswersOfParticipants(participant, event.get(),answerList);
 

@@ -3,14 +3,12 @@ import '../index.css';
 import React from "react";
 
 import EventCard from './EventCard';
-
 //material ui
 import Grid from '@material-ui/core/Grid';
 import Pagination from "@material-ui/lab/Pagination";
 import axios from "axios";
 import AddEventDialog from "./AddEventDialog";
 import {getCreatedItemsByUser, getJwsToken} from "./authentication/LocalStorageService";
-import {} from "./authentication/LocalStorageService";
 import AssignEventDialog from "./AssignEventDialog";
 import QrCodeDialog from "./QrCodeDialog";
 
@@ -23,7 +21,6 @@ export default function EventsList(props) {
     const [assignEventDialogElement, setAssignEventDialogElement] = React.useState(<div/>);
     const [isOpenAssignEventDialog, setIsOpenAssignEventDialog] = React.useState(false);
     const [qrCodeDialogElement, setQrCodeDialogElement] = React.useState(<></>);
-    const [qrImage, setQrImage] = React.useState("");
 
     const ITEMS_PER_PAGE = 3;
     const CARD_IMAGE_URL='https://images.all-free-download.com/images/graphiclarge/team_meeting_background_table_stationery_gathering_people_icons_6838493.jpg';
@@ -129,6 +126,7 @@ export default function EventsList(props) {
             });
         setUpdatedDialogElement(<div/>);
         setOpenUpdateDialog(false);
+
     }
     // UPDATE EVENT FUNCTIONS end //
 
@@ -197,6 +195,7 @@ export default function EventsList(props) {
         let open=false;
         axios.post("/assignevent/assign/"+eventUniqueName.toString(), participant,{responseType: 'blob'})
             .then((response) => {
+                console.log(response);
                 qrCode = response.data;
                 setQrCodeDialogElement(<QrCodeDialog open={true}
                                                      qrCodeImage={response.data}
@@ -204,10 +203,33 @@ export default function EventsList(props) {
                                                      title={title}
                 />);
             }).catch( error => {
-                if(error.response.status === 500){
-                    props.snackbarOpen("You can't assign a event with same TC ID!", "error");
+                if (error.response.status === 400) {
+                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
                 }
+                let blob = error.response.data;
+                let promise = blopToPromiseParser(blob);
+                promiseToJSONParserIncludeFunction(promise);
             });
+    }
+
+    //Its used for convert error blob response to promise.
+    const blopToPromiseParser = (arrayBuffer)=>{
+        return new Response(arrayBuffer);
+    }
+
+    //Its used for convert promise to json object to fetch message field.
+    const promiseToJSONParserIncludeFunction = (promise)=>{
+        let errorMessage = {};
+        promise.text().then(result=> {
+            console.log("before");
+            console.log(result);
+            errorMessage = JSON.parse(result);
+            console.log(errorMessage);
+            if(errorMessage.code === 500){
+                console.log("before");
+                props.snackbarOpen(errorMessage.message, "error");
+            }
+        });
     }
     const handleCloseAssignEventDialog = () => {
         console.log("adasdsadasdasdasdsda")

@@ -40,9 +40,13 @@ export default class AssignEventDialog extends Component{
 
     //validation messages start//
     handleTcIdErrorMessage = ()=>{
-        if(!this.isIdNumberRegExValid()) {
+
+
+        if(!this.isIdNumberValid()) {
             if (this.isValueEmpty(this.state.participant.ssn)) return "This field is required!"
-            else return "TC ID isn't valid!";
+            else{
+
+            } return "TC ID isn't valid!";
         }
     }
     handleMailMessage = ()=>{
@@ -54,14 +58,39 @@ export default class AssignEventDialog extends Component{
     //validation messages end//
 
     //***** VALIDATION FUNCTIONS START *****//
-    isIdNumberRegExValid = () =>{
-        return /^[1-9]{1}[0-9]{9}[02468]{1}$/.test(this.state.participant.ssn);
-        /*
-        valid: 11111111110
-        */
+    isIdNumberValid = () =>{
+        let tcKimlikNo = this.state.participant.ssn;
+        if(tcKimlikNo.length !== 11) {
+            return false;
+        }
+        let sumAllNumbers = 0;
+        let sumOdd = 0;
+        let sumEven = 0;
+        let numbers = [];
+        for (let i = 0; i < 11; i++) {
+            numbers[i] = parseInt(tcKimlikNo.substring(i, i + 1));
+        }
+        for (let i = 0; i < 9; i++) {
+            sumAllNumbers = sumAllNumbers + numbers[i];
+            if (i % 2 !== 0) {
+                sumEven = sumEven + numbers[i];
+            } else {
+                sumOdd = sumOdd + numbers[i];
+            }
+        }
+        if ((sumAllNumbers + numbers[9]) % 10 !== numbers[10]) {
+            return false;
+        }
+        if ((sumOdd * 7 + sumEven * 9) % 10 !== numbers[9]) {
+            return false;
+        }
+        if (((sumOdd) * 8) % 10 !== numbers[10]) {
+            return false;
+        }
+        return true;
     }
-    isValueEmpty=(value)=>{
-        if (value === '') return true;
+    isValueEmpty=(tcId)=>{
+        if (tcId === '') return true;
     }
     isValidateEmail=()=>{
         let regexMail = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
@@ -124,7 +153,7 @@ export default class AssignEventDialog extends Component{
                             label={"Tc no."}
                             value={this.state.participant.ssn}
                             onChange={this.handleOnChangeTcID}
-                            error={!this.isIdNumberRegExValid()}
+                            error={!this.isIdNumberValid()}
                             helperText={this.handleTcIdErrorMessage()}
                             inputProps={{ maxLength: 11}}
                             fullWidth
@@ -137,7 +166,7 @@ export default class AssignEventDialog extends Component{
                             onChange={this.handleOnChangeName}
                             error={this.isValueEmpty(this.state.participant.name)}
                             helperText={"This field is required!"}
-                            inputProps={{ maxLength: 11}}
+                            inputProps={{ maxLength: 50}}
 
                         />
                         {" "}
@@ -216,7 +245,7 @@ export default class AssignEventDialog extends Component{
     }
     checkIsFormValid = ()=>{
         let isDialogStatesValid =
-            this.isIdNumberRegExValid()
+            this.isIdNumberValid()
             && this.isValidateEmail()
             && !this.isValueEmpty(this.state.participant.surname)
             && !this.isValueEmpty(this.state.participant.name);

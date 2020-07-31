@@ -70,13 +70,15 @@ class App extends Component{
         .then(response => {
           this.setState({allEvents: response.data})
         });
-    axios.get("/manageevent/allevents/createdevents",{
-      headers:header
-    })
-        .then(response => {
-          console.log(response);
-          setCreatedItems(response.data);
-        });
+    if(getJwsToken()!==null){
+      axios.get("/manageevent/allevents/createdevents",{
+        headers:header
+      })
+          .then(response => {
+            console.log(response);
+            setCreatedItems(response.data);
+          });
+    }
 
     console.log("response");
   }
@@ -119,9 +121,6 @@ class App extends Component{
         headers:headers
           })
         .then(response => {
-          this.setState(prevState => (
-              {allEvents: [...prevState.allEvents, response.data]}
-          ));
           this.snackbarOpen("Event added successfully", "success")
         })
         .catch(error => {
@@ -131,6 +130,7 @@ class App extends Component{
           console.log(error.response);
         })
       console.log("event: "+eventObject);
+    this.getAllEvents();
   }
   // ADD EVENT FUNCTIONS END //
 
