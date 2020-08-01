@@ -1,7 +1,6 @@
 package com.etkinlikyonetimi.intern.usecases.assignevent.entity;
 
 import com.etkinlikyonetimi.intern.usecases.common.entity.BaseEntity;
-import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,8 +27,8 @@ public class Participant extends BaseEntity {
     @Column(name= "\"surname\"")
     private String surname;
 
-    @ManyToMany(mappedBy = "appliedParticipantSet")
-    private Set<Event> appliedEvents;
+    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
+    private Set<Application> appliedEvents;
 
     @Column(name = "phone_id", unique = true)
     private String phoneId;

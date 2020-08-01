@@ -1,6 +1,6 @@
 import '../index.css';
 
-import React from "react";
+import React, {useContext} from "react";
 
 import EventCard from './EventCard';
 //material ui
@@ -8,9 +8,12 @@ import Grid from '@material-ui/core/Grid';
 import Pagination from "@material-ui/lab/Pagination";
 import axios from "axios";
 import AddEventDialog from "./AddEventDialog";
-import {getCreatedItemsByUser, getJwsToken} from "./authentication/LocalStorageService";
+import { getJwsToken} from "./authentication/LocalStorageService";
 import AssignEventDialog from "./AssignEventDialog";
 import QrCodeDialog from "./QrCodeDialog";
+import Divider from "@material-ui/core/Divider";
+import BarChart from "./BarChart";
+import {CreatedEventsContext} from "./contexts/CreatedEventsContext";
 
 export default function EventsList(props) {
     const [page, setPage] = React.useState(0);
@@ -28,27 +31,33 @@ export default function EventsList(props) {
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
 
+    const createdEventsContext = useContext(CreatedEventsContext);
+
     const titleStyle = {
         marginLeft:'40px',
     };
 
     const printEvents = ()=>{
-        const printedEvents = (props.whichPage===MANAGE_EVENT_PAGE) ? getCreatedItemsByUser() : props.allEvents;
+        console.log(createdEventsContext);
+        const printedEvents = (props.whichPage===MANAGE_EVENT_PAGE) ? createdEventsContext.createdEvents : props.allEvents;
 
         return(
-            printedEvents.slice(page * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE + ITEMS_PER_PAGE).map(
-                (item,index)=> {
-                    item.endDateTime = dateTimeParserFromString(item.endDateTime);
-                    item.startDateTime = dateTimeParserFromString(item.startDateTime);
-                    return setEventCard(item, index);
-                })
+            <Grid item>
+                {printedEvents.slice(page * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE + ITEMS_PER_PAGE).map(
+                    (item,index)=> {
+                        item.endDateTime = dateTimeParserFromString(item.endDateTime);
+                        item.startDateTime = dateTimeParserFromString(item.startDateTime);
+                        return setEventCard(item, index);
+                    })}
+            </Grid>
+
         );
     }
     const dateTimeParserFromString = (dateTime) =>new Date(dateTime);
 
     const setEventCard = (eventObject, index)=>{
         return(
-            <div style={{marginBottom:'4px', marginRight:'40px', marginLeft:'40px'}} key={index}>
+            <div style={{ marginBottom:'40px',marginRight:'40px', marginLeft:'40px'}} key={index}>
                 {createEventCardByPageType(eventObject, index)}
             </div>
         );
@@ -136,10 +145,10 @@ export default function EventsList(props) {
     };
     const calculateNumberOfPage = () => {
         if(props.whichPage===MANAGE_EVENT_PAGE){
-            if(getCreatedItemsByUser().length % ITEMS_PER_PAGE !== 0)
-                return Math.trunc(getCreatedItemsByUser().length / ITEMS_PER_PAGE) +1;
+            if(createdEventsContext.createdEvents.length % ITEMS_PER_PAGE !== 0)
+                return Math.trunc(createdEventsContext.createdEvents.length / ITEMS_PER_PAGE) +1;
             else
-                return getCreatedItemsByUser().length / ITEMS_PER_PAGE;
+                return createdEventsContext.createdEvents.length / ITEMS_PER_PAGE;
         }else{
             if(props.allEvents.length % ITEMS_PER_PAGE !== 0)
                 return Math.trunc(props.allEvents.length / ITEMS_PER_PAGE) +1;
@@ -192,17 +201,17 @@ export default function EventsList(props) {
         setAssignEventDialogElement(<div/>);
         setIsOpenAssignEventDialog(false);
         let qrCode='';
-        let open=false;
-        axios.post("/assignevent/assign/"+eventUniqueName.toString(), participant,{responseType: 'blob'})
-            .then((response) => {
-                console.log(response);
-                qrCode = response.data;
-                setQrCodeDialogElement(<QrCodeDialog open={true}
-                                                     qrCodeImage={response.data}
-                                                     handleClose={handleCloseQrCodeDialog}
-                                                     title={title}
-                />);
-            }).catch( error => {
+
+            axios.post("/assignevent/assign/"+eventUniqueName.toString(), participant,{responseType: 'blob'})
+                .then((response) => {
+                    console.log(response);
+                    qrCode = response.data;
+                    setQrCodeDialogElement(<QrCodeDialog open={true}
+                                                         qrCodeImage={response.data}
+                                                         handleClose={handleCloseQrCodeDialog}
+                                                         title={title}
+                    />);
+                }).catch( error => {
                 if (error.response.status === 400) {
                     props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
                 }
@@ -245,29 +254,55 @@ export default function EventsList(props) {
     };
     //**** ASSIGN EVENT FUNCTIONS END ****//
 
+    const printBarChartsIfManagePage = ()=>{
+        return (
+            <Grid container direction="column" spacing={'3'}>
+                <Grid item style={{marginLeft:'40px',marginRight:'40px'}}>
+                    <BarChart />
+                </Grid>
+                <br/>
+
+                <Grid item >
+                    <Divider variant="middle"/>
+                </Grid>
+                <Grid item >
+                    <h3 style={{marginLeft:'40px',marginBottom:'40px'}}>
+                        Senin Tarafından Yaratılan Etkinlikler
+                    </h3>
+                </Grid>
+            </Grid>
+        )
+    }
 
 
     return (
-        <Grid item md={7} style={{backgroundColor:'#FBF4ED'}}>
 
             <Grid container direction="column" alignItems="stretch" >
                 {qrCodeDialogElement}
                 <h1 style={titleStyle}>{props.pageTitle}</h1>
                 {updatedDialogElement}
                 {assignEventDialogElement}
-                {printEvents()}
-                <div style={{marginBottom:'40px'}}>
-                    <Grid
-                        container
-                        direction="row"
-                        justify="center"
-                        alignItems="flex-start"
-                    >
-                        <Pagination count={calculateNumberOfPage()}
-                                    onChange={onChangePageNumber}/>
+                <Grid
+                    direction="column"
+                    container
+                >
+                    {printBarChartsIfManagePage()}
+                    {printEvents()}
+                    <Grid item >
+                        <Grid
+                            container
+                            direction="row"
+                            justify="center"
+                            alignItems="flex-start"
+                            style={{marginBottom:'40px'}}
+                        >
+                            <Pagination count={calculateNumberOfPage()}
+                                        onChange={onChangePageNumber}/>
+                        </Grid>
                     </Grid>
-                </div>
+                </Grid>
+
+
             </Grid>
-        </Grid>
     )
 }

@@ -1,5 +1,5 @@
 package com.etkinlikyonetimi.intern.usecases.manageevent.entity;
-import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Participant;
+import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Application;
 import com.etkinlikyonetimi.intern.usecases.common.entity.BaseEntity;
 import lombok.*;
 
@@ -49,13 +49,8 @@ public class Event extends BaseEntity {
     @Column(name="address")
     private String address;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "\"application\"",
-            joinColumns = @JoinColumn(name = "\"event_id\""),
-            inverseJoinColumns = @JoinColumn(name = "\"participant_id\"")
-    )
-    private Set<Participant> appliedParticipantSet;
+    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
+    private Set<Application> appliedParticipantSet;
 
     //BI-DIRECTIONAL FIELD
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)

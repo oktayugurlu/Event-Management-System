@@ -1,6 +1,6 @@
 package com.etkinlikyonetimi.intern.usecases.manageevent.dto;
 
-import com.etkinlikyonetimi.intern.usecases.assignevent.dto.ParticipantDTO;
+import com.etkinlikyonetimi.intern.usecases.assignevent.dto.ApplicationDTO;
 import lombok.*;
 
 import javax.validation.constraints.*;
@@ -59,7 +59,7 @@ public class EventDTO {
     @Size(min = 1, max = 255, message = "Karakter sayısı 1 ile 255 arasında olmalı")
     private String address;
 
-    private Set<ParticipantDTO> appliedParticipantSet;
+    private Set<ApplicationDTO> appliedParticipantSet;
 
     private List<QuestionDTO> questionSet;
 

@@ -135,7 +135,7 @@ export default function PrimarySearchAppBar() {
 
     return (
         <div className={classes.grow}>
-            <AppBar position="static" style={{ background: '#F6931E' }}>
+            <AppBar position="fixed" style={{ background: '#F6931E' }}>
                 <Toolbar>
                     <Typography className={classes.title} variant="h6" noWrap>
                         Etkinlik Yönetimi
@@ -143,17 +143,6 @@ export default function PrimarySearchAppBar() {
                     <div className={classes.grow} />
                     <div className={classes.sectionDesktop}>
                         {renderButtonForLogin()}
-
-                        {/*<IconButton
-                            edge="end"
-                            aria-label="account of current user"
-                            aria-controls={menuId}
-                            aria-haspopup="true"
-                            onClick={handleProfileMenuOpen}
-                            color="inherit"
-                        >
-                            <AccountCircle />
-                        </IconButton>*/}
                     </div>
                     <div className={classes.sectionMobile}>
                         <IconButton

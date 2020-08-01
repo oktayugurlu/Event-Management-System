@@ -27,6 +27,8 @@ import axios from "axios";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from '@material-ui/lab/Alert';
 import {getJwsToken, isAuthorized, setCreatedItems} from "./Components/authentication/LocalStorageService";
+import { trackPromise } from 'react-promise-tracker';
+import {CreatedEventsContext} from "./Components/contexts/CreatedEventsContext";
 
 const styles = theme =>  ({
   root: {
@@ -40,6 +42,7 @@ function Alert(props) {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
+
 const BACKGROUND_URL='url(https://previews.123rf.com/images/notkoo2008/notkoo20081412/notkoo2008141200034/34479086-seamless-doodle-coffee-pattern-background.jpg)';
 
 class App extends Component{
@@ -47,12 +50,14 @@ class App extends Component{
   state={
     openAddEventDialog:false,
     allEvents:[],
+    createdEvents:[],
     snackbar: [{
       isOpen: false,
       message: "",
       severity: ""
     }],
-    isLoginDialogOpen:false
+    isLoginDialogOpen:false,
+    setCreatedEvents:()=>{}
   };
 
   MANAGE_EVENT_PAGE=1;
@@ -60,6 +65,9 @@ class App extends Component{
 
   componentDidMount() {
     this.getAllEvents();
+    this.setState({
+      setCreatedEvents:this.setCreatedEvents
+    })
   }
 
   getAllEvents = ()=>{
@@ -71,16 +79,19 @@ class App extends Component{
           this.setState({allEvents: response.data})
         });
     if(getJwsToken()!==null){
-      axios.get("/manageevent/allevents/createdevents",{
-        headers:header
-      })
-          .then(response => {
-            console.log(response);
-            setCreatedItems(response.data);
-          });
+      this.getCreatedEvents(header);
     }
+  }
 
-    console.log("response");
+  getCreatedEvents = (header)=>{
+    axios.get("/manageevent/allevents/createdevents",{
+      headers:header
+    }).then(response => {
+      console.log(response);
+      this.setState({
+        createdEvents: response.data
+      });
+    });
   }
 
   updateLeftMenuIfAuthorized = ()=>{
@@ -115,8 +126,6 @@ class App extends Component{
       let requestObject = {
         eventObject
       };
-
-
       axios.post("/manageevent/addevent",eventObject,{
         headers:headers
           })
@@ -163,7 +172,7 @@ class App extends Component{
                 <ListItemIcon>
                   <AddIcon/>
                 </ListItemIcon>
-                <ListItemText primary="Add Event" style={{color: 'white'}}/>
+                <ListItemText primary="Etkinlik Ekle" style={{color: 'white'}}/>
               </ListItem>);
     else
       return '';
@@ -183,16 +192,27 @@ class App extends Component{
                   snackbarClose={this.snackbarClose}
                   whichPage={this.MANAGE_EVENT_PAGE}
                   getAllEvents={this.getAllEvents}
-                  pageTitle={'Manage Events'}
+                  pageTitle={'Etkinlikleri Yönet'}
               />);
+  }
+
+  setCreatedEvents = (newEvents)=>{
+    this.setState(
+        {
+          createdEvents:newEvents
+        }
+    )
   }
 
 
   render(){
     const { classes } = this.props;
     return (
-        <div>
+        <CreatedEventsContext.Provider value={this.state}>
           <Router>
+            <Grid container direction={"column"}>
+
+            </Grid>
             <PrimarySearchAppBar/>
             {/* Add event Modal start */}
             <AddEventDialog openAddEventDialog={this.state.openAddEventDialog}
@@ -203,12 +223,12 @@ class App extends Component{
                             updatedEvent={{}}
             />
             {/* Add event Modal end */}
-            <Grid item>
               <Grid
                   container
                   direction="row"
                   justify="flex-start"
                   alignItems="stretch"
+                  style={{    marginTop: '64px'}}
               >
                 {/* Left Menu start*/}
                 <Grid item md={3}
@@ -238,7 +258,7 @@ class App extends Component{
                               <ListItemIcon>
                                 <EventNoteIcon/>
                               </ListItemIcon>
-                              <ListItemText primary="All Events" style={{color: 'white'}}/>
+                              <ListItemText primary="Etkinliğe Katıl" style={{color: 'white'}}/>
                             </ListItem>
                           </Link>
                           <Divider/>
@@ -246,7 +266,7 @@ class App extends Component{
                             <ListItemIcon>
                               <EventAvailableIcon/>
                             </ListItemIcon>
-                            <ListItemText primary="Assigned Events" style={{color: 'white'}}/>
+                            <ListItemText primary="Katıldığın Etkinlikler" style={{color: 'white'}}/>
                           </ListItem>
                           <Divider/>
                           <Link to={"/manageevents"} style={{textDecoration: 'none'}}>
@@ -254,7 +274,7 @@ class App extends Component{
                               <ListItemIcon>
                                 <SettingsIcon/>
                               </ListItemIcon>
-                              <ListItemText primary="Manage Events" style={{color: 'white'}}/>
+                              <ListItemText primary="Etkinlikleri Yönet" style={{color: 'white'}}/>
                             </ListItem>
                           </Link>
                           <Divider/>
@@ -267,21 +287,24 @@ class App extends Component{
                 {/*Left Menu end*/}
 
                 {/* Page contents start */}
-                <Switch>
-                  <Route path="/allevents" component={() => (<EventsList allEvents={this.state.allEvents}
-                                                                         pageTitle={'All Events'}
-                                                                         whichPage={this.ALL_EVENTS_PAGE}
-                                                                         snackbarOpen={this.snackbarOpen}
-                                                                         snackbarClose={this.snackbarClose}
-                                                                         getAllEvents={this.getAllEvents}
 
-                                                              />)
-                  }/>
-                  <Route path="/manageevents" component={() => this.routeManageEventPageIfAuthorized()}/>
-                  <Route path="/" component={() => <Login snackbarOpen={this.snackbarOpen}
-                                                          setCreatedEvents={this.setCreatedEvents}
-                                                          updateLeftMenuIfAuthorized={this.updateLeftMenuIfAuthorized}/>}/>
-                </Switch>
+                <Grid item md={7} style={{backgroundColor:'#FBF4ED'}}>
+                  <Switch>
+                    <Route path="/allevents" component={() => (<EventsList allEvents={this.state.allEvents}
+                                                                           pageTitle={'All Events'}
+                                                                           whichPage={this.ALL_EVENTS_PAGE}
+                                                                           snackbarOpen={this.snackbarOpen}
+                                                                           snackbarClose={this.snackbarClose}
+                                                                           getAllEvents={this.getAllEvents}
+
+                                                                />)
+                    }/>
+                    <Route path="/manageevents" component={() => this.routeManageEventPageIfAuthorized()}/>
+                    <Route path="/" component={() => <Login snackbarOpen={this.snackbarOpen}
+                                                            setCreatedEvents={this.setCreatedEvents}
+                                                            updateLeftMenuIfAuthorized={this.updateLeftMenuIfAuthorized}/>}/>
+                  </Switch>
+                </Grid>
                 {/* Page contents end */}
 
                 <Grid item md={2} style={{
@@ -290,14 +313,13 @@ class App extends Component{
                 }}/>
 
               </Grid>
-            </Grid>
           </Router>
           <Snackbar open={this.state.snackbar.isOpen} autoHideDuration={3000} onClose={this.snackbarClose}>
             <Alert onClose={this.snackbarClose} severity={this.state.snackbar.severity}>
               {this.state.snackbar.message}
             </Alert>
           </Snackbar>
-        </div>
+        </CreatedEventsContext.Provider>
       );
   }
 

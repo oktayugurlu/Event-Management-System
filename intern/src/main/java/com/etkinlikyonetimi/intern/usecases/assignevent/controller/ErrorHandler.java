@@ -23,6 +23,7 @@ public class ErrorHandler {
     @ExceptionHandler(QuotaIsFullException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<QuotaIsFullExceptionDTO> handleQuotaIsFullException(QuotaIsFullException qe) {
+
         QuotaIsFullExceptionDTO quotaIsFullExceptionDTO = quotaIsFullExceptionMapper.mapToDto(qe);
         return new ResponseEntity<>(quotaIsFullExceptionDTO, HttpStatus.INTERNAL_SERVER_ERROR);
     }

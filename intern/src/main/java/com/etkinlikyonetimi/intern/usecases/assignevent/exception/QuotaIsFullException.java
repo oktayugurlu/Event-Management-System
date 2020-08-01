@@ -7,6 +7,8 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class QuotaIsFullException extends RuntimeException {
     public String message;
     public Integer code;

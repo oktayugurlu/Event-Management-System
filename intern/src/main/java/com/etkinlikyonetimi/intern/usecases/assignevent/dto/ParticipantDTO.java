@@ -39,6 +39,4 @@ public class ParticipantDTO {
     private String mail;
 
     private Set<AnswerDTO> answerSet;
-
-
 }

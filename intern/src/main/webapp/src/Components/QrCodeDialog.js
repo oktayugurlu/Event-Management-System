@@ -4,7 +4,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
 import IconButton from "@material-ui/core/IconButton";
-import CloseIcon from "@material-ui/core/IconButton";
+import CloseIcon from '@material-ui/icons/Close';
+import Grid from "@material-ui/core/Grid";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -38,17 +39,39 @@ export default class QrCodeDialog extends Component{
                     aria-describedby="alert-dialog-slide-description"
                 >
                     <DialogTitle id="customized-dialog-title" >
-                        <IconButton aria-label="close" onClick={this.props.handleClose}>
-                            <CloseIcon />
-                        </IconButton>
-                        Başvuru Bilgilerinizi İçeren QR Kod
+
+                        <Grid
+                            container
+                            direction="row"
+                            justify="space-between"
+                            alignItems="flex-start"
+                        >
+                            <Grid item>
+                                <p>Başvuru Bilgilerinizi İçeren QR Kod</p>
+                            </Grid>
+                            <Grid item>
+                                <IconButton onClick={()=>this.props.handleClose(this.props.title)}>
+                                    <CloseIcon/>
+                                </IconButton>
+                            </Grid>
+
+                        </Grid>
+
                     </DialogTitle>
                     <DialogContent>
                         <p color="#8298BC">
                             *Kodunuz emailinize gönderildi, lütfen kontrol ediniz.
                         </p>
                         <br/>
-                        <img src={URL.createObjectURL(this.props.qrCodeImage)} />
+                        <Grid
+                            container
+                            direction="column"
+                            justify="center"
+                            alignItems="center"
+                        >
+                            <img src={URL.createObjectURL(this.props.qrCodeImage)} />
+                        </Grid>
+
                     </DialogContent>
                 </Dialog>
             </div>

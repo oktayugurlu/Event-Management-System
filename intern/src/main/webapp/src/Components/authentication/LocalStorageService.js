@@ -1,15 +1,3 @@
-
-export function getCreatedItemsByUser(){
-    if(localStorage.getItem("createdItems")!==null)
-        return JSON.parse(localStorage.getItem("createdItems"));
-    else
-        return [];
-}
-
-export function setCreatedItems(createdEventsList){
-    localStorage.setItem("createdItems", JSON.stringify(createdEventsList));
-}
-
 export function setJwsToken(token){
     localStorage.setItem("Authorization", token);
 }

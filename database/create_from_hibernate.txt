@@ -173,7 +173,6 @@ CREATE TABLE public.participant
     surname character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT participant_pkey PRIMARY KEY ("id"),
     CONSTRAINT uk_5ikk6kqv8v93wl5jyerp3n5j1 UNIQUE (ssn),
-    CONSTRAINT uk_c553ttm8arlm9g9i36s66amhw UNIQUE (mail),
     CONSTRAINT uk_qhchj2auq9wtdgv2aopagvun5 UNIQUE (phone_id)
 )
 
@@ -191,6 +190,7 @@ CREATE TABLE public.application
 (
     event_id bigint NOT NULL,
     participant_id bigint NOT NULL,
+	creation_date timestamp without time zone,
     CONSTRAINT application_pkey PRIMARY KEY (event_id, participant_id),
     CONSTRAINT fk2prhul2pm68wtkiolj5vvifn0 FOREIGN KEY (event_id)
         REFERENCES public."event" ("id") MATCH SIMPLE
@@ -218,7 +218,7 @@ CREATE TABLE public.answer
     id bigint NOT NULL default nextval('answer_seq'),
     creation_date timestamp without time zone,
     last_modified_date timestamp without time zone,
-    version bigint,
+    "version" bigint,
     content character varying(255) COLLATE pg_catalog."default",
     participant_id bigint,
     question_id bigint,

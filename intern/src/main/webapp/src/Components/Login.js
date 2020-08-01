@@ -17,10 +17,12 @@ import {
     setJwsToken,
     setUsername
 } from "./authentication/LocalStorageService";
-import TextField from "@material-ui/core/TextField";
+import {CreatedEventsContext} from "./contexts/CreatedEventsContext";
 
 
 class Login extends Component {
+    static contextType = CreatedEventsContext;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -64,8 +66,8 @@ class Login extends Component {
                 'Authorization': `Bearer ${getJwsToken()}`
             }
         }).then((response) => {
-            setCreatedItems(response.data);
-            this.props.updateLeftMenuIfAuthorized();
+            this.context.setCreatedEvents(response.data);
+            // this.props.updateLeftMenuIfAuthorized();
             this.props.history.push("/manageevents");
         });
     }
@@ -83,12 +85,14 @@ class Login extends Component {
 
     render() {
         return (
-            <Grid item md={7} style={{backgroundColor:'#F0D1AE'}}>
                 <Grid container
                       direction="column"
                       justify="center"
                       alignItems="center"
-                      style={{ minHeight: '80vh'}}
+                      style={{ minHeight: '100vh',
+                          backgroundColor: '#F9B769'
+
+                      }}
                 >
                     <Grid item md={6} style={{minWidth:'80vh'}}>
                         <ValidatorForm
@@ -97,46 +101,54 @@ class Login extends Component {
                         >
                             <Card style={{backgroundColor:'#EDEBE9'}}>
                                 <CardContent>
-                                    <Typography variant="h5" component="h2">
-                                        Login
-                                    </Typography>
-                                        <TextValidator
-                                            label="Username"
-                                            onChange={this.handleChangeUsername}
-                                            name="username"
-                                            value={this.state.username}
-                                            validators={['required']}
-                                            errorMessages={['This field is required']}
-                                            fullWidth
-                                            style={{marginTop:'10px'}}
-                                            inputProps={{ maxLength: 30 }}
-                                        />
-                                        <br />
-                                        <TextValidator
-                                            label="Password"
-                                            onChange={this.handleChangePassword}
-                                            name="password"
-                                            value={this.state.password}
-                                            validators={['required']}
-                                            errorMessages={['This field is required']}
-                                            fullWidth
-                                            floatinglabeltext="Password"
-                                            type="password"
-                                            style={{marginTop:'10px'}}
-                                            inputProps={{ maxLength: 128 }}
-                                        />
-                                        <br />
-
+                                    <Grid
+                                        direction="column"
+                                        container
+                                        spacing={3}
+                                    >
+                                        <Grid item>
+                                            <Typography variant="h5">
+                                                Kurum Üyesi Girişi
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item>
+                                            <TextValidator
+                                                label="Kullanıcı Adı"
+                                                onChange={this.handleChangeUsername}
+                                                name="username"
+                                                value={this.state.username}
+                                                validators={['required']}
+                                                errorMessages={['Bu alan gerekli']}
+                                                fullWidth
+                                                style={{marginTop:'10px'}}
+                                                inputProps={{ maxLength: 30 }}
+                                            />
+                                        </Grid>
+                                        <Grid item>
+                                            <TextValidator
+                                                label="Şifre"
+                                                onChange={this.handleChangePassword}
+                                                name="password"
+                                                value={this.state.password}
+                                                validators={['required']}
+                                                errorMessages={['Bu alan gerekli']}
+                                                fullWidth
+                                                floatinglabeltext="Password"
+                                                type="password"
+                                                style={{marginTop:'10px'}}
+                                                inputProps={{ maxLength: 128 }}
+                                            />
+                                        </Grid>
+                                    </Grid>
                                 </CardContent>
                                 <CardActions>
-                                    <Button type="submit" color="primary">Log in</Button>
+                                    <Button type="submit" color="primary">GİRİŞ Yap</Button>
                                 </CardActions>
                             </Card>
                         </ValidatorForm>
                     </Grid>
 
                 </Grid>
-            </Grid>
         );
     }
 }
