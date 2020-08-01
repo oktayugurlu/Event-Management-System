@@ -10,27 +10,44 @@ import {
 } from '@devexpress/dx-react-chart-material-ui';
 
 import { EventTracker } from '@devexpress/dx-react-chart';
-
-const data = [
-    { year: 'Akşam Yemeği', population: 2.525 },
-    { year: '1960', population: 3.018 },
-    { year: '1970', population: 3.682 },
-    { year: '1980', population: 4.440 },
-    { year: '1990', population: 5.310 },
-    { year: '2000', population: 6.127 },
-    { year: '2010', population: 6.930 },
-];
+import {CreatedEventsContext} from "./contexts/CreatedEventsContext";
 
 export default class BarChart extends React.PureComponent {
+    static contextType = CreatedEventsContext;
+
     constructor(props) {
         super(props);
 
         this.state = {
-            data,
+            data:[],
             targetItem: undefined,
         };
-
         this.changeTargetItem = targetItem => this.setState({ targetItem });
+    }
+
+    componentDidMount() {
+        const pureData = this.context.createdEvents;
+        let preprocessedData = this.preprocess(pureData);
+        this.setState(
+            {
+                data:preprocessedData
+            }
+        );
+    }
+    preprocess = (pureData)=>{
+        return pureData.map(
+            event=>{
+                return {
+                    event: event.title +'/'+ event.uniqueName,
+                    participantNumber: event.appliedParticipantSet.length
+                };
+            }
+        ).sort(function(a, b){
+            return a.participantNumber-b.participantNumber;
+        });
+    }
+    componentWillUnmount() {
+        console.log("Grafik oluyor");
     }
 
     render() {
@@ -44,10 +61,11 @@ export default class BarChart extends React.PureComponent {
                 >
                     <ArgumentAxis />
                     <ValueAxis />
-
                     <BarSeries
-                        valueField="population"
-                        argumentField="year"
+
+                        valueField="participantNumber"
+                        argumentField="event"
+                        color="#FF7043"
                     />
                     <Title
                         text="Katılımcı Sayısı"

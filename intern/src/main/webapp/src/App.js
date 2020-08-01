@@ -4,7 +4,7 @@ import React, {Component} from "react";
 
 import PrimarySearchAppBar from './Components/PrimarySearchAppBar';
 import AddEventDialog from './Components/AddEventDialog';
-
+import 'fontsource-roboto';
 //material ui
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
@@ -92,6 +92,7 @@ class App extends Component{
         createdEvents: response.data
       });
     });
+
   }
 
   updateLeftMenuIfAuthorized = ()=>{
@@ -291,7 +292,7 @@ class App extends Component{
                 <Grid item md={7} style={{backgroundColor:'#FBF4ED'}}>
                   <Switch>
                     <Route path="/allevents" component={() => (<EventsList allEvents={this.state.allEvents}
-                                                                           pageTitle={'All Events'}
+                                                                           pageTitle={'Tüm Etkinlikler'}
                                                                            whichPage={this.ALL_EVENTS_PAGE}
                                                                            snackbarOpen={this.snackbarOpen}
                                                                            snackbarClose={this.snackbarClose}

@@ -1,7 +1,7 @@
 import '../index.css';
 
 import React, {useContext} from "react";
-
+import 'fontsource-roboto';
 import EventCard from './EventCard';
 //material ui
 import Grid from '@material-ui/core/Grid';
@@ -14,6 +14,10 @@ import QrCodeDialog from "./QrCodeDialog";
 import Divider from "@material-ui/core/Divider";
 import BarChart from "./BarChart";
 import {CreatedEventsContext} from "./contexts/CreatedEventsContext";
+import Typography from "@material-ui/core/Typography";
+import Alert from "@material-ui/lab/Alert";
+import AlertTitle from "@material-ui/lab/AlertTitle";
+import ParticipantTable from "./ParticipantTable";
 
 export default function EventsList(props) {
     const [page, setPage] = React.useState(0);
@@ -34,30 +38,40 @@ export default function EventsList(props) {
     const createdEventsContext = useContext(CreatedEventsContext);
 
     const titleStyle = {
-        marginLeft:'40px',
+        marginLeft:'40px', marginTop:'20px'
     };
 
+
     const printEvents = ()=>{
-        console.log(createdEventsContext);
+
+        console.log("tum eventler: %O",props.allEvents);
+        console.log("created eventler: %O",createdEventsContext.createdEvents);
         const printedEvents = (props.whichPage===MANAGE_EVENT_PAGE) ? createdEventsContext.createdEvents : props.allEvents;
 
-        return(
-            <Grid item>
-                {printedEvents.slice(page * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE + ITEMS_PER_PAGE).map(
-                    (item,index)=> {
-                        item.endDateTime = dateTimeParserFromString(item.endDateTime);
-                        item.startDateTime = dateTimeParserFromString(item.startDateTime);
-                        return setEventCard(item, index);
-                    })}
-            </Grid>
+        if(printedEvents.length>0)
+            return(
+                <Grid item>
+                    {printedEvents.slice(page * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE + ITEMS_PER_PAGE).map(
+                        (item,index)=> {
+                            item.endDateTime = dateTimeParserFromString(item.endDateTime);
+                            item.startDateTime = dateTimeParserFromString(item.startDateTime);
+                            return setEventCard(item, index);
+                        })}
+                </Grid>
 
-        );
+            );
+        else
+            return (
+                <Alert style={{marginLeft: '40px', marginRight: '40px', marginTop: '40px'}} variant="filled" severity="error">
+                    <AlertTitle>Hata!</AlertTitle>
+                    Henüz bir etkinlik bulunmamaktadır
+                </Alert>);
     }
     const dateTimeParserFromString = (dateTime) =>new Date(dateTime);
 
     const setEventCard = (eventObject, index)=>{
         return(
-            <div style={{ marginBottom:'40px',marginRight:'40px', marginLeft:'40px'}} key={index}>
+            <div style={{ marginTop:'40px',marginRight:'40px', marginLeft:'40px'}} key={index}>
                 {createEventCardByPageType(eventObject, index)}
             </div>
         );
@@ -255,38 +269,44 @@ export default function EventsList(props) {
     //**** ASSIGN EVENT FUNCTIONS END ****//
 
     const printBarChartsIfManagePage = ()=>{
-        return (
-            <Grid container direction="column" spacing={'3'}>
-                <Grid item style={{marginLeft:'40px',marginRight:'40px'}}>
-                    <BarChart />
+        if(props.whichPage===MANAGE_EVENT_PAGE){
+            return(
+                <Grid container direction="column" spacing={3}>
+                    <Grid item style={{marginLeft: '40px', marginRight: '40px', marginTop: '40px'}}>
+                        <BarChart/>
+                    </Grid>
+                    <Grid item>
+                        <Divider variant="middle"/>
+                    </Grid>
+                    <Grid item style={{marginLeft: '40px'}}>
+                        <Typography style={{marginLeft: '40px',}} variant="h5" gutterBottom>
+                            Senin Tarafından Yaratılan Etkinlikler
+                        </Typography>
+                    </Grid>
                 </Grid>
-                <br/>
-
-                <Grid item >
-                    <Divider variant="middle"/>
-                </Grid>
-                <Grid item >
-                    <h3 style={{marginLeft:'40px',marginBottom:'40px'}}>
-                        Senin Tarafından Yaratılan Etkinlikler
-                    </h3>
-                </Grid>
-            </Grid>
-        )
+            );
+        }
     }
 
 
     return (
-
             <Grid container direction="column" alignItems="stretch" >
                 {qrCodeDialogElement}
-                <h1 style={titleStyle}>{props.pageTitle}</h1>
+                <Typography style={titleStyle} variant="h3" gutterBottom>
+                    {props.pageTitle}
+                </Typography>
+                <Grid item>
+                    <Divider variant="middle"/>
+                </Grid>
                 {updatedDialogElement}
                 {assignEventDialogElement}
+
                 <Grid
                     direction="column"
                     container
                 >
                     {printBarChartsIfManagePage()}
+
                     {printEvents()}
                     <Grid item >
                         <Grid

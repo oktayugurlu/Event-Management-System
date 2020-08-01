@@ -19,6 +19,9 @@ import CheckIcon from '@material-ui/icons/Check';
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import {isAuthorized} from "./authentication/LocalStorageService";
+import ParticipantsDetailDialog from "./ParticipantsDetailDialog";
+import QrCodeDialog from "./QrCodeDialog";
+import AssignEventDialog from "./AssignEventDialog";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -76,6 +79,9 @@ export default function EventCard(props) {
 
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
+
+    const [participantsDetailDialogElement, setParticipantsDetailDialogElement] = React.useState(<></>);
+
 
     const buttonClassname = clsx({
         [classes.buttonSuccess]: success,
@@ -145,9 +151,22 @@ export default function EventCard(props) {
             }
         }
     }
+    const handleCloseParticipantsDetailDialog = (title) => {
+        setParticipantsDetailDialogElement(<></>);
+    };
+    const handleOpenParticipantsDetailDialog = () => {
+        setParticipantsDetailDialogElement((
+            <ParticipantsDetailDialog
+                open={true}
+                openedEvent={props.eventObject}
+                handleClose={handleCloseParticipantsDetailDialog}
+            />
+        ));
+    }
 
     return (
         <Card className={classes.root} >
+            {participantsDetailDialogElement}
             <Grid
                 container
                 direction="row"
@@ -155,7 +174,7 @@ export default function EventCard(props) {
                 alignItems="center"
             >
                 <Grid item md={10}>
-                    <CardActionArea>
+                    <CardActionArea disabled={props.whichPage===ALL_EVENTS_PAGE} onClick={handleOpenParticipantsDetailDialog}>
                         <CardContent>
                             <Grid
                                 container
@@ -182,11 +201,26 @@ export default function EventCard(props) {
                                             {props.eventObject.title}
                                         </Typography>
                                         <br/>
+                                        {(props.whichPage === MANAGE_EVENT_PAGE)
+                                            ?   (<>
+                                                    <Typography variant="body2" component="p" >
+                                                        <b>Etinlik ID: </b> {props.eventObject.uniqueName}
+                                                    </Typography>
+                                                    <Typography variant="body2" component="p" >
+                                                        <b>Kalan Kota: </b> {props.eventObject.quota}
+                                                    </Typography>
+                                                    <Typography variant="body2" component="p" >
+                                                        <b>Katılımcı Sayısı: </b> {props.eventObject.appliedParticipantSet.length}
+                                                    </Typography>
+                                                </>
+                                            )
+                                            :''
+                                        }
                                         <Typography variant="body2" component="p" >
-                                            <b>Start Date: </b> {props.eventObject.startDateTime.toString().slice(0,21)}
+                                            <b>Başlangıç Tarihi: </b> {props.eventObject.startDateTime.toString().slice(0,21)}
                                         </Typography>
                                         <Typography variant="body2" component="p" >
-                                            <b>End Date: </b> {props.eventObject.endDateTime.toString().slice(0,21)}
+                                            <b>Bitiş Tarihi: </b> {props.eventObject.endDateTime.toString().slice(0,21)}
                                         </Typography>
                                         <br/>
                                         <Typography variant="body2" component="p">

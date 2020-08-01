@@ -3,7 +3,6 @@ package com.etkinlikyonetimi.intern.usecases.manageevent.controller;
 import com.etkinlikyonetimi.intern.usecases.manageevent.dto.EventDTO;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
 import com.etkinlikyonetimi.intern.usecases.manageevent.mapper.EventMapper;
-import com.etkinlikyonetimi.intern.usecases.manageevent.mapper.QuestionMapper;
 import com.etkinlikyonetimi.intern.usecases.manageevent.service.ManageEventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -20,24 +19,25 @@ import java.util.List;
 public class ManageEventController {
     private final ManageEventService manageEventService;
     private final EventMapper eventMapper;
-    private final QuestionMapper questionMapper;
 
     @GetMapping("/allevents")
     public List<EventDTO> getEvents(){
-        return eventMapper.mapToDto(manageEventService.listAllEvents());
+        final List<Event> events = manageEventService.listAllEvents();
+        return eventMapper.mapToDto(events);
     }
 
     @GetMapping("/allevents/createdevents")
     public List<EventDTO> getCreatedEvents(){
-        System.out.println("helloo");
-        return eventMapper.mapToDto(manageEventService.listAllCreatedEventsByUser());
+        final List<Event> eventList = manageEventService.listAllCreatedEventsByUser();
+        return eventMapper.mapToDto(eventList);
     }
 
 
     @PostMapping("/addevent")
     public EventDTO addEvent(@Valid @RequestBody EventDTO eventDTO){
-        Event requestEvent = eventMapper.mapToEntity(eventDTO);
-        return eventMapper.mapToDto(manageEventService.addEvent(requestEvent));
+        final Event requestEvent = eventMapper.mapToEntity(eventDTO);
+        final Event addEvent = manageEventService.addEvent(requestEvent);
+        return eventMapper.mapToDto(addEvent);
     }
 
     @PutMapping("/updateevent")

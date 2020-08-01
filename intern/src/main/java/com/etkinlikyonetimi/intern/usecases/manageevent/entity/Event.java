@@ -49,7 +49,7 @@ public class Event extends BaseEntity {
     @Column(name="address")
     private String address;
 
-    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private Set<Application> appliedParticipantSet;
 
     //BI-DIRECTIONAL FIELD
