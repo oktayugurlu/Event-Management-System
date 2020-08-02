@@ -34,4 +34,5 @@ public class AssignEventController {
                 answerMapper.mapToEntity(List.copyOf(participantDTO.getAnswerSet())));
     }
 
+
 }

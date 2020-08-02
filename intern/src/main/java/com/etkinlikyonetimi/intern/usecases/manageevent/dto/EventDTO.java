@@ -50,6 +50,7 @@ public class EventDTO {
     private LocalDateTime endDateTime;
 
     @NotNull(message = "Quota can't be null!")
+    @Min(0)
     private Long quota;
 
     @Size(min = 1, max = 255, message = "Karakter sayısı 1 ile 255 arasında olmalı")
@@ -81,5 +82,10 @@ public class EventDTO {
             return notUniqueQuestionsCount.isEmpty();
         }
         else return true;
+    }
+
+    @AssertTrue(message = "Etkinlik IDsi uygun değil!")
+    public boolean isUniqueNameValid(){
+        return this.uniqueName.matches("^(?!.*\\.\\.)(?!.*\\.$)[^\\W][\\w.]{0,29}$");
     }
 }

@@ -29,7 +29,7 @@ public class CorporateUser extends BaseEntity implements UserDetails, Credential
     private String password;
 
     //Bi directional fields
-    @OneToMany(mappedBy = "corporateUser", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "corporateUser", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<Event> eventSet;
 
     @Override
