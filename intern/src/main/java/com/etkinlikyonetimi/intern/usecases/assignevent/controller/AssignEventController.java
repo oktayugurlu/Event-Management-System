@@ -29,7 +29,8 @@ public class AssignEventController {
     public BufferedImage assignAndReturnQrCode(@PathVariable @Size(max = 50, min = 1) String eventUniqueName,
                                       @RequestBody @Valid ParticipantDTO participantDTO) throws Exception{
 
-        return assignEventService.assign( participantMapper.mapToEntity(participantDTO),
+        return assignEventService.assign(
+                participantMapper.mapToEntity(participantDTO),
                 eventUniqueName,
                 answerMapper.mapToEntity(List.copyOf(participantDTO.getAnswerSet())));
     }

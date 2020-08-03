@@ -85,10 +85,6 @@ public class AssignEventService {
 
     }
 
-    public List<Answer> findAnswerByQuestionAndParticipant(Question question, Participant participant){
-        return answerRepository.findByQuestionAndParticipant(question, participant);
-    }
-
     public BufferedImage createQrCode(Participant participant, String eventUniqueName) throws Exception {
         Optional<Event> event = eventRepository.findByUniqueName(eventUniqueName);
         if(event.isPresent()) {
@@ -102,19 +98,20 @@ public class AssignEventService {
         else return null;
     }
     public String createQrCodeContent(Event event, Participant participant){
-        String content = "****KATILIMCI BILGILERI****"+"\n";
-        content += "-Katilimci TC Kimlik numarasi: " + participant.getSsn()+"\n";
-        content += "-Katilimcı Adi: " + participant.getName()+"\n";
-        content += "-Katilimci Soyadi: " + participant.getSurname()+"\n";
+        String content = "****KATILIMCI BİLGİLERİ****"+"\n";
+        content += "-Katılımcı TC Kimlik numarası: " + participant.getSsn()+"\n";
+        content += "-Katılımcı Adı: " + participant.getName()+"\n";
+        content += "-Katılımcı Soyadı: " + participant.getSurname()+"\n";
         content += "-Katılımcı Emaili: " + participant.getMail()+"\n\n";
-        content += "****ETKINLIK BILGILERI****"+"\n";
+        content += "****ETKİNLİK BİLGİLERİ****"+"\n";
         content += "-Etkinlik ID: " + event.getUniqueName()+"\n";
-        content += "-Etkinlik Basligi: " + event.getTitle()+"\n";
-        content += "-Etkinlik Baslama Zamani: " + event.getStartDateTime()+"\n";
-        content += "-Etkinlik Bitis Zamani: " + event.getEndDateTime()+"\n";
+        content += "-Etkinlik Başlığı: " + event.getTitle()+"\n";
+        content += "-Etkinlik Başlama Zamanı: " + event.getStartDateTime()+"\n";
+        content += "-Etkinlik Bitiş Zamanı: " + event.getEndDateTime()+"\n";
         content += "-Etkinlik Adresi: " + event.getAddress()+"\n";
-        content += "-Etkinlik Detaylari: " + event.getNotes()+"\n";
-        return content;
+        content += "-Etkinlik Detayları: " + event.getNotes()+"\n";
+        Locale trlocale= new Locale("tr", "TR");
+        return String.format(trlocale, "%s",content);
     }
 
     public void saveImageAsPng(BufferedImage bufferedImage, String fileName){
@@ -128,10 +125,13 @@ public class AssignEventService {
     }
 
     public void sendMail(String fileName, String email, String eventTitle) throws IOException, MessagingException {
+        Locale trlocale= new Locale("tr", "TR");
+        String subject = "Katıldığınız "+eventTitle+" etkinliği hakkında";
+        String content = "Bu QR kodu telefondan okutarak kayit bilgilerine erisebilirsiniz.";
         mailSenderService.sendmail("etkinlikyonetimi1234@gmail.com",
                 email,
-                "Bu QR kodu telefondan okutarak kayıt bilgilerine erişebilirsiniz.",
-                "Katıldğınız "+eventTitle+" etkinliği hakkında",
+                String.format(trlocale, "%s",content),
+                String.format(trlocale, "%s",subject),
                 fileName
         );
     }

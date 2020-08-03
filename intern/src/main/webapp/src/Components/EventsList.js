@@ -127,7 +127,6 @@ export default function EventsList(props) {
     };
 
     const handleSubmitUpdateEvent = (eventObject) => {
-
         console.log("eventObject: ");
         console.log(eventObject);
         let headers = {
@@ -142,7 +141,7 @@ export default function EventsList(props) {
                 else props.snackbarOpen(response.data, "error");
                 props.getAllEvents();
             }).catch(error => {
-            if(error.response.status === 500)
+            if(error.response.status === 500 || error.response.status === 500)
                 props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
             console.log(error.response);
         });
