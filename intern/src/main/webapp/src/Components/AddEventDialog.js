@@ -16,6 +16,7 @@ import DateFnsUtils from '@date-io/date-fns';
 import {
     MuiPickersUtilsProvider, DateTimePicker,
 } from '@material-ui/pickers';
+import trLocale from "date-fns/locale/tr";
 
 import Map from './Map';
 import EventQuestion from "./EventQuestion";
@@ -92,7 +93,6 @@ class AddEventDialog extends Component{
     };
 
     componentWillUnmount() {
-        console.log("component siliniyor./././//./././././/.//./")
         ValidatorForm.removeValidationRule('isTitleUnique');
         ValidatorForm.removeValidationRule('isContentUnique');
         ValidatorForm.removeValidationRule('isValid');
@@ -120,16 +120,13 @@ class AddEventDialog extends Component{
     onClickDeleteQuestion = (index)=>{
         let questionElementListToDeleteElement = [...this.state.questionElementList];
         let questionValueListToDeleteValue = [...this.state.questionValueList];
-        console.log('null check-----> %O',questionValueListToDeleteValue);
         questionElementListToDeleteElement.splice(index,index+1);
         questionValueListToDeleteValue.splice(index,index+1);
-        console.log('null check-----> %O',questionValueListToDeleteValue);
         this.setState({
             questionCounter: this.state.questionCounter-1,
             questionValueList: questionValueListToDeleteValue,
             questionElementList: questionElementListToDeleteElement
         });
-        console.log('id:'+' ' +index+'- counter:'+this.state.questionCounter);
     }
 
     handleAddQuestionButton = () => {
@@ -138,8 +135,6 @@ class AddEventDialog extends Component{
         );
         let expandedQuestionValueList = [...this.state.questionValueList];
         expandedQuestionValueList[this.state.questionCounter] = '';
-        console.log("expandedQuestionValueList: %O",expandedQuestionValueList);
-        console.log("this.state.questionCounter: %O",this.state.questionCounter);
         this.setState({
             questionValueList: expandedQuestionValueList,
             questionElementList: documents,
@@ -159,7 +154,6 @@ class AddEventDialog extends Component{
     };
 
     onChangeQuestion = (event) => {
-        console.log( event.target.name+ '---'+event.target.value);
         let questionValueListCopy = [...this.state.questionValueList];
         questionValueListCopy[event.target.name] = event.target.value;
         console.log( questionValueListCopy);
@@ -245,23 +239,22 @@ class AddEventDialog extends Component{
         let currentDate = new Date();
 
         if(selectedEndDateTime <= selectedStartDateTime)
-            return this.createAlertForValidation("Start date can't be bigger than or equal to end time!");
+            return this.createAlertForValidation("Başlangıç tarihi bitişten sonra veya aynı olamaz!");
         else if(currentDate > selectedStartDateTime )
-            return this.createAlertForValidation("Start date should be bigger than now!");
+            return this.createAlertForValidation("Başlangıç tarihi şimdiden büyük olmalı!");
         else if(currentDate > selectedEndDateTime)
-            return this.createAlertForValidation("End date should be bigger than now!");
+            return this.createAlertForValidation("Bitiş tarihi şimdiden büyük olmalı!");
     }
 
     isLocationSelect = ()=>{
         if(this.state.marker.lng === 300)
-            return this.createAlertForValidation("Please pick a location from map!");
+            return this.createAlertForValidation("Lütfen haritadan bir konum seçiniz!");
     }
 
 
     createAlertForValidation = (message)=>{
         return (<Alert style={{marginTop:'8px', marginBottom:'8px'}} severity="error">{message}</Alert>);
     }
-
 
 
     /*
@@ -340,28 +333,28 @@ class AddEventDialog extends Component{
                         <DialogTitle id="scroll-dialog-title">Add Event</DialogTitle>
                         <DialogContent>
                             <TextValidator
-                                label="Event ID"
+                                label="Etkinlik ID"
                                 onChange={this.handleChangeUniqueNameInput}
                                 name="id"
                                 inputProps={{ maxLength: 50 }}
                                 value={this.state.uniqueName}
                                 validators={!this.props.isEventUpdated ? ['required','isTitleUnique', 'isValid' ]:['required']}
-                                errorMessages={!this.props.isEventUpdated ?['Bu alan gerekli','Bu ID ile bir etkinlik mevcut!','Bu isim do[ru formatta değil']:['This field is required']}
+                                errorMessages={!this.props.isEventUpdated ?['Bu alan gerekli','Bu ID ile bir etkinlik mevcut!','Bu isim doğru formatta değil']:['Bu alan gerekli']}
                                 fullWidth
                                 disabled={this.props.isEventUpdated}
                             />
                             <TextValidator
-                                label="Event Name"
+                                label="Etkinlik İsmi"
                                 onChange={this.handleChangeTitleInput}
                                 name="title"
                                 value={this.state.title}
                                 inputProps={{ maxLength: 50 }}
                                 validators={['required']}
-                                errorMessages={['This field is required']}
+                                errorMessages={['Bu alan gerekli']}
                                 fullWidth
                             />
                             <TextValidator
-                                label="Address"
+                                label="Adres"
                                 onChange={this.handleChangeAddressInput}
                                 name="address"
                                 multiline
@@ -369,7 +362,7 @@ class AddEventDialog extends Component{
                                 inputProps={{ maxLength: 255 }}
                                 value={this.state.address}
                                 validators={['required']}
-                                errorMessages={['This field is required']}
+                                errorMessages={['Bu alan gerekli']}
                                 fullWidth
                             />
                             <TextValidator
@@ -381,14 +374,14 @@ class AddEventDialog extends Component{
                                 inputProps={{ maxLength: 255 }}
                                 value={this.state.notes}
                                 validators={['required']}
-                                errorMessages={['This field is required']}
+                                errorMessages={['Bu alan gerekli']}
                                 fullWidth
                             />
-                            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                            <MuiPickersUtilsProvider utils={DateFnsUtils} locale={trLocale}>
                                 <Grid container justify="space-between">
                                     <DateTimePicker
                                         id="datetime-local"
-                                        label="Start Date"
+                                        label="Başlangıç Tarihi"
                                         margin="normal"
                                         ampm={false}
                                         value={this.state.selectedStartDateTime}
@@ -398,7 +391,7 @@ class AddEventDialog extends Component{
                                 <Grid container justify="space-between">
                                     <DateTimePicker
                                         id="datetime-local"
-                                        label="End Date"
+                                        label="Bitiş Tarihi"
                                         margin="normal"
                                         ampm={false}
                                         value={this.state.selectedEndDateTime}
@@ -408,13 +401,13 @@ class AddEventDialog extends Component{
                             {this.isStartDateAndEndDateValid(this.state.selectedStartDateTime, this.state.selectedEndDateTime)}
                             <TextValidator
                                 id="standard-number"
-                                label="Quota"
+                                label="Kota"
                                 type="number"
                                 onChange={this.handleChangeQuota}
                                 name="quota"
                                 value={this.state.quota}
                                 validators={['required', 'minNumber:0', 'maxNumber:9223372036854775807']}
-                                errorMessages={['This field is required','The value should be bigger than 1', 'The value should be less than 9223372036854775807.']}
+                                errorMessages={['Bu alan gerekli','Değer 1\'den büyük olmalı.', 'Değer 9223372036854775807\'den küçük olmalı.']}
 
                                 InputLabelProps={{
                                     shrink: true,
@@ -435,11 +428,11 @@ class AddEventDialog extends Component{
                                     onClick={this.handleAddQuestionButton}
                                     startIcon={<AddIcon />}
                                 >
-                                    Add Question
+                                    Soru Ekle
                                 </Button>
                             </Grid>
                             <Grid item style={{marginTop:'10px',}}>
-                                <h4>Mark Location</h4>
+                                <h4>Konumu Seç</h4>
                                 <Map onClick={this.onChangeMarkerInput}
                                      updatedMarker={this.state.marker}
                                 />
@@ -448,9 +441,9 @@ class AddEventDialog extends Component{
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={this.props.handleClose} color="primary">
-                                Cancel
+                                İptal
                             </Button>
-                            <Button type="submit" color="primary">Submit</Button>
+                            <Button type="submit" color="primary">Gönder</Button>
                         </DialogActions>
                     </ValidatorForm>
                 </Dialog>

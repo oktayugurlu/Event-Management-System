@@ -107,7 +107,7 @@ export default function PrimarySearchAppBar() {
                         startIcon={<ExitToAppIcon/>}
                         color="inherit"
                 >
-                    Logout
+                    ÇIKIŞ YAP
                 </Button>
             )
         }
@@ -119,7 +119,7 @@ export default function PrimarySearchAppBar() {
                     color="inherit"
                     onClick={handleLogin}
                 >
-                    Login
+                    GİRİŞ YAP
                 </Button>
             );
         }

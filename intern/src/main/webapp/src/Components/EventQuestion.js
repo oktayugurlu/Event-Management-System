@@ -27,7 +27,7 @@ export default class EventQuestion extends React.Component{
                 name={this.props.name.toString()}
                 value={this.state.question}
                 validators={['required', 'isContentUnique']}
-                errorMessages={['This field is required', "There can't be the same question!"]}
+                errorMessages={['Bu alan gerekli', "Aynı soruyu ekleyemezsin!"]}
                 style={{
                     marginTop:'8px',
                     minWidth: '90vh'
