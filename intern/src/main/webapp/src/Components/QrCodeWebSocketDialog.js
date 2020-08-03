@@ -7,6 +7,7 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from '@material-ui/icons/Close';
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
+import Box from "@material-ui/core/Box";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -53,9 +54,11 @@ export default class QrCodeWebSocketDialog extends Component{
                 <Grid direction="column" container spacing={1}>
                     <Grid item>
                         <Grid container direction={"row"} justify="space-between">
-                            <Typography fontWeight="fontWeightBold" variant="body1" display={"inline"} align="left">
-                                Katılımcının Adı:
-                            </Typography>
+                            <Box fontWeight="fontWeightBold">
+                                <Typography variant="body1" display={"inline"} align="left">
+                                    Katılımcının Adı:
+                                </Typography>
+                            </Box>
                             <Typography variant="body1" display={"inline"} align="right">
                                 {this.props.message.name}
                             </Typography>
@@ -64,9 +67,11 @@ export default class QrCodeWebSocketDialog extends Component{
 
                     <Grid item>
                         <Grid container direction={"row"} justify="space-between">
-                            <Typography fontWeight="fontWeightBold" variant="body1" display={"inline"} align="left">
-                                Katılımcının Soyadı:
-                            </Typography>
+                            <Box fontWeight="fontWeightBold">
+                                <Typography variant="body1" display={"inline"} align="left">
+                                    Katılımcının Soyadı:
+                                </Typography>
+                            </Box>
                             <Typography variant="body1" display={"inline"} align="right">
                                 {this.props.message.surname}
                             </Typography>
@@ -75,8 +80,13 @@ export default class QrCodeWebSocketDialog extends Component{
 
                     <Grid item>
                         <Grid container direction={"row"} justify="space-between">
+                            <Box fontWeight="fontWeightBold">
+                                <Typography variant="body1" display={"inline"} align="left">
+                                    TC Kimlik No.su:
+                                </Typography>
+                            </Box>
                             <Typography fontWeight="fontWeightBold" variant="body1" display={"inline"} align="left">
-                                Katılımcının TC Kimlik No.su:
+
                             </Typography>
                             <Typography variant="body1" display={"inline"} align="right">
                                 {this.props.message.ssn}
@@ -86,9 +96,11 @@ export default class QrCodeWebSocketDialog extends Component{
 
                     <Grid item>
                         <Grid container direction={"row"} justify="space-between">
-                            <Typography fontWeight="fontWeightBold" variant="body1" display={"inline"} align="left">
-                                Etkinlik Adı:
-                            </Typography>
+                            <Box fontWeight="fontWeightBold">
+                                <Typography variant="body1" display={"inline"} align="left">
+                                    Etkinlik Adı:
+                                </Typography>
+                            </Box>
                             <Typography variant="body1" display={"inline"} align="right">
                                 {this.props.message.eventTitle}
                             </Typography>
@@ -96,9 +108,11 @@ export default class QrCodeWebSocketDialog extends Component{
                     </Grid>
                     <Grid item>
                         <Grid container direction={"row"} justify="space-between">
-                            <Typography fontWeight="fontWeightBold" variant="body1" display={"inline"} align="left">
-                                Etkinlik ID:
-                            </Typography>
+                            <Box fontWeight="fontWeightBold">
+                                <Typography variant="body1" display={"inline"} align="left">
+                                    Etkinlik ID:
+                                </Typography>
+                            </Box>
                             <Typography variant="body1" display={"inline"} align="right">
                                 {this.props.message.eventUniqueName}
                             </Typography>
