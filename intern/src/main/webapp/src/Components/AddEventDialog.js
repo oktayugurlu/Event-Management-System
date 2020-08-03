@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {makeStyles, withStyles} from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
-import MuiAlert from '@material-ui/lab/Alert';
+import Alert from "@material-ui/lab/Alert";
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
@@ -16,15 +16,16 @@ import DateFnsUtils from '@date-io/date-fns';
 import {
     MuiPickersUtilsProvider, DateTimePicker,
 } from '@material-ui/pickers';
-import trLocale from "date-fns/locale/tr";
+import enLocale from "date-fns/locale/en-GB";
+
 
 import Map from './Map';
 import EventQuestion from "./EventQuestion";
 
 
-function Alert(props) {
+/*function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
-}
+}*/
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -377,7 +378,7 @@ class AddEventDialog extends Component{
                                 errorMessages={['Bu alan gerekli']}
                                 fullWidth
                             />
-                            <MuiPickersUtilsProvider utils={DateFnsUtils} locale={trLocale}>
+                            <MuiPickersUtilsProvider utils={DateFnsUtils} locale={enLocale}>
                                 <Grid container justify="space-between">
                                     <DateTimePicker
                                         id="datetime-local"

@@ -1,7 +1,7 @@
 
 import React from "react";
 
-export const CreatedEventsContext = React.createContext({
+export const GlobalStateContext = React.createContext({
     createdEvents:[],
     setCreatedEvents: ()=>{}
 });

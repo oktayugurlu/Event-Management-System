@@ -89,7 +89,7 @@ export default function Map(props) {
         if(props.isStatic){
             const mapContainerStyleForStatic={
                 height: "50vh",
-                width: "40vw",
+                width: "35vw",
             };
             return(<div>
                 <GoogleMap

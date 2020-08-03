@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -10,8 +10,8 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import Button from "@material-ui/core/Button";
 import PersonOutlineIcon from '@material-ui/icons/PersonOutline';
-import {isAuthorized} from "./authentication/LocalStorageService";
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
+import {GlobalStateContext} from "./contexts/GlobalStateContext";
 
 const useStyles = makeStyles((theme) => ({
     grow: {
@@ -45,6 +45,7 @@ export default function PrimarySearchAppBar() {
     const [anchorEl, setAnchorEl] = React.useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
+    const createdEventsContext = useContext(GlobalStateContext);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
     const handleProfileMenuOpen = (event) => {
@@ -100,7 +101,7 @@ export default function PrimarySearchAppBar() {
     );
 
     const renderButtonForLogin = ()=>{
-        if(isAuthorized()){
+        if(createdEventsContext.isAuthorized){
             return (
                 <Button variant="outlined"
                         onClick={handleLogout}

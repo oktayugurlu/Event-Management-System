@@ -35,25 +35,23 @@ export default class AssignEventDialog extends Component{
     }
 
     componentWillUnmount() {
-        console.log("component siliniyor./././//./././././/.//./");
     }
 
     //validation messages start//
     handleTcIdErrorMessage = ()=>{
-
-
         if(!this.isIdNumberValid()) {
-            if (this.isValueEmpty(this.state.participant.ssn)) return "This field is required!"
-            else{
-
-            } return "TC ID isn't valid!";
+            if (this.isValueEmpty(this.state.participant.ssn)) return "Bu alan gerekli!"
+            else return "TC Kimlik No.'su gerçek değil!";
         }
     }
     handleMailMessage = ()=>{
         if(!this.isValidateEmail()) {
-            if (this.isValueEmpty(this.state.participant.mail)) return "This field is required!"
-            else return "Email address isn't valid!";
+            if (this.isValueEmpty(this.state.participant.mail)) return "Bu alan gerekli!";
+            else return "Email adresi geçerli değil!";
         }
+    }
+    handleEmptyCheck = (value)=>{
+        if(this.isValueEmpty(value)) return "Bu alan gerekli!";
     }
     //validation messages end//
 
@@ -89,14 +87,16 @@ export default class AssignEventDialog extends Component{
         }
         return true;
     }
-    isValueEmpty=(tcId)=>{
-        if (tcId === '') return true;
+    isValueEmpty=(value)=>{
+        if (value === '' || (value.indexOf(' ') >= 0)) return true;
     }
     isValidateEmail=()=>{
         let regexMail = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return regexMail.test(this.state.participant.mail);
     }
     //***** VALIDATION FUNCTIONS END *****//
+
+
 
     //***** SET STATE VARIABLES START *****//
     handleOnChangeTcID = (event) => {
@@ -141,9 +141,11 @@ export default class AssignEventDialog extends Component{
     }
     //***** SET STATE VARIABLES END *****//
 
+
+
     renderApplicationFormIfQuotaAvailable = ()=>{
-        if(this.state.assignedEvent.quota===0){
-            return (<Alert severity="warning">Sorry, this event has reached the maximum quota!</Alert>);
+        if(this.props.assignedEvent.quota===0){
+            return (<Alert severity="warning">Üzgünüz, bu etkinlik maksimum kotaya erişti!</Alert>);
         }
         else{
             return(
@@ -165,9 +167,8 @@ export default class AssignEventDialog extends Component{
                             value={this.state.participant.name}
                             onChange={this.handleOnChangeName}
                             error={this.isValueEmpty(this.state.participant.name)}
-                            helperText={"This field is required!"}
+                            helperText={this.handleEmptyCheck(this.state.participant.name)}
                             inputProps={{ maxLength: 50}}
-
                         />
                         {" "}
                         <TextField
@@ -175,7 +176,7 @@ export default class AssignEventDialog extends Component{
                             value={this.state.participant.surname}
                             onChange={this.handleOnChangeSurname}
                             error={this.isValueEmpty(this.state.participant.surname)}
-                            helperText={"This field is required!"}
+                            helperText={this.handleEmptyCheck(this.state.participant.surname)}
                             inputProps={{ maxLength: 50}}/>
                     </Grid>
                     <Grid item xs>
@@ -264,35 +265,35 @@ export default class AssignEventDialog extends Component{
                     open={this.props.isOpenAssignEventForm}
                     onClose={this.props.handleClose}
                     fullWidth={true}
-                    maxWidth={'md'}>
+                    maxWidth={'sm'}>
                 <DialogTitle style={{backgroundImage:"url("+CARD_IMAGE_URL+")"}} id="scroll-dialog-title">
-                    Assign to {this.props.assignedEvent.title}
+                    {this.props.assignedEvent.title+" Etkinliğine Başvur"}
                 </DialogTitle>
                 <DialogContent>
                     <Grid direction="column" container spacing={3}>
                         <Grid item xs>
                             <h3>
-                                Informations
+                                Bilgiler
                             </h3>
                         </Grid>
                         <Grid item xs>
-                            <b>Start Date: </b>{this.props.assignedEvent.startDateTime.toString().slice(0,21)}
+                            <b>Başlangıç Tarihi: </b>{this.props.assignedEvent.startDateTime.toString().slice(0,21)}
                         </Grid>
                         <Divider/>
                         <Grid item xs>
-                            <b>End Date: </b>{this.props.assignedEvent.endDateTime.toString().slice(0,21)}
+                            <b>Bitiş Tarihi: </b>{this.props.assignedEvent.endDateTime.toString().slice(0,21)}
                         </Grid>
                         <Divider/>
                         <Grid item xs>
-                            <b>Notes: </b>{this.props.assignedEvent.notes}
+                            <b>Detaylar: </b>{this.props.assignedEvent.notes}
                         </Grid>
                         <Divider/>
                         <Grid item xs>
-                            <b>Address: </b>{this.props.assignedEvent.address}
+                            <b>Adres: </b>{this.props.assignedEvent.address}
                         </Grid>
                         <Divider/>
                         <Grid item xs>
-                            <b>You can see the location of event: </b>
+                            <b>Konum: </b>
                             <br/>
                             <Map isStatic={true}
                                  staticMarker={{lat: this.props.assignedEvent.latitude,
@@ -302,7 +303,7 @@ export default class AssignEventDialog extends Component{
                         <Divider/>
                         <Grid item xs>
                             <h3>
-                                Application Form
+                                Başvuru Formu
                             </h3>
                         </Grid>
                     </Grid>
@@ -310,9 +311,14 @@ export default class AssignEventDialog extends Component{
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={this.props.handleClose} color="primary">
-                        Cancel
+                        İptal
                     </Button>
-                    <Button onClick={this.handleSubmit} color="primary">Submit</Button>
+                    <Button onClick={this.handleSubmit}
+                            color="primary"
+                            disabled={this.props.assignedEvent.quota===0}
+                    >
+                        Kaydol
+                    </Button>
                 </DialogActions>
             </Dialog>
         );

@@ -26,8 +26,9 @@ import Login from "./Components/Login";
 import axios from "axios";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from '@material-ui/lab/Alert';
-import {getJwsToken, getUsername, isAuthorized} from "./Components/authentication/LocalStorageService";
-import {CreatedEventsContext} from "./Components/contexts/CreatedEventsContext";
+import {getJwsToken, getUsername} from "./Components/authentication/LocalStorageService";
+import {GlobalStateContext} from "./Components/contexts/GlobalStateContext";
+import QrCodeWebSocketDialog from "./Components/QrCodeWebSocketDialog";
 
 
 const styles = theme =>  ({
@@ -46,6 +47,7 @@ function Alert(props) {
 const BACKGROUND_URL='url(https://previews.123rf.com/images/notkoo2008/notkoo20081412/notkoo2008141200034/34479086-seamless-doodle-coffee-pattern-background.jpg)';
 
 let stompClient=null;
+const WEBSOCKET_COMPONENT=1;
 
 class App extends Component{
 
@@ -59,8 +61,13 @@ class App extends Component{
       severity: ""
     }],
     isLoginDialogOpen:false,
+    isAuthorized:false,
+    username:'',
+    setIsAuthorized:()=>{} ,
+    setUsername:()=>{} ,
     setCreatedEvents:()=>{},
-    sendNotification:()=>{}
+    sendNotification:()=>{},
+    websocketDialogElement:(<></>)
   };
 
   MANAGE_EVENT_PAGE=1;
@@ -70,15 +77,37 @@ class App extends Component{
     this.getAllEvents();
     this.setState({
       setCreatedEvents:this.setCreatedEvents,
-      sendNotification:this.sendNotification
+      sendNotification:this.sendNotification,
+      setIsAuthorized: this.setIsAuthorized,
+      setUsername: this.setUsername,
+      isAuthorized:false
     })
+    this.checkJwtValidation();
     this.connectWebSocket();
-    console.log("let stompClient= %O",stompClient);
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-
+  checkJwtValidation = ()=>{
+    axios.get("/manageevent/allevents/createdevents",{
+      headers: {
+        'Authorization': `Bearer ${getJwsToken()}`
+      }
+    }).then((response) => {
+      this.setIsAuthorized(true);
+    });
   }
+
+  //**** setters for context variables ***///
+  setIsAuthorized = (value) =>{
+    this.setState({
+      isAuthorized: value
+    });
+  }
+  setUsername = (username)=>{
+    this.setState({
+      username: username
+    });
+  }
+  //**** setters for context variables ***///
 
   //****WEBSOCKET***//
   connectWebSocket = () => {
@@ -88,18 +117,13 @@ class App extends Component{
     stompClient = Stomp.over(SockJS);
     stompClient.connect({}, this.onConnected, this.onError);
   }
-
   onConnected = () => {
-    // Subscribing to the private topic
-    console.log("sub");
-    if(isAuthorized())
+    if(this.state.isAuthorized)
       stompClient.subscribe('/notify/reply/'+getUsername(), this.onMessageReceived);
-    else if(!isAuthorized()){
-      stompClient.subscribe('/notify', this.onMessageReceived);
+    else if(!this.state.isAuthorized){
+      stompClient.subscribe('', this.onMessageReceived);
     }
-    console.log("onConnected");
   }
-
   sendNotification = ( participantDTO, assignedEvent) => {
     let notificationDTO = {
       name: participantDTO.name,
@@ -108,26 +132,27 @@ class App extends Component{
       eventTitle: assignedEvent.title,
       eventUniqueName: assignedEvent.uniqueName
     };
-
       stompClient.send('/app/sendNotification', {}, JSON.stringify(notificationDTO));
       console.log("sendNotification");
-
   }
-
   onMessageReceived = (payload) => {
     let message = JSON.parse(payload.body);
-    /*this.state.broadcastMessage.push({
-        message: message.content,
-        sender: message.sender,
-        dateTime: message.dateTime
-    })*/
-    window.alert("Katılımcının Adı: "+message.name+"\n"
-                + "Katılımcının Soyadı: "+message.surname+"\n"
-                + "Katılımcının TC Kimlik No.su: "+message.ssn+"\n"
-        + "Etkinlik Adı: "+message.eventTitle+"\n"
-        + "Etkinlik ID: "+message.eventUniqueName+"\n");
-
+    this.setState({
+      websocketDialogElement: (
+          <QrCodeWebSocketDialog
+              message={message}
+              dialogTitle={"Yeni bir katılımcı var"}
+              whichDialogContent={WEBSOCKET_COMPONENT}
+              handleClose={this.handleCloseWebsocketDialog}
+              open={true}
+          />)
+    });
   }
+  handleCloseWebsocketDialog = () => {
+    this.setState({
+      websocketDialogElement:(<></>)
+    });
+  };
   //****WEBSOCKET***//
 
 
@@ -199,7 +224,7 @@ class App extends Component{
             this.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
           }
           console.log(error.response);
-        })
+        });
     console.log("event: "+eventObject);
     this.getAllEvents();
   }
@@ -229,7 +254,7 @@ class App extends Component{
   // SNACK BAR FUNCTIONS END
 
   getAddEventButtonIfAuthorized() {
-    if(isAuthorized())
+    if(this.state.isAuthorized)
       return (<ListItem button onClick={this.handleClickOpen}>
         <ListItemIcon>
           <AddIcon/>
@@ -241,7 +266,7 @@ class App extends Component{
   }
 
   routeManageEventPageIfAuthorized=()=>{
-    if (!isAuthorized())
+    if (!this.state.isAuthorized)
       return (<Login
           snackbarOpen={this.snackbarOpen}
           setCreatedEvents={this.setCreatedEvents}
@@ -270,12 +295,13 @@ class App extends Component{
   render(){
     const { classes } = this.props;
     return (
-        <CreatedEventsContext.Provider value={this.state}>
+        <GlobalStateContext.Provider value={this.state}>
           <Router>
             <Grid container direction={"column"}>
 
             </Grid>
             <PrimarySearchAppBar/>
+            {this.state.websocketDialogElement}
             {/* Add event Modal start */}
             <AddEventDialog openAddEventDialog={this.state.openAddEventDialog}
                             handleClose={this.handleCloseAddEvent}
@@ -376,12 +402,12 @@ class App extends Component{
 
             </Grid>
           </Router>
-          <Snackbar open={this.state.snackbar.isOpen} autoHideDuration={3000} onClose={this.snackbarClose}>
+          <Snackbar open={this.state.snackbar.isOpen} autoHideDuration={2000} onClose={this.snackbarClose}>
             <Alert onClose={this.snackbarClose} severity={this.state.snackbar.severity}>
               {this.state.snackbar.message}
             </Alert>
           </Snackbar>
-        </CreatedEventsContext.Provider>
+        </GlobalStateContext.Provider>
     );
   }
 

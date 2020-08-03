@@ -110,10 +110,10 @@ public class ManageEventService {
     public String deleteEvent(String uniqueName){
         Optional<Event> deletedEvent = eventRepository.findByUniqueName(uniqueName);
         if(deletedEvent.isEmpty() || deletedEvent.get().getEndDateTime().isBefore(LocalDateTime.now()))
-            return "Invalid delete request!";
+            return "Geçersiz silme işlemi!";
         else{
-            eventRepository.delete(deletedEvent.get());
-            return "Successfully deleted!";
+            eventRepository.deleteById(deletedEvent.get().getId());
+            return "Başarıyla silindi!";
         }
     }
 

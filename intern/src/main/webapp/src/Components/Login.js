@@ -12,15 +12,13 @@ import CardActions from "@material-ui/core/CardActions";
 import { withRouter } from 'react-router-dom';
 import {
     getJwsToken,
-    setIsAuthorized,
-    setJwsToken,
-    setUsername
+    setJwsToken, setUsername
 } from "./authentication/LocalStorageService";
-import {CreatedEventsContext} from "./contexts/CreatedEventsContext";
+import {GlobalStateContext} from "./contexts/GlobalStateContext";
 
 
 class Login extends Component {
-    static contextType = CreatedEventsContext;
+    static contextType = GlobalStateContext;
 
     constructor(props) {
         super(props);
@@ -43,20 +41,18 @@ class Login extends Component {
         };
 
         axios.post(endpoint, body).then(response => {
-            this.checkValidCredentials(response)
-            setUsername(username);
-
+            this.checkValidCredentials(response);
             return this.redirectManageEventPage();
         });
     };
 
     checkValidCredentials= (response)=>{
-        if( !(response.data.token === "Username or password is not correct!")){
-            setIsAuthorized(true);
-            setJwsToken(response.data.token);
+        if( !(response.data.token === "Kullanıcı adı veya şifre yanlış!")){
+            this.context.setIsAuthorized(true);
+            this.context.setUsername(this.state.username);
             setUsername(this.state.username);
-            // this.context.connectWebSocket();
-            this.props.snackbarOpen('Logged in succesfully', "success");
+            setJwsToken(response.data.token);
+            this.props.snackbarOpen('Giriş başarılı', "success");
         }
         else
             this.props.snackbarOpen(response.data.token, "error");

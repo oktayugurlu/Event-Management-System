@@ -10,10 +10,13 @@ import {
 } from '@devexpress/dx-react-chart-material-ui';
 
 import { EventTracker } from '@devexpress/dx-react-chart';
-import {CreatedEventsContext} from "./contexts/CreatedEventsContext";
+import {GlobalStateContext} from "./contexts/GlobalStateContext";
+
+const NUMBER_OF_PARTICIPANT=0;
+const APPLIYING_DAYS=1;
 
 export default class BarChart extends React.PureComponent {
-    static contextType = CreatedEventsContext;
+    static contextType = GlobalStateContext;
 
     constructor(props) {
         super(props);
@@ -26,16 +29,15 @@ export default class BarChart extends React.PureComponent {
     }
 
     componentDidMount() {
-        const pureData = this.context.createdEvents;
-        let preprocessedData = this.preprocess(pureData);
-        this.setState(
-            {
-                data:preprocessedData
-            }
-        );
+        this.preprocessNumberOfParticipant();
     }
-    preprocess = (pureData)=>{
-        return pureData.map(
+    componentWillUnmount() {
+        console.log("Grafik oluyor");
+    }
+
+    preprocessNumberOfParticipant = ()=>{
+        const pureData = this.context.createdEvents;
+        let preprocessedData = pureData.map(
             event=>{
                 return {
                     event: event.title +'/'+ event.uniqueName,
@@ -45,10 +47,12 @@ export default class BarChart extends React.PureComponent {
         ).sort(function(a, b){
             return a.participantNumber-b.participantNumber;
         });
+        this.setState({
+            data:preprocessedData
+        });
     }
-    componentWillUnmount() {
-        console.log("Grafik oluyor");
-    }
+
+
 
     render() {
         const { data: chartData, targetItem } = this.state;

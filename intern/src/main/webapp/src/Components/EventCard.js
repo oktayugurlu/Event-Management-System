@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -13,13 +13,11 @@ import Grid from "@material-ui/core/Grid";
 import AddIcon from '@material-ui/icons/Add';
 
 // Accept Button
-import clsx from 'clsx';
 import {green} from '@material-ui/core/colors';
-import CheckIcon from '@material-ui/icons/Check';
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import {isAuthorized} from "./authentication/LocalStorageService";
 import ParticipantsDetailDialog from "./ParticipantsDetailDialog";
+import {GlobalStateContext} from "./contexts/GlobalStateContext";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -74,6 +72,8 @@ export default function EventCard(props) {
     const classes = useStyles();
     const timer = React.useRef();
 
+    const createdEventsContext = useContext(GlobalStateContext);
+
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
 
@@ -124,7 +124,7 @@ export default function EventCard(props) {
             );
         }
         else if(props.whichPage===ALL_EVENTS_PAGE){
-            if(checkIsUpToDate() && !isAuthorized()){
+            if(checkIsUpToDate() && !createdEventsContext.isAuthorized){
                 return ('');
             }
             else{

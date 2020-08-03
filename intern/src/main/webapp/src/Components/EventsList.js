@@ -8,12 +8,12 @@ import Grid from '@material-ui/core/Grid';
 import Pagination from "@material-ui/lab/Pagination";
 import axios from "axios";
 import AddEventDialog from "./AddEventDialog";
-import {getJwsToken, getUsername} from "./authentication/LocalStorageService";
+import {getJwsToken} from "./authentication/LocalStorageService";
 import AssignEventDialog from "./AssignEventDialog";
-import QrCodeDialog from "./QrCodeDialog";
+import QrCodeWebSocketDialog from "./QrCodeWebSocketDialog";
 import Divider from "@material-ui/core/Divider";
 import BarChart from "./BarChart";
-import {CreatedEventsContext} from "./contexts/CreatedEventsContext";
+import {GlobalStateContext} from "./contexts/GlobalStateContext";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
@@ -33,7 +33,9 @@ export default function EventsList(props) {
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
 
-    const createdEventsContext = useContext(CreatedEventsContext);
+    const QR_CODE_COMPONENT=0;
+
+    const createdEventsContext = useContext(GlobalStateContext);
 
 
 
@@ -43,9 +45,6 @@ export default function EventsList(props) {
 
 
     const printEvents = ()=>{
-
-        console.log("tum eventler: %O",props.allEvents);
-        console.log("created eventler: %O",createdEventsContext.createdEvents);
         const printedEvents = (props.whichPage===MANAGE_EVENT_PAGE) ? createdEventsContext.createdEvents : props.allEvents;
 
         if(printedEvents.length>0)
@@ -186,7 +185,7 @@ export default function EventsList(props) {
             headers:headers
         })
             .then((response) => {
-                props.snackbarOpen(response.data, response.data==="Invalid delete request!" ? "error":"success")
+                props.snackbarOpen(response.data, response.data==="Geçersiz silme işlemi!" ? "error":"success")
                 props.getAllEvents();
             })
             .catch(error => {
@@ -214,13 +213,15 @@ export default function EventsList(props) {
         let qrCode='';
         axios.post("/assignevent/assign/"+eventUniqueName.toString(), participant,{responseType: 'blob'})
             .then((response) => {
-                console.log(response);
                 qrCode = response.data;
-                setQrCodeDialogElement(<QrCodeDialog open={true}
-                                                     qrCodeImage={response.data}
-                                                     handleClose={handleCloseQrCodeDialog}
-                                                     title={assignedEvent.title}
-                />);
+                setQrCodeDialogElement(
+                    <QrCodeWebSocketDialog open={true}
+                                           qrCodeImage={response.data}
+                                           handleClose={handleCloseQrCodeDialog}
+                                           title={assignedEvent.title}
+                                           dialogTitle={"Başvuru Bilgilerinizi İçeren QR Kod"}
+                                           whichDialogContent={QR_CODE_COMPONENT}
+                    />);
                 createdEventsContext.sendNotification(participant,assignedEvent);
             }).catch( error => {
             if (error.response.status === 400) {
