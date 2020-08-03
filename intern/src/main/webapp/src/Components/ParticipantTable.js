@@ -98,25 +98,23 @@ class ParticipantTable extends Component{
         this.createColumnsAndRows(this.props.openedEvent.appliedParticipantSet);
     }
 
-    createColumnsAndRows=(participants)=>{
+    createColumnsAndRows=(applications)=>{
         let columns=[...this.state.columns];
-        let participantObjectList = this.participantRowArrayCreator(participants);
+        let participantObjectList = this.participantRowArrayCreator(applications);
         this.addQuestionToColumn(columns);
-        console.log("Participant Listesi:");
-        console.log(columns);
         this.setState({
-            rows:participantObjectList,
-            columns:columns
+            rows:[...participantObjectList],
+            columns:[...columns]
         });
     }
-    participantRowArrayCreator = (participants)=>{
-        return participants.map((application)=>{
+    participantRowArrayCreator = (applications)=>{
+        return applications.map((application)=>{
             let newParticipant = this.deleteAnswerSetFromParticipant(application.participant);
+
             this.props.openedEvent.questionSet.forEach(
-                (question)=>{
-                    console.log("Participant objesi:");
-                    newParticipant = this.extractAnswerSetAsQuestionAnswerKeyValueForJSON(newParticipant
-                        ,question,application);
+                (question,index)=>{
+                    this.extractAnswerSetAsQuestionAnswerKeyValueForJSON(newParticipant
+                        ,question,application,index );
                 }
             );
             return newParticipant;
@@ -136,7 +134,6 @@ class ParticipantTable extends Component{
                 )
             }
         );
-
     }
 
     deleteAnswerSetFromParticipant = (participant)=>{
@@ -147,12 +144,8 @@ class ParticipantTable extends Component{
             ssn: participant.ssn,
         };
     }
-    extractAnswerSetAsQuestionAnswerKeyValueForJSON = (newParticipant, question, application)=>{
-        newParticipant[question.content] =
-            application.participant.answerSet.filter(
-                (answer)=>
-                    answer.content===question.content
-            )[0];
+    extractAnswerSetAsQuestionAnswerKeyValueForJSON = (newParticipant, question, application, index)=>{
+        newParticipant[question.content] = application.participant.answerSet[index].content;
         return newParticipant;
     }
 

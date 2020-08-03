@@ -24,7 +24,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         config.enableSimpleBroker("/notify");
         config.setApplicationDestinationPrefixes("/app");   // Enables a simple in-memory broker
 
-
     }
 
 
