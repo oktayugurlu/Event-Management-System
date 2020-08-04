@@ -1,4 +1,4 @@
-package com.etkinlikyonetimi.intern.usecases.security.util;
+package com.etkinlikyonetimi.intern.usecases.common.service;
 
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.CorporateUser;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
@@ -26,7 +26,8 @@ public class DatabasePopulator {
 
     public void insertEvent(){
         // List<Authority> savedAuthorities = authorityRepository.saveAll(Set.of(new Authority(null, "READ"), new Authority(null, "WRITE")));
-/*       CorporateUser corporateUser =new CorporateUser("admin", "1234",Set.of());
+/*
+       CorporateUser corporateUser =new CorporateUser("admin", "1234",Set.of());
         CorporateUser corporateUser1 =new CorporateUser("admin1", "admin",Set.of());
         CorporateUser corporateUser2 =new CorporateUser("admin2", "admin",Set.of());
         CorporateUser corporateUser3 =new CorporateUser("admin3", "admin",Set.of());
@@ -48,7 +49,8 @@ public class DatabasePopulator {
                 "Lütfen zamanında gelin!!!",
                 "Çukurambar. Çukurambar Mahallesi, 1111. Sokak, X Blok, No 22, Çankaya,",
                 Set.of(),
-                List.of()
+                List.of(),
+                Set.of()
                 ));
         eventRepository.save(new Event(
                 "event12",
@@ -62,7 +64,8 @@ public class DatabasePopulator {
                 "Lütfen zamanında gelin!!!",
                 "Çukurambar. Çukurambar Mahallesi, 1111. Sokak, X Blok, No 22, Çankaya,",
                 Set.of(),
-                List.of()
+                List.of(),
+                Set.of()
         ));
         eventRepository.save(new Event(
                 "event13",
@@ -76,7 +79,8 @@ public class DatabasePopulator {
                 "Lütfen zamanında gelin!!!",
                 "Çukurambar. Çukurambar Mahallesi, 1111. Sokak, X Blok, No 22, Çankaya,",
                 Set.of(),
-                List.of()
+                List.of(),
+                Set.of()
         ));
         eventRepository.save(new Event(
                 "event14",
@@ -90,7 +94,8 @@ public class DatabasePopulator {
                 "Lütfen zamanında gelin!!!",
                 "Çukurambar. Çukurambar Mahallesi, 1111. Sokak, X Blok, No 22, Çankaya,",
                 Set.of(),
-                List.of()
+                List.of(),
+                Set.of()
         ));
         Event event = eventRepository.save(new Event(
                 "event15",
@@ -104,9 +109,11 @@ public class DatabasePopulator {
                 "Lütfen zamanında gelin!!!",
                 "Çukurambar. Çukurambar Mahallesi, 1111. Sokak, X Blok, No 22, Çankaya,",
                 Set.of(),
-                List.of()
+                List.of(),
+                Set.of()
         ));
         questionRepository.save(new Question(event ,"aaaa",List.of()));
-        questionRepository.save(new Question(event ,"bbbb",List.of()));*/
+        questionRepository.save(new Question(event ,"bbbb",List.of()));
+*/
     }
 }

@@ -1,6 +1,7 @@
 package com.etkinlikyonetimi.intern.usecases.manageevent.entity;
 import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Application;
 import com.etkinlikyonetimi.intern.usecases.common.entity.BaseEntity;
+import com.etkinlikyonetimi.intern.usecases.managesurvey.entity.SurveyQuestion;
 import lombok.*;
 
 import javax.persistence.*;
@@ -55,4 +56,8 @@ public class Event extends BaseEntity {
     //BI-DIRECTIONAL FIELD
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Question> questionSet;
+
+    @OneToMany(mappedBy = "event")
+    private Set<SurveyQuestion> surveyQuestionSet;
+
 }

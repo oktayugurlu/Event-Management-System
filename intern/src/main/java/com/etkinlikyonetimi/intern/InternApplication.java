@@ -1,6 +1,6 @@
 package com.etkinlikyonetimi.intern;
 
-import com.etkinlikyonetimi.intern.usecases.security.util.DatabasePopulator;
+import com.etkinlikyonetimi.intern.usecases.common.service.DatabasePopulator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;

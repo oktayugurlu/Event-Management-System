@@ -36,6 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/manageevent/addevent").authenticated()
                 .antMatchers("/manageevent/deleteevent/{uniqueName}").authenticated()
                 .antMatchers("/manageevent/updateevent").authenticated()
+                .antMatchers("/managesurvey/createsurvey").authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

@@ -388,9 +388,7 @@ class App extends Component{
                   />)
                   }/>
                   <Route path="/manageevents" component={() => this.routeManageEventPageIfAuthorized()}/>
-                  <Route path="/" component={() => <Login snackbarOpen={this.snackbarOpen}
-                                                          setCreatedEvents={this.setCreatedEvents}
-                                                          updateLeftMenuIfAuthorized={this.updateLeftMenuIfAuthorized}/>}/>
+                  <Route path="/" component={() => this.routeManageEventPageIfAuthorized()}/>
                 </Switch>
               </Grid>
               {/* Page contents end */}

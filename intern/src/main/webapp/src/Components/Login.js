@@ -65,8 +65,6 @@ class Login extends Component {
             }
         }).then((response) => {
             this.context.setCreatedEvents(response.data);
-
-            // this.props.updateLeftMenuIfAuthorized();
             this.props.history.push("/manageevents");
         });
     }

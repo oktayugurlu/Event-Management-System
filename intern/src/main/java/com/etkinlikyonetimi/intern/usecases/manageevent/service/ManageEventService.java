@@ -61,10 +61,12 @@ public class ManageEventService {
 
     }
 
+
     //After update event, set all question's event field to their related event
     public void setQuestionsEventFieldAndSave(Event requestEvent, Event updatedEvent) {
         System.out.println(requestEvent.getQuestionSet().toString());
-        deleteQuestionIfNotExistOnEventsField(requestEvent, updatedEvent);
+
+        // deleteQuestionIfNotExistOnEventsField(requestEvent, updatedEvent);
         if (!requestEvent.getQuestionSet().toString().isEmpty() && requestEvent.getQuestionSet().toString()!=null)
             saveQuestionIfNotExistOnDatabase(requestEvent, updatedEvent);
     }

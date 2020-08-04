@@ -1,9 +1,6 @@
 package com.etkinlikyonetimi.intern.usecases.assignevent.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Embeddable;
 import java.io.Serializable;
@@ -13,6 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Setter
 @Getter
+@EqualsAndHashCode
 public class ApplicationPrimaryKey implements Serializable {
     public Long event;
     public Long participant;

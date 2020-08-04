@@ -51,23 +51,15 @@ ALTER SEQUENCE public.answer_seq
     OWNER TO postgres;
 	
 	--> survey sequences
-CREATE SEQUENCE public.survey_questions_seq
+CREATE SEQUENCE public.survey_question_seq
     INCREMENT 1
     START 1
     MINVALUE 1
     MAXVALUE 9223372036854775807
     CACHE 1;
-ALTER SEQUENCE public.survey_questions_seq
+ALTER SEQUENCE public.survey_question_seq
     OWNER TO postgres;
 	
-CREATE SEQUENCE public.survey_seq
-    INCREMENT 1
-    START 1
-    MINVALUE 1
-    MAXVALUE 9223372036854775807
-    CACHE 1;
-ALTER SEQUENCE public.survey_seq
-    OWNER TO postgres;
 
 CREATE SEQUENCE public.survey_answer_seq
     INCREMENT 1
@@ -222,41 +214,21 @@ ALTER TABLE public.answer
 	
 	
 
-
-CREATE TABLE public.survey
+ 
+CREATE TABLE public.survey_question
 (
-	"id" bigint NOT NULL default nextval('survey_seq'),
+    "id" bigint NOT NULL default nextval('survey_question_seq'),
     creation_date timestamp without time zone,
     last_modified_date timestamp without time zone,
     "version" bigint,
-	"name" character varying(255) COLLATE pg_catalog."default",
+    "content" character varying(255) COLLATE pg_catalog."default",
     event_id bigint NOT NULL,
-	UNIQUE ("name"),
     PRIMARY KEY ("id"),
     FOREIGN KEY (event_id)
-        REFERENCES public."event" ("id") MATCH SIMPLE
+        REFERENCES public.event ("id") MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
- 
-	
-CREATE TABLE public.survey_questions
-(
-    "id" bigint NOT NULL default nextval('survey_questions_seq'),
-    creation_date timestamp without time zone,
-    last_modified_date timestamp without time zone,
-    "version" bigint,
-    "question" character varying(255) COLLATE pg_catalog."default",
-    survey_id bigint,
-    PRIMARY KEY ("id"),
-    UNIQUE ("question", survey_id),
-    FOREIGN KEY (survey_id)
-        REFERENCES public.survey ("id") MATCH SIMPLE
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
-
-
 
 CREATE TABLE public.survey_answer
 (
@@ -265,14 +237,14 @@ CREATE TABLE public.survey_answer
     last_modified_date timestamp without time zone,
     "version" bigint,
     "point" int,
-    survey_questions_id bigint,
+    survey_question_id bigint,
 	participant_id bigint,
-    PRIMARY KEY ("id"),
-    UNIQUE (survey_questions_id, participant_id),
-    FOREIGN KEY (survey_questions_id)
-        REFERENCES public.survey_questions ("id") MATCH SIMPLE
+    PRIMARY KEY ("id"), 
+    UNIQUE (participant_id, survey_question_id), 
+    FOREIGN KEY (survey_question_id)
+        REFERENCES public.survey_question ("id") MATCH SIMPLE
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
+        ON DELETE CASCADE, 
     FOREIGN KEY (participant_id)
         REFERENCES public.participant ("id") MATCH SIMPLE
         ON UPDATE CASCADE

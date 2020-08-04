@@ -30,7 +30,7 @@ export default class EventQuestion extends React.Component{
                 errorMessages={['Bu alan gerekli', "Aynı soruyu ekleyemezsin!"]}
                 style={{
                     marginTop:'8px',
-                    minWidth: '90vh'
+                    minWidth: '95vh'
                 }}
                 multiline
                 rowsMax={4}

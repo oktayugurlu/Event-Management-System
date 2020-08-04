@@ -18,7 +18,10 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import ParticipantsDetailDialog from "./ParticipantsDetailDialog";
 import {GlobalStateContext} from "./contexts/GlobalStateContext";
-
+import AssessmentIcon from '@material-ui/icons/Assessment';
+import SurveyDialog from "./SurveyDialog";
+import {getJwsToken} from "./authentication/LocalStorageService";
+import axios from "axios";
 const useStyles = makeStyles((theme) => ({
     root: {
         minWidth: 275,
@@ -78,6 +81,7 @@ export default function EventCard(props) {
     const ALL_EVENTS_PAGE=2;
 
     const [participantsDetailDialogElement, setParticipantsDetailDialogElement] = React.useState(<></>);
+    const [surveyDialogElement, setSurveyDialogElement] = React.useState(<></>);
 
 
     React.useEffect(() => {
@@ -120,6 +124,17 @@ export default function EventCard(props) {
                             <DeleteIcon/>
                         </Fab>
                     </div>
+                    <div className={classes.wrapper}>
+                        <Fab
+                            aria-label="delete"
+                            color="inherit"
+                            style={{colorInherit:"#FF7F00"}}
+                            onClick={()=>handleClickOpenSurveyButton()}
+                            disabled={checkIsUpToDate()}
+                        >
+                            <AssessmentIcon/>
+                        </Fab>
+                    </div>
                 </Grid>
             );
         }
@@ -143,6 +158,38 @@ export default function EventCard(props) {
             }
         }
     }
+    const handleClickOpenSurveyButton = ()=>{
+        setSurveyDialogElement(
+            <SurveyDialog
+                openDialog={true}
+                handleClose={handleCloseSurveyButton}
+                handleSubmit={handleSubmitSurveyButton}
+                event={props.eventObject}
+            />
+        );
+    }
+    const handleCloseSurveyButton= ()=>{
+        setSurveyDialogElement(<></>);
+    }
+    const handleSubmitSurveyButton= (surveyQuestions)=>{
+        console.log(props.eventObject.uniqueName);
+        let headers = {
+            'Authorization': `Bearer ${getJwsToken()}`
+        };
+        axios.post("/managesurvey/createsurvey/"+props.eventObject.uniqueName, surveyQuestions, {
+            headers:headers
+        })
+            .then((response) => {
+                if(response.data==='') props.snackbarOpen("Anket başarı ile güncellendi", "success");
+                else props.snackbarOpen(response.data, "error");
+                props.getAllEvents();
+            }).catch(error => {
+            if(error.response.status === 500 || error.response.status === 400)
+                props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
+            console.log(error.response);
+        });
+    }
+
     const handleCloseParticipantsDetailDialog = (title) => {
         setParticipantsDetailDialogElement(<></>);
     };
@@ -158,6 +205,7 @@ export default function EventCard(props) {
 
     return (
         <Card className={classes.root} >
+            {surveyDialogElement}
             {participantsDetailDialogElement}
             <Grid
                 container

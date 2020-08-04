@@ -72,7 +72,7 @@ class AddEventDialog extends Component{
                 selectedStartDateTime:this.props.updatedEvent.startDateTime,
                 selectedEndDateTime:this.props.updatedEvent.endDateTime,
                 questionCounter:this.props.updatedEvent.questionSet.length,
-                questionElementList:(this.props.updatedEvent.questionSet).map((questionObject,index)=>this.createQuestionElementFromEventDTO(questionObject,index)),
+                questionElementList:(this.props.updatedEvent.questionSet).map((questionObject,index)=>this.createQuestionElementFromEventDTO(questionObject.content,index)),
                 questionValueList:this.extractQuestionObjectToQuestionValueFromEventDTO(this.props.updatedEvent.questionSet),
                 quota: this.props.updatedEvent.quota,
                 marker:{
@@ -106,9 +106,8 @@ class AddEventDialog extends Component{
             <EventQuestion onChange = {this.onChangeQuestion}
                            key={index}
                            questionCounter={index+1}
-                           updatedQuestion={questionValue.content}
+                           updatedQuestion={questionValue}
                            name={index}
-                           disabled={this.props.isEventUpdated}
             />
         );
     }
@@ -119,14 +118,15 @@ class AddEventDialog extends Component{
 
 
     onClickDeleteQuestion = (index)=>{
-        let questionElementListToDeleteElement = [...this.state.questionElementList];
         let questionValueListToDeleteValue = [...this.state.questionValueList];
-        questionElementListToDeleteElement.splice(index,index+1);
-        questionValueListToDeleteValue.splice(index,index+1);
+        questionValueListToDeleteValue.splice(index,1);
+        let refreshedQuestionElementList = questionValueListToDeleteValue.map((value, index)=>{
+            return this.createQuestionElementFromEventDTO(value, index);
+        });
         this.setState({
             questionCounter: this.state.questionCounter-1,
             questionValueList: questionValueListToDeleteValue,
-            questionElementList: questionElementListToDeleteElement
+            questionElementList: refreshedQuestionElementList
         });
     }
 
@@ -185,31 +185,9 @@ class AddEventDialog extends Component{
                 appliedParticipantSet: [],
                 questionSet: this.state.questionValueList.map((item)=>this.createQuestionObject(item))
             };
-            this.clearStateVariable();
             this.props.handleSubmit(updatedObject);
         }
     };
-
-    clearStateVariable = ()=>{
-        this.setState({
-                uniqueName:'',
-                address: '',
-                title: '',
-                notes: '',
-                selectedStartDateTime: new Date(),
-                selectedEndDateTime: new Date(),
-                questionCounter: 0,
-                questionElementList: [],
-                questionValueList: [],
-                quota: 1,
-                marker: {
-                    lat: 300,
-                    lng: 300
-                },
-                updatedEvent:{}
-            }
-        );
-    }
 
     isMarkSelectFromMap=()=> !(this.state.marker.lng === 300);
 
