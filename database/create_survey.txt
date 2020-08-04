@@ -266,10 +266,15 @@ CREATE TABLE public.survey_answer
     "version" bigint,
     "point" int,
     survey_questions_id bigint,
+	participant_id bigint,
     PRIMARY KEY ("id"),
-    UNIQUE (survey_questions_id, "point"),
+    UNIQUE (survey_questions_id, participant_id),
     FOREIGN KEY (survey_questions_id)
         REFERENCES public.survey_questions ("id") MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (participant_id)
+        REFERENCES public.participant ("id") MATCH SIMPLE
         ON UPDATE CASCADE
         ON DELETE CASCADE
 )
