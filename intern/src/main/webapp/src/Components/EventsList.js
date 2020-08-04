@@ -185,12 +185,15 @@ export default function EventsList(props) {
             headers:headers
         })
             .then((response) => {
-                props.snackbarOpen(response.data, response.data==="Geçersiz silme işlemi!" ? "error":"success")
+                props.snackbarOpen(
+                    response.data, response.data==="Geçersiz silme işlemi!"
+                    ? "error"
+                    :"success");
                 props.getAllEvents();
             })
             .catch(error => {
                 if (error.response.status === 400) {
-                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
+                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
                 }
             })
     }
@@ -211,16 +214,18 @@ export default function EventsList(props) {
     const handleSubmitAssignEvent = (participant, eventUniqueName, assignedEvent) => {
         setAssignEventDialogElement(<div/>);
         let qrCode='';
-        axios.post("/assignevent/assign/"+eventUniqueName.toString(), participant,{responseType: 'blob'})
+        axios.post("/assignevent/assign/"+eventUniqueName.toString(),
+            participant,{responseType: 'blob'})
             .then((response) => {
                 qrCode = response.data;
                 setQrCodeDialogElement(
-                    <QrCodeWebSocketDialog open={true}
-                                           qrCodeImage={response.data}
-                                           handleClose={handleCloseQrCodeDialog}
-                                           title={assignedEvent.title}
-                                           dialogTitle={"Başvuru Bilgilerinizi İçeren QR Kod"}
-                                           whichDialogContent={QR_CODE_COMPONENT}
+                    <QrCodeWebSocketDialog
+                        open={true}
+                        qrCodeImage={response.data}
+                        handleClose={handleCloseQrCodeDialog}
+                        title={assignedEvent.title}
+                        dialogTitle={"Başvuru Bilgilerinizi İçeren QR Kod"}
+                        whichDialogContent={QR_CODE_COMPONENT}
                     />);
                 createdEventsContext.sendNotification(participant,assignedEvent);
             }).catch( error => {
