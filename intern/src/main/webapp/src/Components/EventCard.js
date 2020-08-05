@@ -126,7 +126,7 @@ export default function EventCard(props) {
                     </div>
                     <div className={classes.wrapper}>
                         <Fab
-                            aria-label="delete"
+                            aria-label="survey"
                             color="inherit"
                             style={{colorInherit:"#FF7F00"}}
                             onClick={()=>handleClickOpenSurveyButton()}
@@ -172,7 +172,7 @@ export default function EventCard(props) {
         setSurveyDialogElement(<></>);
     }
     const handleSubmitSurveyButton= (surveyQuestions)=>{
-        console.log(props.eventObject.uniqueName);
+        console.log("surveyQuestions: %O", surveyQuestions);
         let headers = {
             'Authorization': `Bearer ${getJwsToken()}`
         };
@@ -182,12 +182,13 @@ export default function EventCard(props) {
             .then((response) => {
                 if(response.data==='') props.snackbarOpen("Anket başarı ile güncellendi", "success");
                 else props.snackbarOpen(response.data, "error");
-                props.getAllEvents();
             }).catch(error => {
+                console.log(error);
             if(error.response.status === 500 || error.response.status === 400)
                 props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
             console.log(error.response);
         });
+        handleCloseSurveyButton();
     }
 
     const handleCloseParticipantsDetailDialog = (title) => {

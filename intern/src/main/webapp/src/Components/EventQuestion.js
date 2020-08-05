@@ -4,11 +4,12 @@ import {TextValidator} from "react-material-ui-form-validator";
 export default class EventQuestion extends React.Component{
     state = {
         questionCounter:0,
-        question:this.props.updatedQuestion
+        question:''
     }
     componentDidMount() {
         this.setState({
-            questionCounter: this.props.questionCounter
+            questionCounter: this.props.questionCounter,
+            question:this.props.updatedQuestion
         });
     }
 
@@ -22,7 +23,7 @@ export default class EventQuestion extends React.Component{
     render(){
         return (
             <TextValidator
-                label={"Soru-"+this.state.questionCounter}
+                label={"Soru-"+this.props.name.slice(2,3)}
                 onChange={this.handleChange}
                 name={this.props.name.toString()}
                 value={this.state.question}

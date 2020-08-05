@@ -89,6 +89,7 @@ export default function EventsList(props) {
                             handleSubmit= {handleSubmitUpdateEvent}
                             handleClickOpenUpdateDialog={handleClickOpenUpdateDialog}
                             handleClickDeleteEventButton={handleClickDeleteEventButton}
+                            snackbarOpen={props.snackbarOpen}
                 />
             );
         }

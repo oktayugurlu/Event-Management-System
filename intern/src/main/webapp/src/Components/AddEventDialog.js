@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {makeStyles, withStyles} from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
 import Alert from "@material-ui/lab/Alert";
-import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
+import {TextValidator, ValidatorForm} from 'react-material-ui-form-validator';
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -13,9 +13,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import 'date-fns';
 import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
-import {
-    MuiPickersUtilsProvider, DateTimePicker,
-} from '@material-ui/pickers';
+import {DateTimePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import enLocale from "date-fns/locale/en-GB";
 
 
@@ -37,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 
 class AddEventDialog extends Component{
 
+    lastAddedSequenceQuestionId=0;
 
     constructor(props) {
         super(props);
@@ -48,8 +47,8 @@ class AddEventDialog extends Component{
             selectedStartDateTime:new Date(),
             selectedEndDateTime:new Date(),
             questionCounter:0,
-            questionElementList:[],
-            questionValueList:[],
+            questionElementObject:{},
+            questionValueObject: {},
             quota: 1,
             marker:{
                 lat: 300,
@@ -64,6 +63,7 @@ class AddEventDialog extends Component{
             return !isThereSameUniqueNameArray.includes(true);
         });
         if (this.props.isEventUpdated){
+            this.extractQuestionObjectToQuestionElementFromEventDTO(this.props.updatedEvent.questionSet);
             this.setState( {
                 uniqueName:this.props.updatedEvent.uniqueName,
                 address: this.props.updatedEvent.address,
@@ -72,8 +72,6 @@ class AddEventDialog extends Component{
                 selectedStartDateTime:this.props.updatedEvent.startDateTime,
                 selectedEndDateTime:this.props.updatedEvent.endDateTime,
                 questionCounter:this.props.updatedEvent.questionSet.length,
-                questionElementList:(this.props.updatedEvent.questionSet).map((questionObject,index)=>this.createQuestionElementFromEventDTO(questionObject.content,index)),
-                questionValueList:this.extractQuestionObjectToQuestionValueFromEventDTO(this.props.updatedEvent.questionSet),
                 quota: this.props.updatedEvent.quota,
                 marker:{
                     lat: this.props.updatedEvent.latitude,
@@ -82,7 +80,10 @@ class AddEventDialog extends Component{
             });
         }
         ValidatorForm.addValidationRule('isContentUnique', (value) => {
-            let isThereSameContent =  this.state.questionValueList.map(questionValue=>questionValue===value);
+            let questionValueObjectRef = this.state.questionValueObject
+            let isThereSameContent = Object.keys(questionValueObjectRef).map(function(key) {
+                return questionValueObjectRef[key]===value;
+            });
             let counts = 0;
             isThereSameContent.forEach(function(isTrue) { if(isTrue) counts += 1;});
             return !(counts>1);
@@ -100,68 +101,113 @@ class AddEventDialog extends Component{
     };
 
 
-
+    extractQuestionObjectToQuestionElementFromEventDTO = (questionSet) =>{
+        let createdQuestionElementObject={};
+        let createdQuestionValueObject={};
+        console.log(questionSet);
+        questionSet.forEach(
+            (questionObject,index)=> {
+                let elementFromEventDTO = this.createQuestionElementFromEventDTO(questionObject.content, index);
+                createdQuestionElementObject['q_'+this.lastAddedSequenceQuestionId]=elementFromEventDTO;
+                createdQuestionValueObject['q_'+this.lastAddedSequenceQuestionId] = questionObject.content;
+            });
+        this.setState({
+            questionElementObject:createdQuestionElementObject,
+            questionValueObject:createdQuestionValueObject
+        });
+    };
     createQuestionElementFromEventDTO = (questionValue, index)=>{
+        let id = ++this.lastAddedSequenceQuestionId;
         return (
-            <EventQuestion onChange = {this.onChangeQuestion}
-                           key={index}
-                           questionCounter={index+1}
-                           updatedQuestion={questionValue}
-                           name={index}
-            />
+            <Grid key={'q_'+ id}
+                  container
+                  direction="row"
+                  justify="space-between"
+                  alignItems="flex-end"
+            >
+                <EventQuestion onChange = {this.onChangeQuestion}
+                               questionCounter={index+1}
+                               updatedQuestion={questionValue}
+                               name={'q_'+id}
+                />
+                <IconButton aria-label="delete" onClick = {()=>this.onClickDeleteQuestion('q_'+id)}>
+                    <DeleteIcon style={{color:'red'}}/>
+                </IconButton>
+            </Grid>
         );
     }
+    onClickDeleteQuestion = (deletedId)=>{
+        console.log("selam");
+        console.log("onchange: %O",this.state.questionValueObject);
+        let questionElementObjectToDeleteElement = {...this.state.questionElementObject};
+        let questionValueObjectToDeleteValue = {...this.state.questionValueObject};
+        delete questionElementObjectToDeleteElement[deletedId];
+        delete questionValueObjectToDeleteValue[deletedId];
 
-    extractQuestionObjectToQuestionValueFromEventDTO = (questionSet) =>{
-        return questionSet.map((questionObject)=> questionObject.content);
-    };
+        console.log("selam");
+        console.log("onchange: %O",questionValueObjectToDeleteValue);
 
-
-    onClickDeleteQuestion = (index)=>{
-        let questionValueListToDeleteValue = [...this.state.questionValueList];
-        questionValueListToDeleteValue.splice(index,1);
-        let refreshedQuestionElementList = questionValueListToDeleteValue.map((value, index)=>{
-            return this.createQuestionElementFromEventDTO(value, index);
-        });
+        console.log(questionElementObjectToDeleteElement);
         this.setState({
             questionCounter: this.state.questionCounter-1,
-            questionValueList: questionValueListToDeleteValue,
-            questionElementList: refreshedQuestionElementList
+            questionValueObject: {...questionValueObjectToDeleteValue},
+            questionElementObject: {...questionElementObjectToDeleteElement}
         });
     }
-
     handleAddQuestionButton = () => {
-        const documents = this.state.questionElementList.concat(
-            this.createEmptyQuestionElement()
-        );
-        let expandedQuestionValueList = [...this.state.questionValueList];
-        expandedQuestionValueList[this.state.questionCounter] = '';
+        let documents = {...this.state.questionElementObject};
+        console.log("before");
+        let createdElement = this.createEmptyQuestionElement();
+        documents['q_'+ this.lastAddedSequenceQuestionId] = createdElement;
+
+        let expandedQuestionValueList = {...this.state.questionValueObject};
+        expandedQuestionValueList['q_'+ (this.lastAddedSequenceQuestionId)] = '';
+
+        console.log("after");
         this.setState({
-            questionValueList: expandedQuestionValueList,
-            questionElementList: documents,
+            questionValueObject: expandedQuestionValueList,
+            questionElementObject: documents,
             questionCounter: this.state.questionCounter+1
         });
     };
 
     createEmptyQuestionElement = () =>{
+        let id = ++this.lastAddedSequenceQuestionId;
         return (
-            <EventQuestion onChange = {this.onChangeQuestion}
-                           key={(this.state.questionCounter+1)}
-                           questionCounter={this.state.questionCounter+1}
-                           name={this.state.questionCounter}
-                           updatedQuestion={''}
-            />
+            <Grid key={'q_'+ id}
+                  container
+                  direction="row"
+                  justify="space-between"
+                  alignItems="flex-end"
+            >
+                <EventQuestion onChange = {this.onChangeQuestion}
+                               questionCounter={this.state.questionCounter+1}
+                               name={'q_'+id}
+                               updatedQuestion={''}
+                />
+                <IconButton aria-label="delete" onClick = {()=>this.onClickDeleteQuestion('q_'+id)}>
+                    <DeleteIcon style={{color:'red'}}/>
+                </IconButton>
+            </Grid>
         );
     };
 
     onChangeQuestion = (event) => {
-        let questionValueListCopy = [...this.state.questionValueList];
-        questionValueListCopy[event.target.name] = event.target.value;
-        console.log( questionValueListCopy);
+        console.log("onchange: %O",this.state.questionValueObject);
+        let questionValueObjectCopy = {...this.state.questionValueObject};
+        let changedId = event.target.name;
+        questionValueObjectCopy[changedId] = event.target.value;
         this.setState({
-            questionValueList:questionValueListCopy
+            questionValueObject:questionValueObjectCopy
         });
     };
+
+    exportQuestionElementFromJSONAsArray=()=>{
+        let refQuestionElementObject = this.state.questionElementObject;
+        return Object.keys(refQuestionElementObject).map(function(key) {
+            return refQuestionElementObject[key];
+        });
+    }
 
     handleChangeQuota = (event) => {
         const quota = event.target.value;
@@ -172,6 +218,13 @@ class AddEventDialog extends Component{
 
     handleSubmit = () =>{
         if(this.state.selectedEndDateTime>this.state.selectedStartDateTime && this.isMarkSelectFromMap()) { // Everything is ok, the form can be submitted.
+            let questionSet = Object.keys(this.state.questionValueObject).map(
+                (key) =>{
+                return this.createQuestionObject(this.state.questionValueObject[key]);
+            });
+
+            console.log("submitSorulsi: %O",this.state.questionValueObject);
+            console.log(questionSet);
             let updatedObject = {
                 uniqueName: this.state.uniqueName,
                 title: this.state.title,
@@ -183,11 +236,33 @@ class AddEventDialog extends Component{
                 notes: this.state.notes,
                 address: this.state.address,
                 appliedParticipantSet: [],
-                questionSet: this.state.questionValueList.map((item)=>this.createQuestionObject(item))
+                questionSet: questionSet
             };
+            this.clearStateVariable();
             this.props.handleSubmit(updatedObject);
         }
     };
+
+    clearStateVariable = ()=>{
+        this.setState({
+                uniqueName:'',
+                address: '',
+                title: '',
+                notes: '',
+                selectedStartDateTime: new Date(),
+                selectedEndDateTime: new Date(),
+                questionCounter: 0,
+                questionElementObject: {},
+                questionValueObject: {},
+                quota: 1,
+                marker: {
+                    lat: 300,
+                    lng: 300
+                },
+                updatedEvent:{}
+            }
+        );
+    }
 
     isMarkSelectFromMap=()=> !(this.state.marker.lng === 300);
 
@@ -197,22 +272,7 @@ class AddEventDialog extends Component{
         };
     }
 
-    extractQuestionElements = () => {
-        return this.state.questionElementList.map((value, i) => {
-            return (
-                <Grid key={i}
-                      container
-                      direction="row"
-                      justify="space-between"
-                      alignItems="flex-end">
-                    {value}
-                    <IconButton aria-label="delete" onClick = {() =>{this.onClickDeleteQuestion(i)}}>
-                        <DeleteIcon style={{color:'red'}}/>
-                    </IconButton>
-                </Grid>
-            );
-        })
-    }
+
 
     isStartDateAndEndDateValid = (selectedStartDateTime, selectedEndDateTime) =>{
         let currentDate = new Date();
@@ -392,8 +452,7 @@ class AddEventDialog extends Component{
                                     shrink: true,
                                 }}
                             />
-                            {this.extractQuestionElements()}
-
+                            {this.exportQuestionElementFromJSONAsArray()}
                             <Grid container direction="row"
                                   justify="center"
                                   alignItems="center">

@@ -26,25 +26,31 @@ const useStyles = makeStyles((theme) => ({
 class SurveyDialog extends Component{
 
 
+
+    lastAddedSequenceQuestionId=0;
+
     constructor(props) {
         super(props);
         this.state = {
             questionCounter:0,
-            questionElementList:[],
-            questionValueList:[]
+            questionElementObject:{},
+            questionValueObject: {}
         }
     }
 
     componentDidMount() {
-        if (this.props.event.surveyQuestionSet.length>0){
-            this.setState( {
-                questionCounter:this.props.event.surveyQuestionSet.length,
-                questionElementList:(this.props.event.surveyQuestionSet).map((questionObject,index)=>this.createQuestionElementFromEventDTO(questionObject.content,index)),
-                questionValueList:this.extractQuestionObjectToQuestionValueFromEventDTO(this.props.event.surveyQuestionSet),
-            });
-        }
+        ValidatorForm.addValidationRule('isTitleUnique', (value) => {
+            let isThereSameUniqueNameArray =  this.props.allEvents.map((event)=> event.uniqueName===value );
+            return !isThereSameUniqueNameArray.includes(true);
+        });
+
+        this.extractQuestionObjectToQuestionElementFromEventDTO(this.props.event.surveyQuestionSet);
+
         ValidatorForm.addValidationRule('isContentUnique', (value) => {
-            let isThereSameContent =  this.state.questionValueList.map(questionValue=>questionValue===value);
+            let questionValueObjectRef = this.state.questionValueObject
+            let isThereSameContent = Object.keys(questionValueObjectRef).map(function(key) {
+                return questionValueObjectRef[key]===value;
+            });
             let counts = 0;
             isThereSameContent.forEach(function(isTrue) { if(isTrue) counts += 1;});
             return !(counts>1);
@@ -55,74 +61,116 @@ class SurveyDialog extends Component{
         ValidatorForm.removeValidationRule('isContentUnique');
     };
 
+
+    extractQuestionObjectToQuestionElementFromEventDTO = (questionSet) =>{
+        let createdQuestionElementObject={};
+        let createdQuestionValueObject={};
+        questionSet.forEach(
+            (questionObject,index)=> {
+                let elementFromEventDTO = this.createQuestionElementFromEventDTO(questionObject.content, index);
+                createdQuestionElementObject['q_'+this.lastAddedSequenceQuestionId]=elementFromEventDTO;
+                createdQuestionValueObject['q_'+this.lastAddedSequenceQuestionId] = questionObject.content;
+            });
+        this.setState({
+            questionElementObject:createdQuestionElementObject,
+            questionValueObject:createdQuestionValueObject
+        });
+    };
     createQuestionElementFromEventDTO = (questionValue, index)=>{
+        let id = ++this.lastAddedSequenceQuestionId;
         return (
-            <EventQuestion onChange = {this.onChangeQuestion}
-                           key={index}
-                           questionCounter={index+1}
-                           updatedQuestion={questionValue}
-                           name={index}
-            />
+            <Grid key={'q_'+ id}
+                  container
+                  direction="row"
+                  justify="space-between"
+                  alignItems="flex-end"
+            >
+                <EventQuestion onChange = {this.onChangeQuestion}
+                               questionCounter={index+1}
+                               updatedQuestion={questionValue}
+                               name={'q_'+id}
+                />
+                <IconButton aria-label="delete" onClick = {()=>this.onClickDeleteQuestion('q_'+id)}>
+                    <DeleteIcon style={{color:'red'}}/>
+                </IconButton>
+            </Grid>
         );
     }
+    onClickDeleteQuestion = (deletedId)=>{
+        console.log("selam");
+        console.log("onchange: %O",this.state.questionValueObject);
+        let questionElementObjectToDeleteElement = {...this.state.questionElementObject};
+        let questionValueObjectToDeleteValue = {...this.state.questionValueObject};
+        delete questionElementObjectToDeleteElement[deletedId];
+        delete questionValueObjectToDeleteValue[deletedId];
 
-    extractQuestionObjectToQuestionValueFromEventDTO = (questionSet) =>{
-        return questionSet.map((questionObject)=> questionObject.content);
-    };
-
-    onClickDeleteQuestion = (index)=>{
-        let questionValueListToDeleteValue = [...this.state.questionValueList];
-        questionValueListToDeleteValue.splice(index,1);
-        let refreshedQuestionElementList = questionValueListToDeleteValue.map((value, index)=>{
-            return this.createQuestionElementFromEventDTO(value, index);
-        });
         this.setState({
             questionCounter: this.state.questionCounter-1,
-            questionValueList: questionValueListToDeleteValue,
-            questionElementList: refreshedQuestionElementList
+            questionValueObject: {...questionValueObjectToDeleteValue},
+            questionElementObject: {...questionElementObjectToDeleteElement}
         });
     }
-
     handleAddQuestionButton = () => {
-        const documents = this.state.questionElementList.concat(
-            this.createEmptyQuestionElement()
-        );
-        let expandedQuestionValueList = [...this.state.questionValueList];
-        expandedQuestionValueList[this.state.questionCounter] = '';
+        let documents = {...this.state.questionElementObject};
+        let createdElement = this.createEmptyQuestionElement();
+        documents['q_'+ this.lastAddedSequenceQuestionId] = createdElement;
+
+        let expandedQuestionValueList = {...this.state.questionValueObject};
+        expandedQuestionValueList['q_'+ (this.lastAddedSequenceQuestionId)] = '';
+
         this.setState({
-            questionValueList: expandedQuestionValueList,
-            questionElementList: documents,
+            questionValueObject: expandedQuestionValueList,
+            questionElementObject: documents,
             questionCounter: this.state.questionCounter+1
         });
     };
 
     createEmptyQuestionElement = () =>{
+        let id = ++this.lastAddedSequenceQuestionId;
         return (
-            <EventQuestion onChange = {this.onChangeQuestion}
-                           key={(this.state.questionCounter+1)}
-                           questionCounter={this.state.questionCounter+1}
-                           name={this.state.questionCounter}
-                           updatedQuestion={''}
-            />
+            <Grid key={'q_'+ id}
+                  container
+                  direction="row"
+                  justify="space-between"
+                  alignItems="flex-end"
+            >
+                <EventQuestion onChange = {this.onChangeQuestion}
+                               questionCounter={this.state.questionCounter+1}
+                               name={'q_'+id}
+                               updatedQuestion={''}
+                />
+                <IconButton aria-label="delete" onClick = {()=>this.onClickDeleteQuestion('q_'+id)}>
+                    <DeleteIcon style={{color:'red'}}/>
+                </IconButton>
+            </Grid>
         );
     };
 
     onChangeQuestion = (event) => {
-        let questionValueListCopy = [...this.state.questionValueList];
-        questionValueListCopy[event.target.name] = event.target.value;
-        console.log( questionValueListCopy);
+        console.log("onchange: %O",this.state.questionValueObject);
+        let questionValueObjectCopy = {...this.state.questionValueObject};
+        let changedId = event.target.name;
+        questionValueObjectCopy[changedId] = event.target.value;
         this.setState({
-            questionValueList:questionValueListCopy
+            questionValueObject:questionValueObjectCopy
         });
     };
 
+    exportQuestionElementFromJSONAsArray=()=>{
+        let refQuestionElementObject = this.state.questionElementObject;
+        return Object.keys(refQuestionElementObject).map(function(key) {
+            return refQuestionElementObject[key];
+        });
+    }
+
     handleSubmit = () =>{
-        console.log(this.props.event);
-        let questionSet = this.state.questionValueList.map((item)=>{
-            this.createQuestionObject(item,[]);
+        let questionSet = Object.keys(this.state.questionValueObject).map((key)=>{
+            return this.createQuestionObject(this.state.questionValueObject[key],[]);
         });
         this.props.handleSubmit(questionSet);
     };
+
+
     createQuestionObject = (item, surveyAnswerSet) =>{
         return {
             content: item,
@@ -130,22 +178,7 @@ class SurveyDialog extends Component{
         };
     }
 
-    extractQuestionElements = (questionElementList) => {
-        return questionElementList.map((value, i) => {
-            return (
-                <Grid key={i}
-                      container
-                      direction="row"
-                      justify="space-between"
-                      alignItems="flex-end">
-                    {value}
-                    <IconButton aria-label="delete" onClick = {() =>{this.onClickDeleteQuestion(i)}}>
-                        <DeleteIcon style={{color:'red'}}/>
-                    </IconButton>
-                </Grid>
-            );
-        })
-    }
+
 
     render() {
         const { classes } = this.props;
@@ -164,7 +197,7 @@ class SurveyDialog extends Component{
                     >
                         <DialogTitle id="scroll-dialog-title">Add Event</DialogTitle>
                         <DialogContent>
-                            {this.extractQuestionElements(this.state.questionElementList)}
+                            {this.exportQuestionElementFromJSONAsArray( )}
 
                             <Grid container direction="row"
                                   justify="center"
