@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-class SurveyDialog extends Component{
+class CreateSurveyDialog extends Component{
 
 
 
@@ -230,4 +230,4 @@ class SurveyDialog extends Component{
 }
 
 
-export default withStyles(useStyles)(SurveyDialog)
+export default withStyles(useStyles)(CreateSurveyDialog)

@@ -19,7 +19,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import ParticipantsDetailDialog from "./ParticipantsDetailDialog";
 import {GlobalStateContext} from "./contexts/GlobalStateContext";
 import AssessmentIcon from '@material-ui/icons/Assessment';
-import SurveyDialog from "./SurveyDialog";
+import SurveyDialog from "./CreateSurveyDialog";
 import {getJwsToken} from "./authentication/LocalStorageService";
 import axios from "axios";
 const useStyles = makeStyles((theme) => ({
@@ -79,6 +79,8 @@ export default function EventCard(props) {
 
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
+
+    const SURVEY_RESULTS=2;
 
     const [participantsDetailDialogElement, setParticipantsDetailDialogElement] = React.useState(<></>);
     const [surveyDialogElement, setSurveyDialogElement] = React.useState(<></>);

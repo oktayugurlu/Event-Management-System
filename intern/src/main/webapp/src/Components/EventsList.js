@@ -32,8 +32,11 @@ export default function EventsList(props) {
 
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
-
     const QR_CODE_COMPONENT=0;
+
+    //BARCHART CONSTANTS
+    const ALL_EVENTS_NUMBER_OF_PARTICIPANTS=0;
+    //BARCHART CONSTANTS
 
     const createdEventsContext = useContext(GlobalStateContext);
 
@@ -277,7 +280,7 @@ export default function EventsList(props) {
             return(
                 <Grid container direction="column" spacing={3}>
                     <Grid item style={{marginLeft: '40px', marginRight: '40px', marginTop: '40px'}}>
-                        <BarChart/>
+                        <BarChart whichChart={ALL_EVENTS_NUMBER_OF_PARTICIPANTS}/>
                     </Grid>
                     <Grid item>
                         <Divider variant="middle"/>
