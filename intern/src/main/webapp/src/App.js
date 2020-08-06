@@ -147,6 +147,7 @@ class App extends Component{
               open={true}
           />)
     });
+    this.getAllEvents();
   }
   handleCloseWebsocketDialog = () => {
     this.setState({

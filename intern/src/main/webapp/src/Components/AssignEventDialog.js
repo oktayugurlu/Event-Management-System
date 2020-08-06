@@ -16,6 +16,10 @@ export default class AssignEventDialog extends Component{
 
     constructor(props) {
         super(props);
+        let answerEmpty = {};
+        this.props.assignedEvent.questionSet.forEach(question=> {
+            answerEmpty[question.content] = '';
+        });
         this.state = {
             assignedEvent:{},
             participant:{
@@ -24,14 +28,13 @@ export default class AssignEventDialog extends Component{
                 surname:'',
                 mail:''
             },
-            questionAnswerMap: {},
+            questionAnswerMap: {...answerEmpty},
             questionAnswerElementArray:[]
         }
+
     }
     componentDidMount(){
-        this.props.assignedEvent.questionSet.forEach(question=> {
-            this.questionAnswerJSONCreator(question.content, '');
-        });
+
     }
 
     componentWillUnmount() {
@@ -148,6 +151,7 @@ export default class AssignEventDialog extends Component{
             return (<Alert severity="warning">Üzgünüz, bu etkinlik maksimum kotaya erişti!</Alert>);
         }
         else{
+
             return(
                 <Grid direction="column" container spacing={3}>
                     <Grid item xs>
@@ -203,7 +207,11 @@ export default class AssignEventDialog extends Component{
                         <TextField
                             label={question.content}
                             value={this.state.questionAnswerMap[question.content]}
-                            onChange={(event)=>this.questionAnswerJSONCreator(question.content, event.target.value)}
+                            onChange={
+                                (event)=>this.questionAnswerJSONCreator(
+                                    question.content,
+                                    event.target.value)
+                            }
                             error={this.isValueEmpty(this.state.questionAnswerMap[question.content])}
                             helperText={this.isValueEmpty(this.state.questionAnswerMap[question.content])?'This field is required!':''}
                             inputProps={{ maxLength: 50}}
@@ -219,12 +227,12 @@ export default class AssignEventDialog extends Component{
             ...this.state.questionAnswerMap
         };
         questionAnswerMapCopy[question] = answer;
-        this.setState(prevState=>({
-            questionAnswerMap: {
-                ...prevState.questionAnswerMap,
-                [question]:answer
-            }
-        }));
+        console.log("hello question: %O",question);
+        console.log("hello: %O",questionAnswerMapCopy);
+        this.setState({
+            questionAnswerMap: questionAnswerMapCopy
+        });
+        console.log("hellothis.state.questionAnswerMap: %O",this.state.questionAnswerMap);
     }
 
     handleSubmit = ()=>{
