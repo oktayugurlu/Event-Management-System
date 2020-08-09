@@ -126,4 +126,8 @@ public class ManageSurveyService {
                 .isEmpty();
 
     }
+
+    public List<SurveyAnswer> findSurveyAnswersByParticipant(Participant participant) {
+        return surveyAnswerRepository.findByParticipantSSN(participant.getSsn());
+    }
 }

@@ -82,21 +82,12 @@ export default function EventCard(props) {
 
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
-
+    const APPLIED_EVENTS_PAGE=3;
 /*    const SURVEY_RESULTS=2;*/
 
     const [participantsDetailDialogElement, setParticipantsDetailDialogElement] = React.useState(<></>);
     const [surveyDialogElement, setSurveyDialogElement] = React.useState(<></>);
     const [fillSurveyDialogElement, setFillSurveyDialogElement] = React.useState(<></>);
-
-
-/*    React.useEffect(() => {
-        return () => {
-            clearTimeout(timer.current);
-        };
-    }, []);*/
-
-
 
     const selectCardActionButtons = ()=>{
         if(props.whichPage === MANAGE_EVENT_PAGE){
@@ -212,6 +203,37 @@ export default function EventCard(props) {
                 );
             }
         }
+        else if(props.whichPage===APPLIED_EVENTS_PAGE){
+            return (
+                <Grid
+                    container
+                    direction="column"
+                    justify="flex-start"
+                    alignItems="center"
+                >
+                    <div className={classes.wrapper}>
+                        <Tooltip title={checkEndDateIsUpToDate(new Date())
+                            ? "Anket etkinlik bitince aktif olacak"
+                            : "Anketi doldurun"}
+                                 aria-label="add">
+                            <Box component="span" display="block">
+                                    <span>
+                                        <Fab
+                                            aria-label="survey"
+                                            color="inherit"
+                                            style={{colorInherit:"#FF7F00"}}
+                                            onClick={()=>handleClickOpenFillSurveyButton()}
+                                            disabled={checkEndDateIsUpToDate(new Date())}
+                                        >
+                                            <AssessmentIcon/>
+                                        </Fab>
+                                    </span>
+                            </Box>
+                        </Tooltip>
+                    </div>
+                </Grid>
+            );
+        }
     }
     const checkStartDateIsNotUpToDate = (compareWith)=>{
         return props.eventObject.startDateTime <= compareWith;
@@ -223,12 +245,14 @@ export default function EventCard(props) {
 
     //********* FILL SURVEY BUTTONS **********//
     const handleClickOpenFillSurveyButton = ()=>{
+        console.log("acildi");
         setFillSurveyDialogElement(
             <FillSurveyDialog
                 openDialog={true}
                 handleClose={handleCloseFillSurveyButton}
                 handleSubmit={handleSubmitFillSurveyButton}
                 event={props.eventObject}
+                participant={props.participant}
             />
         );
     }
@@ -248,15 +272,14 @@ export default function EventCard(props) {
                     props.snackbarOpen("Anket başarı ile dolduruldu!", "success");
                 }
                 else props.snackbarOpen(response.data, "error");
+                createdEventsContext.getAllEvents();
             }).catch(error => {
                 if(error.response.status === 400)
                     props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
                 if(error.response.data.code===500){
-                    console.log(error.response.data.message);
                     props.snackbarOpen(error.response.data.message, "error");
                 }
         });
-        createdEventsContext.getAllEvents();
         handleCloseFillSurveyButton();
     }
 
@@ -294,7 +317,6 @@ export default function EventCard(props) {
         });
         handleCloseManageSurveyButton();
     }
-
 
 
     //********* PARTICIPANT DETAILS **********//
@@ -340,7 +362,7 @@ export default function EventCard(props) {
                 alignItems="center"
             >
                 <Grid item md={10}>
-                    <CardActionArea disabled={props.whichPage===ALL_EVENTS_PAGE} onClick={handleOpenParticipantsDetailDialog}>
+                    <CardActionArea disabled={props.whichPage!==MANAGE_EVENT_PAGE} onClick={handleOpenParticipantsDetailDialog}>
                         <CardContent>
                             <Grid
                                 container

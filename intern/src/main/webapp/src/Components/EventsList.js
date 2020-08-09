@@ -268,6 +268,8 @@ export default function EventsList(props) {
     };
     //**** ASSIGN EVENT FUNCTIONS END ****//
 
+
+
     const printBarChartsIfManagePage = ()=>{
         if(props.whichPage===MANAGE_EVENT_PAGE){
 
@@ -307,7 +309,6 @@ export default function EventsList(props) {
                 container
             >
                 {printBarChartsIfManagePage()}
-
                 {printEvents()}
                 <Grid item style={{paddingTop:'20px', paddingBottom:'40px'}}>
                     <Grid
@@ -321,8 +322,6 @@ export default function EventsList(props) {
                     </Grid>
                 </Grid>
             </Grid>
-
-
         </Grid>
     )
 }

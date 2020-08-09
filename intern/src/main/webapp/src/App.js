@@ -29,6 +29,7 @@ import MuiAlert from '@material-ui/lab/Alert';
 import {getJwsToken, getUsername} from "./Components/authentication/LocalStorageService";
 import {GlobalStateContext} from "./Components/contexts/GlobalStateContext";
 import QrCodeWebSocketDialog from "./Components/QrCodeWebSocketDialog";
+import AppliedEventsList from "./Components/AppliedEventsList";
 
 
 const styles = theme =>  ({
@@ -69,6 +70,7 @@ class App extends Component{
       setUsername:this.setUsername ,
       setCreatedEvents:this.setCreatedEvents,
       sendNotification:this.sendNotification,
+      getAllEvents:this.getAllEvents,
       websocketDialogElement:(<></>)
     };
   }
@@ -76,6 +78,7 @@ class App extends Component{
 
   MANAGE_EVENT_PAGE=1;
   ALL_EVENTS_PAGE=2;
+  APPLIED_EVENTS_PAGE=3;
 
   componentDidMount() {
     this.getAllEvents();
@@ -263,19 +266,19 @@ class App extends Component{
   routeManageEventPageIfAuthorized=()=>{
     if (!this.state.isAuthorized)
       return (<Login
-          snackbarOpen={this.snackbarOpen}
-          setCreatedEvents={this.setCreatedEvents}
-          updateLeftMenuIfAuthorized={this.updateLeftMenuIfAuthorized}
-      />);
+                  snackbarOpen={this.snackbarOpen}
+                  setCreatedEvents={this.setCreatedEvents}
+                  updateLeftMenuIfAuthorized={this.updateLeftMenuIfAuthorized}
+              />);
     else
       return (<EventsList
-          allEvents={this.state.allEvents}
-          snackbarOpen={this.snackbarOpen}
-          snackbarClose={this.snackbarClose}
-          whichPage={this.MANAGE_EVENT_PAGE}
-          getAllEvents={this.getAllEvents}
-          pageTitle={'Etkinlikleri Yönet'}
-      />);
+                  allEvents={this.state.allEvents}
+                  snackbarOpen={this.snackbarOpen}
+                  snackbarClose={this.snackbarClose}
+                  whichPage={this.MANAGE_EVENT_PAGE}
+                  getAllEvents={this.getAllEvents}
+                  pageTitle={'Etkinlikleri Yönet'}
+              />);
   }
 
   setCreatedEvents = (newEvents)=>{
@@ -285,7 +288,6 @@ class App extends Component{
         }
     )
   }
-
 
   render(){
     const { classes } = this.props;
@@ -330,8 +332,6 @@ class App extends Component{
                       direction="column"
                       justify="center"
                       alignItems="center"
-                      // spacing={3}
-                      // style={{ minHeight: '100vh' }}
                   >
                     <Card className={classes.root} variant="outlined" style={{backgroundColor: '#F6931E'}}>
                       <List component="nav" aria-label="main mailbox folders">
@@ -345,12 +345,14 @@ class App extends Component{
                           </ListItem>
                         </Link>
                         <Divider/>
-                        <ListItem button>
-                          <ListItemIcon>
-                            <EventAvailableIcon/>
-                          </ListItemIcon>
-                          <ListItemText primary="Katıldığın Etkinlikler" style={{color: 'white'}}/>
-                        </ListItem>
+                        <Link to={"/listappliedevents"} style={{textDecoration: 'none'}}>
+                          <ListItem button>
+                            <ListItemIcon>
+                              <EventAvailableIcon/>
+                            </ListItemIcon>
+                            <ListItemText primary="Katıldığın Etkinlikler" style={{color: 'white'}}/>
+                          </ListItem>
+                        </Link>
                         <Divider/>
                         <Link to={"/manageevents"} style={{textDecoration: 'none'}}>
                           <ListItem button>
@@ -383,6 +385,14 @@ class App extends Component{
                   />)
                   }/>
                   <Route path="/manageevents" component={() => this.routeManageEventPageIfAuthorized()}/>
+                  <Route path="/listappliedevents" component={
+                    () => (<AppliedEventsList allEvents={this.state.allEvents}
+                                              pageTitle={'Kaydolunan Etkinlikler'}
+                                              whichPage={this.APPLIED_EVENTS_PAGE}
+                                              snackbarOpen={this.snackbarOpen}
+                                              snackbarClose={this.snackbarClose}
+                          />)}
+                  />
                   <Route path="/" component={() => this.routeManageEventPageIfAuthorized()}/>
                 </Switch>
               </Grid>
@@ -403,8 +413,6 @@ class App extends Component{
         </GlobalStateContext.Provider>
     );
   }
-
-
 }
 
 export default withStyles(styles)(App)

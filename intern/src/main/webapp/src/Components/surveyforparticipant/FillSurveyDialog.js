@@ -50,118 +50,6 @@ class FillSurveyDialog extends Component{
         }
     }
 
-    renderDialogContent = ()=>{
-        if(this.state.isSubmitSSNClicked){
-            if(this.state.isParticipantAppliedThisEvent && this.isParticipantDontFillSurveyBefore())
-                return (<SurveyTableToFill
-                            surveyQuestions={this.props.event.surveyQuestionSet}
-                            handleChangeRadioButtons={this.handleChangeRadioButtons}
-                            renderRadioButtons={this.renderRadioButtons}
-                        />);
-
-            else
-                return ( <Grid container>
-                            <Grid item md={3}/>
-                            <Grid item md={6}>
-                                <TextField
-                                    id="filled-error-helper-text"
-                                    label="TC Kimlik Numarası"
-                                    variant="filled"
-                                    inputProps={{ maxLength: 11}}
-                                    onChange={this.handleOnChangeSSNInput}
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item md={3}/>
-                        </Grid>);
-        }
-        else
-            return(<Grid container>
-                    <Grid item md={3}/>
-                    <Grid item md={6}>
-                        <TextField
-                            id="filled-error-helper-text"
-                            label="TC Kimlik Numarası"
-                            variant="filled"
-                            onChange={this.handleOnChangeSSNInput}
-                            inputProps={{ maxLength: 11}}
-                            fullWidth
-                        />
-                    </Grid>
-                    <Grid item md={3}/>
-                   </Grid>);
-    }
-    handleOnChangeSSNInput = (event)=>{
-        this.setState({
-            ssn:event.target.value
-        });
-    }
-    renderErrorMessage = ()=>{
-        if(this.state.isSubmitSSNClicked && !this.state.isParticipantAppliedThisEvent)
-            return (
-                <Grid container>
-                    <Grid item md={3}/>
-                    <Grid item md={6}>
-                        <Alert style={{marginTop:'8px', marginBottom:'8px'}} severity="error">
-                            Bu TC Kimlik numarası ile bir katılımcı bulunamadı!
-                        </Alert>
-                    </Grid>
-                    <Grid item md={3}/>
-                </Grid>);
-        console.log(this.state.isSubmitSSNClicked);
-        console.log(this.state.isParticipantAppliedThisEvent);
-        console.log(this.isParticipantDontFillSurveyBefore());
-        if(this.state.isSubmitSSNClicked
-            && this.state.isParticipantAppliedThisEvent
-            && !this.isParticipantDontFillSurveyBefore()
-        )
-            return (
-                <Grid container>
-                    <Grid item md={3}/>
-                    <Grid item md={6}>
-                        <Alert style={{marginTop:'8px', marginBottom:'8px'}} severity="error">
-                            Anketi doldurmuşsunuz!
-                        </Alert>
-                    </Grid>
-                    <Grid item md={3}/>
-                </Grid>);
-
-    }
-
-    isParticipantDontFillSurveyBefore() {
-        return this.props.event.appliedParticipantSet.filter(application=>application.participant.ssn === this.participant.ssn)===[];
-    }
-
-    chooseSubmitFunction=()=>{
-        if(this.state.isSubmitSSNClicked && this.state.isParticipantAppliedThisEvent && this.isParticipantDontFillSurveyBefore()){
-            return this.handleSubmitSurvey;
-        }
-        else
-            return this.handleClickSubmitSSN;
-    }
-
-    handleClickSubmitSSN = ()=>{
-        let isParticipantApplied;
-        this.props.event.appliedParticipantSet.forEach(
-            application=>{
-                if(application.participant.ssn===this.state.ssn){
-                    isParticipantApplied=true;
-                    this.participant = application.participant;
-                }
-            }
-        );
-        if(isParticipantApplied)
-            this.setState({
-                isParticipantAppliedThisEvent:true,
-                isSubmitSSNClicked:true
-            });
-        else
-            this.setState({
-                isSubmitSSNClicked:true
-            });
-    }
-
-
     //******* Survey Table Functions ******//
     handleSubmitSurvey=()=>{
         console.log("submit: %O",this.state.questionAnswerMap);
@@ -182,7 +70,7 @@ class FillSurveyDialog extends Component{
         );
         return {
             point:answerPoint,
-            participant:this.participant,
+            participant:this.props.participant,
             surveyQuestion: {...surveyQuestionObject}
         };
     }
@@ -214,15 +102,18 @@ class FillSurveyDialog extends Component{
                                 container
                                 direction="column"
                             >
-                                {this.renderDialogContent()}
-                                {this.renderErrorMessage()}
+                                <SurveyTableToFill
+                                    surveyQuestions={this.props.event.surveyQuestionSet}
+                                    handleChangeRadioButtons={this.handleChangeRadioButtons}
+                                    renderRadioButtons={this.renderRadioButtons}
+                                />
                             </Grid>
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={this.props.handleClose} color="primary">
                                 İptal
                             </Button>
-                            <Button onClick={this.chooseSubmitFunction()} type="submit" color="primary">Gönder</Button>
+                            <Button onClick={this.handleSubmitSurvey} type="submit" color="primary">Gönder</Button>
                         </DialogActions>
                 </Dialog>
             </div>
