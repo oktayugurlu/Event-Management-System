@@ -26,7 +26,6 @@ export default function Map(props) {
         libraries,
     });
     const [marker, setMarker] = React.useState({});
-    const [selected, setSelected] = React.useState(null);
 
     const extractMarkerToParentComponent = props.onClick;
     const onMapClick = React.useCallback((e) => {
@@ -56,18 +55,14 @@ export default function Map(props) {
              return (<Marker
                         key={`${marker.lat}-${marker.lng}`}
                         position={{ lat: marker.lat, lng: marker.lng }}
-                        onClick={() => {
-                            setSelected(marker);
-                        }}
+
                      />);
          if(!isEmpty(props.updatedMarker) && !props.isStatic)
              return (
                  <Marker
                      key={`${marker.lat}-${marker.lng}`}
                      position={{ lat: props.updatedMarker.lat, lng: props.updatedMarker.lng }}
-                     onClick={() => {
-                         setSelected(marker);
-                     }}
+
 
                  />
              );
@@ -76,9 +71,7 @@ export default function Map(props) {
                  <Marker
                      key={`${marker.lat}-${marker.lng}`}
                      position={{ lat: props.staticMarker.lat, lng: props.staticMarker.lng }}
-                     onClick={() => {
-                         setSelected(marker);
-                     }}
+
 
                  />
              );

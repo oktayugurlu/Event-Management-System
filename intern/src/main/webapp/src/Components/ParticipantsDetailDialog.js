@@ -81,11 +81,6 @@ export default class ParticipantsDetailDialog extends Component{
                             <Grid item>
                                 <Divider variant="middle"/>
                             </Grid>
-                            <Grid item>
-                                <Typography variant="h5" gutterBottom>
-                                    Senin Tarafından Yaratılan Etkinlikler
-                                </Typography>
-                            </Grid>
                             <Grid>
                                 <ParticipantTable openedEvent={this.props.openedEvent}/>
                             </Grid>

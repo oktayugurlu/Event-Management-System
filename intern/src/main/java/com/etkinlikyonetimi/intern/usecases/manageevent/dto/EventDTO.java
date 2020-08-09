@@ -2,7 +2,10 @@ package com.etkinlikyonetimi.intern.usecases.manageevent.dto;
 
 import com.etkinlikyonetimi.intern.usecases.assignevent.dto.ApplicationDTO;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.dto.SurveyQuestionDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;

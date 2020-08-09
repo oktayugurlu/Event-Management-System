@@ -27,7 +27,7 @@ export default function EventsList(props) {
     const [assignEventDialogElement, setAssignEventDialogElement] = React.useState(<div/>);
     const [qrCodeDialogElement, setQrCodeDialogElement] = React.useState(<></>);
 
-    const ITEMS_PER_PAGE = 3;
+    const ITEMS_PER_PAGE = 5;
     const CARD_IMAGE_URL='https://images.all-free-download.com/images/graphiclarge/team_meeting_background_table_stationery_gathering_people_icons_6838493.jpg';
 
     const MANAGE_EVENT_PAGE=1;
@@ -102,6 +102,8 @@ export default function EventsList(props) {
                             eventObject={eventObject}
                             imageOfEvent={CARD_IMAGE_URL}
                             handleClickOpenAssignDialog={handleClickOpenAssignDialog}
+                            snackbarOpen={props.snackbarOpen}
+
                 />
             );
         }
@@ -140,7 +142,7 @@ export default function EventsList(props) {
             headers:headers
         })
             .then((response) => {
-                if(response.data==='') props.snackbarOpen(eventObject.uniqueName+" updated successfully", "success");
+                if(response.data==='') props.snackbarOpen(eventObject.uniqueName+" başarıyla güncellendi!", "success");
                 else props.snackbarOpen(response.data, "error");
                 props.getAllEvents();
             }).catch(error => {
@@ -172,14 +174,7 @@ export default function EventsList(props) {
         }
     }
 
-    function isEmpty(obj) {
-        for(let prop in obj) {
-            if(obj.hasOwnProperty(prop)) {
-                return false;
-            }
-        }
-        return JSON.stringify(obj) === JSON.stringify({});
-    }
+
 
     const handleClickDeleteEventButton = (uniqueName)=>{
         let headers = {
@@ -217,11 +212,10 @@ export default function EventsList(props) {
 
     const handleSubmitAssignEvent = (participant, eventUniqueName, assignedEvent) => {
         setAssignEventDialogElement(<div/>);
-        let qrCode='';
+
         axios.post("/assignevent/assign/"+eventUniqueName.toString(),
             participant,{responseType: 'blob'})
             .then((response) => {
-                qrCode = response.data;
                 setQrCodeDialogElement(
                     <QrCodeWebSocketDialog
                         open={true}
@@ -233,12 +227,12 @@ export default function EventsList(props) {
                     />);
                 createdEventsContext.sendNotification(participant,assignedEvent);
             }).catch( error => {
-            if (error.response.status === 400) {
-                props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error")
-            }
-            let blob = error.response.data;
-            let promise = blopToPromiseParser(blob);
-            promiseToJSONParserIncludeFunction(promise);
+                        if (error.response.status === 400) {
+                            props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
+                        }
+                        let blob = error.response.data;
+                        let promise = blopToPromiseParser(blob);
+                        promiseToJSONParserIncludeFunction(promise);
         });
     }
 
@@ -252,7 +246,7 @@ export default function EventsList(props) {
         let errorMessage = {};
         promise.text().then(result=> {
             console.log("before");
-            console.log(result);
+            console.log("%O",result);
             errorMessage = JSON.parse(result);
             console.log(errorMessage);
             if(errorMessage.code === 500){
@@ -315,13 +309,12 @@ export default function EventsList(props) {
                 {printBarChartsIfManagePage()}
 
                 {printEvents()}
-                <Grid item >
+                <Grid item style={{paddingTop:'20px', paddingBottom:'40px'}}>
                     <Grid
                         container
                         direction="row"
                         justify="center"
                         alignItems="flex-start"
-                        style={{marginBottom:'40px'}}
                     >
                         <Pagination count={calculateNumberOfPage()}
                                     onChange={onChangePageNumber}/>

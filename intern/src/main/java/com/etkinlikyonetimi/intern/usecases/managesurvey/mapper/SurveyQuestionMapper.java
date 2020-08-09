@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface SurveyQuestionMapper {
 
-    SurveyQuestionDTO mapToDto(SurveyQuestion surveyQuestion);
+    SurveyQuestionDTO mapToDto(SurveyQuestion question);
 
     List<SurveyQuestionDTO> mapToDto(List<SurveyQuestion> surveyQuestionList);
 

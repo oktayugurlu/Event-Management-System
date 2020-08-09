@@ -26,5 +26,5 @@ public class SurveyAnswer extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "survey_question_id")
-    private SurveyQuestion question;
+    private SurveyQuestion surveyQuestion;
 }

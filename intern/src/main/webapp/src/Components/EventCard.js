@@ -22,6 +22,9 @@ import AssessmentIcon from '@material-ui/icons/Assessment';
 import SurveyDialog from "./CreateSurveyDialog";
 import {getJwsToken} from "./authentication/LocalStorageService";
 import axios from "axios";
+import FillSurveyDialog from "./surveyforparticipant/FillSurveyDialog";
+import Tooltip from "@material-ui/core/Tooltip";
+import Box from "@material-ui/core/Box";
 const useStyles = makeStyles((theme) => ({
     root: {
         minWidth: 275,
@@ -73,28 +76,27 @@ const useStyles = makeStyles((theme) => ({
 
 export default function EventCard(props) {
     const classes = useStyles();
-    const timer = React.useRef();
+  /*  const timer = React.useRef();*/
 
     const createdEventsContext = useContext(GlobalStateContext);
 
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
 
-    const SURVEY_RESULTS=2;
+/*    const SURVEY_RESULTS=2;*/
 
     const [participantsDetailDialogElement, setParticipantsDetailDialogElement] = React.useState(<></>);
     const [surveyDialogElement, setSurveyDialogElement] = React.useState(<></>);
+    const [fillSurveyDialogElement, setFillSurveyDialogElement] = React.useState(<></>);
 
 
-    React.useEffect(() => {
+/*    React.useEffect(() => {
         return () => {
             clearTimeout(timer.current);
         };
-    }, []);
+    }, []);*/
 
-    const checkIsUpToDate = ()=>{
-        return props.eventObject.endDateTime <= new Date();
-    }
+
 
     const selectCardActionButtons = ()=>{
         if(props.whichPage === MANAGE_EVENT_PAGE){
@@ -107,92 +109,195 @@ export default function EventCard(props) {
                 >
                     <div className={classes.wrapper}
                     >
-                        <Fab
-                            aria-label="edit"
-                            color="primary"
-                            disabled={checkIsUpToDate()}
-                            onClick={()=>props.handleClickOpenUpdateDialog(props.eventObject)}
-                        >
-                            <EditIcon />
-                        </Fab>
+                        <Tooltip title="Etkinliği güncelle" aria-label="add">
+                            <Box component="span" display="block">
+                                <span>
+                                    <Fab
+                                        aria-label="edit"
+                                        color="primary"
+                                        disabled={checkStartDateIsNotUpToDate( new Date())}
+                                        onClick={()=>props.handleClickOpenUpdateDialog(props.eventObject)}
+                                    >
+                                        <EditIcon />
+                                    </Fab>
+                                </span>
+                            </Box>
+                        </Tooltip>
                     </div>
                     <div className={classes.wrapper}>
-                        <Fab
-                            aria-label="delete"
-                            color="secondary"
-                            onClick={()=>props.handleClickDeleteEventButton(props.eventObject.uniqueName)}
-                            disabled={checkIsUpToDate()}
-                        >
-                            <DeleteIcon/>
-                        </Fab>
+                        <Tooltip title="Sil" aria-label="add">
+                            <Box component="span" display="block">
+                                <span>
+                                    <Fab
+                                        aria-label="delete"
+                                        color="secondary"
+                                        onClick={()=>props.handleClickDeleteEventButton(props.eventObject.uniqueName)}
+                                        disabled={checkStartDateIsNotUpToDate( new Date())}
+                                    >
+                                        <DeleteIcon/>
+                                    </Fab>
+                                </span>
+                            </Box>
+                        </Tooltip>
                     </div>
                     <div className={classes.wrapper}>
-                        <Fab
-                            aria-label="survey"
-                            color="inherit"
-                            style={{colorInherit:"#FF7F00"}}
-                            onClick={()=>handleClickOpenSurveyButton()}
-                            disabled={checkIsUpToDate()}
-                        >
-                            <AssessmentIcon/>
-                        </Fab>
+                        <Tooltip title="Etkinlikleri yönet" aria-label="add">
+                            <Box component="span" display="block">
+                                <span>
+                                    <Fab
+                                        aria-label="survey"
+                                        color="inherit"
+                                        style={{colorInherit:"#FF7F00"}}
+                                        onClick={()=>handleClickOpenManageSurveyButton()}
+                                        disabled={checkStartDateIsNotUpToDate()}
+                                    >
+                                        <AssessmentIcon/>
+                                    </Fab>
+                                </span>
+                            </Box>
+                        </Tooltip>
                     </div>
                 </Grid>
             );
         }
         else if(props.whichPage===ALL_EVENTS_PAGE){
-            if(checkIsUpToDate() && !createdEventsContext.isAuthorized){
+            if(checkStartDateIsNotUpToDate( new Date()) && !createdEventsContext.isAuthorized){
                 return ('');
             }
             else{
                 return (
-                    <div className={classes.wrapper}>
-                        <Fab
-                            aria-label="save"
-                            color="primary"
-                            onClick={()=>props.handleClickOpenAssignDialog(props.eventObject)}
-                            disabled={checkIsUpToDate()}
-                        >
-                            <AddIcon />
-                        </Fab>
-                    </div>
+                    <Grid
+                        container
+                        direction="column"
+                        justify="flex-start"
+                        alignItems="center"
+                    >
+                        <div className={classes.wrapper}>
+                            <Tooltip title="Katıl" aria-label="add">
+                                <Box component="span" display="block">
+                                    <span>
+                                        <Fab
+                                            aria-label="save"
+                                            color="primary"
+                                            onClick={()=>props.handleClickOpenAssignDialog(props.eventObject)}
+                                            disabled={checkStartDateIsNotUpToDate( new Date())}
+                                        >
+                                            <AddIcon />
+                                        </Fab>
+                                    </span>
+                                </Box>
+                            </Tooltip>
+                        </div>
+                        <div className={classes.wrapper}>
+                            <Tooltip title={checkEndDateIsUpToDate(new Date())
+                                                ? "Anket etkinlik bitince aktif olacak"
+                                                : "Anketi doldurun"}
+                                     aria-label="add">
+                                <Box component="span" display="block">
+                                    <span>
+                                        <Fab
+                                            aria-label="survey"
+                                            color="inherit"
+                                            style={{colorInherit:"#FF7F00"}}
+                                            onClick={()=>handleClickOpenFillSurveyButton()}
+                                            disabled={checkEndDateIsUpToDate(new Date())}
+                                        >
+                                            <AssessmentIcon/>
+                                        </Fab>
+                                    </span>
+                                </Box>
+                            </Tooltip>
+                        </div>
+                    </Grid>
                 );
             }
         }
     }
-    const handleClickOpenSurveyButton = ()=>{
-        setSurveyDialogElement(
-            <SurveyDialog
+    const checkStartDateIsNotUpToDate = (compareWith)=>{
+        return props.eventObject.startDateTime <= compareWith;
+    }
+    const checkEndDateIsUpToDate = (compareWith)=>{
+        return props.eventObject.endDateTime > compareWith;
+    }
+
+
+    //********* FILL SURVEY BUTTONS **********//
+    const handleClickOpenFillSurveyButton = ()=>{
+        setFillSurveyDialogElement(
+            <FillSurveyDialog
                 openDialog={true}
-                handleClose={handleCloseSurveyButton}
-                handleSubmit={handleSubmitSurveyButton}
+                handleClose={handleCloseFillSurveyButton}
+                handleSubmit={handleSubmitFillSurveyButton}
                 event={props.eventObject}
             />
         );
     }
-    const handleCloseSurveyButton= ()=>{
+    const handleCloseFillSurveyButton= ()=>{
+        setFillSurveyDialogElement(<></>);
+    }
+    const handleSubmitFillSurveyButton= (surveyAnswers)=>{
+        console.log("surveyAnswers: %O", surveyAnswers);
+        let headers = {
+            'Authorization': `Bearer ${getJwsToken()}`
+        };
+        axios.post("/managesurvey/fillsurvey/"+props.eventObject.uniqueName, surveyAnswers, {
+            headers:headers
+        })
+            .then((response) => {
+                if(response.data===''){
+                    props.snackbarOpen("Anket başarı ile dolduruldu!", "success");
+                }
+                else props.snackbarOpen(response.data, "error");
+            }).catch(error => {
+                if(error.response.status === 400)
+                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
+                if(error.response.data.code===500){
+                    console.log(error.response.data.message);
+                    props.snackbarOpen(error.response.data.message, "error");
+                }
+        });
+        createdEventsContext.getAllEvents();
+        handleCloseFillSurveyButton();
+    }
+
+
+    //********* MANAGE SURVEY BUTTONS **********//
+    const handleClickOpenManageSurveyButton = ()=>{
+        setSurveyDialogElement(
+            <SurveyDialog
+                openDialog={true}
+                handleClose={handleCloseManageSurveyButton}
+                handleSubmit={handleSubmitManageSurveyButton}
+                event={props.eventObject}
+            />
+        );
+    }
+    const handleCloseManageSurveyButton= ()=>{
         setSurveyDialogElement(<></>);
     }
-    const handleSubmitSurveyButton= (surveyQuestions)=>{
+    const handleSubmitManageSurveyButton= (surveyQuestions)=>{
         console.log("surveyQuestions: %O", surveyQuestions);
         let headers = {
             'Authorization': `Bearer ${getJwsToken()}`
         };
         axios.post("/managesurvey/createsurvey/"+props.eventObject.uniqueName, surveyQuestions, {
             headers:headers
-        })
-            .then((response) => {
-                if(response.data==='') props.snackbarOpen("Anket başarı ile güncellendi", "success");
-                else props.snackbarOpen(response.data, "error");
-            }).catch(error => {
-                console.log(error);
+        }).then((response) => {
+            if(response.data==='') {
+                props.snackbarOpen("Anket başarı ile güncellendi", "success");
+                createdEventsContext.getAllEvents();
+            }
+            else props.snackbarOpen(response.data, "error");
+        }).catch(error => {
             if(error.response.status === 500 || error.response.status === 400)
                 props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
-            console.log(error.response);
         });
-        handleCloseSurveyButton();
+        handleCloseManageSurveyButton();
     }
 
+
+
+    //********* PARTICIPANT DETAILS **********//
     const handleCloseParticipantsDetailDialog = (title) => {
         setParticipantsDetailDialogElement(<></>);
     };
@@ -206,9 +311,27 @@ export default function EventCard(props) {
         ));
     }
 
+    const renderEventDetailsIfInManagePage = ()=>{
+        if(props.whichPage === MANAGE_EVENT_PAGE)
+        return (<>
+                <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
+                    <b>Etinlik ID: </b> {props.eventObject.uniqueName}
+                </Typography>
+                <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
+                    <b>Kalan Kota: </b> {props.eventObject.quota}
+                </Typography>
+                <Typography style={{marginTop:'5px'}} variant="body2" component="p" >
+                    <b>Katılımcı Sayısı: </b> {props.eventObject.appliedParticipantSet.length}
+                </Typography>
+            </>
+        );
+    }
+    //********* PARTICIPANT DETAILS **********//
+
     return (
         <Card className={classes.root} >
             {surveyDialogElement}
+            {fillSurveyDialogElement}
             {participantsDetailDialogElement}
             <Grid
                 container
@@ -244,29 +367,18 @@ export default function EventCard(props) {
                                             {props.eventObject.title}
                                         </Typography>
                                         <br/>
-                                        {(props.whichPage === MANAGE_EVENT_PAGE)
-                                            ?   (<>
-                                                    <Typography variant="body2" component="p" >
-                                                        <b>Etinlik ID: </b> {props.eventObject.uniqueName}
-                                                    </Typography>
-                                                    <Typography variant="body2" component="p" >
-                                                        <b>Kalan Kota: </b> {props.eventObject.quota}
-                                                    </Typography>
-                                                    <Typography variant="body2" component="p" >
-                                                        <b>Katılımcı Sayısı: </b> {props.eventObject.appliedParticipantSet.length}
-                                                    </Typography>
-                                                </>
-                                            )
-                                            :''
-                                        }
-                                        <Typography variant="body2" component="p" >
-                                            <b>Başlangıç Tarihi: </b> {props.eventObject.startDateTime.toString().slice(0,21)}
+
+                                        {renderEventDetailsIfInManagePage()}
+                                        <Typography style={{marginTop:'5px'}} variant="body2" component="p" >
+                                            <b>Adres: </b> {props.eventObject.address}
                                         </Typography>
-                                        <Typography variant="body2" component="p" >
-                                            <b>Bitiş Tarihi: </b> {props.eventObject.endDateTime.toString().slice(0,21)}
+                                        <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
+                                            <b>Başlangıç Tarihi: </b> {props.eventObject.startDateTime.toLocaleString('tr-TR').slice(0,16)}
                                         </Typography>
-                                        <br/>
-                                        <Typography variant="body2" component="p">
+                                        <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
+                                            <b>Bitiş Tarihi: </b> {props.eventObject.endDateTime.toLocaleString('tr-TR').slice(0,16)}
+                                        </Typography>
+                                        <Typography style={{marginTop:'5px'}} variant="body2" component="p">
                                             <b style={{float:'left'}}>{"Detaylar:"}</b>{'\u00A0'}
                                              {props
                                                 ?  props.eventObject.notes.length > 250

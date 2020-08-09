@@ -14,7 +14,7 @@ import 'date-fns';
 import Grid from '@material-ui/core/Grid';
 import DateFnsUtils from '@date-io/date-fns';
 import {DateTimePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
-import enLocale from "date-fns/locale/en-GB";
+import trLocale from "date-fns/locale/tr";
 
 
 import Map from './Map';
@@ -137,17 +137,12 @@ class AddEventDialog extends Component{
         );
     }
     onClickDeleteQuestion = (deletedId)=>{
-        console.log("selam");
-        console.log("onchange: %O",this.state.questionValueObject);
         let questionElementObjectToDeleteElement = {...this.state.questionElementObject};
         let questionValueObjectToDeleteValue = {...this.state.questionValueObject};
         delete questionElementObjectToDeleteElement[deletedId];
         delete questionValueObjectToDeleteValue[deletedId];
 
-        console.log("selam");
-        console.log("onchange: %O",questionValueObjectToDeleteValue);
 
-        console.log(questionElementObjectToDeleteElement);
         this.setState({
             questionCounter: this.state.questionCounter-1,
             questionValueObject: {...questionValueObjectToDeleteValue},
@@ -156,14 +151,12 @@ class AddEventDialog extends Component{
     }
     handleAddQuestionButton = () => {
         let documents = {...this.state.questionElementObject};
-        console.log("before");
         let createdElement = this.createEmptyQuestionElement();
         documents['q_'+ this.lastAddedSequenceQuestionId] = createdElement;
 
         let expandedQuestionValueList = {...this.state.questionValueObject};
         expandedQuestionValueList['q_'+ (this.lastAddedSequenceQuestionId)] = '';
 
-        console.log("after");
         this.setState({
             questionValueObject: expandedQuestionValueList,
             questionElementObject: documents,
@@ -217,21 +210,19 @@ class AddEventDialog extends Component{
     };
 
     handleSubmit = () =>{
+        console.log(this.state.selectedEndDateTime.toISOString());
         if(this.state.selectedEndDateTime>this.state.selectedStartDateTime && this.isMarkSelectFromMap()) { // Everything is ok, the form can be submitted.
             let questionSet = Object.keys(this.state.questionValueObject).map(
                 (key) =>{
                 return this.createQuestionObject(this.state.questionValueObject[key]);
             });
-
-            console.log("submitSorulsi: %O",this.state.questionValueObject);
-            console.log(questionSet);
             let updatedObject = {
                 uniqueName: this.state.uniqueName,
                 title: this.state.title,
                 longitude: this.state.marker.lng,
                 latitude: this.state.marker.lat,
-                startDateTime: this.state.selectedStartDateTime,
-                endDateTime: this.state.selectedEndDateTime,
+                startDateTime: this.addHours(this.state.selectedStartDateTime,3).toISOString(),
+                endDateTime: this.addHours(this.state.selectedEndDateTime,3).toISOString(),
                 quota: this.state.quota,
                 notes: this.state.notes,
                 address: this.state.address,
@@ -242,6 +233,11 @@ class AddEventDialog extends Component{
             this.props.handleSubmit(updatedObject);
         }
     };
+
+    addHours = (date,offset) => {
+        date.setTime(date.getTime() + (offset*60*60*1000));
+        return date;
+    }
 
     clearStateVariable = ()=>{
         this.setState({
@@ -405,7 +401,7 @@ class AddEventDialog extends Component{
                                 fullWidth
                             />
                             <TextValidator
-                                label="Description"
+                                label="Detaylar"
                                 onChange={this.handleChangeNotesInput}
                                 name="notes"
                                 multiline
@@ -416,7 +412,7 @@ class AddEventDialog extends Component{
                                 errorMessages={['Bu alan gerekli']}
                                 fullWidth
                             />
-                            <MuiPickersUtilsProvider utils={DateFnsUtils} locale={enLocale}>
+                            <MuiPickersUtilsProvider utils={DateFnsUtils} locale={trLocale}>
                                 <Grid container justify="space-between">
                                     <DateTimePicker
                                         id="datetime-local"
@@ -424,7 +420,9 @@ class AddEventDialog extends Component{
                                         margin="normal"
                                         ampm={false}
                                         value={this.state.selectedStartDateTime}
-                                        onChange={this.handleStartDateChangeInput} />
+                                        onChange={this.handleStartDateChangeInput}
+                                        dateFormat={"YYYY-MM-DDThh:mm:ss.s"}
+                                    />
                                 </Grid>
                                 <br/>
                                 <Grid container justify="space-between">
@@ -434,7 +432,9 @@ class AddEventDialog extends Component{
                                         margin="normal"
                                         ampm={false}
                                         value={this.state.selectedEndDateTime}
-                                        onChange={this.handleEndDateChangeInput}/>
+                                        onChange={this.handleEndDateChangeInput}
+                                        dateFormat={"YYYY-MM-DDThh:mm:ss.s"}
+                                    />
                                 </Grid>
                             </MuiPickersUtilsProvider>
                             {this.isStartDateAndEndDateValid(this.state.selectedStartDateTime, this.state.selectedEndDateTime)}

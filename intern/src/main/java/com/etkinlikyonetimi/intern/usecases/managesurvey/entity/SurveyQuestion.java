@@ -26,6 +26,6 @@ public class SurveyQuestion extends BaseEntity {
     @JoinColumn(name = "\"event_id\"")
     private Event event;
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "surveyQuestion")
     private Set<SurveyAnswer> surveyAnswerSet;
 }

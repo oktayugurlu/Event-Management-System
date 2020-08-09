@@ -26,9 +26,10 @@ public class ManageEventService {
     private final CorporateUserRepository corporateUserRepository;
 
     public List<Event> listAllEvents(){
+        System.out.println(LocalDateTime.now());
         return eventRepository.findAllByOrderByTitleAsc()
                 .stream()
-                .filter(event -> event.getEndDateTime().isAfter(LocalDateTime.now()))
+                .filter(event -> event.getEndDateTime().plusDays(3).isAfter(LocalDateTime.now()))
                 .collect(Collectors.toList());
     }
 
@@ -50,8 +51,8 @@ public class ManageEventService {
     public String updateEvent(Event requestEvent) {
 
         Event updatedEvent = eventRepository.findByUniqueName(requestEvent.getUniqueName()).get();
-        if(updatedEvent.getEndDateTime().isBefore(LocalDateTime.now()))
-            return "The event can't be updated due to end date is out of date!";
+        if(updatedEvent.getStartDateTime().isBefore(LocalDateTime.now()))
+            return "Etkinlik, başlangıç tarihinden sonra güncellenemez!";
         else{
             updateEventFields(requestEvent,updatedEvent);
             updatedEvent = eventRepository.save(updatedEvent);

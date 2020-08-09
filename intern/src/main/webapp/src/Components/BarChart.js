@@ -13,12 +13,10 @@ import { EventTracker } from '@devexpress/dx-react-chart';
 import {GlobalStateContext} from "./contexts/GlobalStateContext";
 import { Animation } from '@devexpress/dx-react-chart';
 
-const NUMBER_OF_PARTICIPANT=0;
-const APPLIYING_DAYS=1;
 
 const ALL_EVENTS_NUMBER_OF_PARTICIPANTS=0;
 const LAST_TEN_DAY_PARTICIPANTS=1;
-const SURVEY_RESULTS=2;
+/*const SURVEY_RESULTS=2;*/
 
 export default class BarChart extends React.PureComponent {
     static contextType = GlobalStateContext;
@@ -55,7 +53,7 @@ export default class BarChart extends React.PureComponent {
     createDataRows(lastnday){
         let dataRow = {};
         let dataRows = [];
-        for(let i=lastnday;i>0;i--){
+        for(let i=lastnday-1;i>=0;i--){
             let last = this.getNDaysAgo(i);
             let numberOfApplicationThisDay = this.findNumberOfApplicationsThisDay(
                 last.getDate(),

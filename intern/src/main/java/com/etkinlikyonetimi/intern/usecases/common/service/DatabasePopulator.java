@@ -26,8 +26,7 @@ public class DatabasePopulator {
 
     public void insertEvent(){
         // List<Authority> savedAuthorities = authorityRepository.saveAll(Set.of(new Authority(null, "READ"), new Authority(null, "WRITE")));
-/*
-       CorporateUser corporateUser =new CorporateUser("admin", "1234",Set.of());
+      /* CorporateUser corporateUser =new CorporateUser("admin", "1234",Set.of());
         CorporateUser corporateUser1 =new CorporateUser("admin1", "admin",Set.of());
         CorporateUser corporateUser2 =new CorporateUser("admin2", "admin",Set.of());
         CorporateUser corporateUser3 =new CorporateUser("admin3", "admin",Set.of());
@@ -113,7 +112,6 @@ public class DatabasePopulator {
                 Set.of()
         ));
         questionRepository.save(new Question(event ,"aaaa",List.of()));
-        questionRepository.save(new Question(event ,"bbbb",List.of()));
-*/
+        questionRepository.save(new Question(event ,"bbbb",List.of()));*/
     }
 }

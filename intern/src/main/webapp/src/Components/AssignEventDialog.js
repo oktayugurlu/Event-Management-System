@@ -91,10 +91,10 @@ export default class AssignEventDialog extends Component{
         return true;
     }
     isValueEmpty=(value)=>{
-        if (value === '' || (value.indexOf(' ') >= 0)) return true;
+        if (value === '') return true;
     }
     isValidateEmail=()=>{
-        let regexMail = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        let regexMail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return regexMail.test(this.state.participant.mail);
     }
     //***** VALIDATION FUNCTIONS END *****//
@@ -108,7 +108,7 @@ export default class AssignEventDialog extends Component{
             prevState => ({
                 participant:{
                     ...prevState.participant,
-                    ssn: tcId
+                    ssn: tcId.trim()
                 }
             }))
     }
@@ -118,7 +118,7 @@ export default class AssignEventDialog extends Component{
             prevState => ({
                 participant:{
                     ...prevState.participant,
-                    name: name
+                    name: name.trim()
                 }
             }))
     }
@@ -128,7 +128,7 @@ export default class AssignEventDialog extends Component{
             prevState => ({
                 participant:{
                     ...prevState.participant,
-                    surname: surname
+                    surname: surname.trim()
                 }
             }))
     }
@@ -138,7 +138,7 @@ export default class AssignEventDialog extends Component{
             prevState => ({
                 participant:{
                     ...prevState.participant,
-                    mail: mail
+                    mail: mail.trim()
                 }
             }))
     }

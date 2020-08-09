@@ -51,39 +51,37 @@ const WEBSOCKET_COMPONENT=1;
 
 class App extends Component{
 
-  state={
-    openAddEventDialog:false,
-    allEvents:[],
-    createdEvents:[],
-    snackbar: [{
-      isOpen: false,
-      message: "",
-      severity: ""
-    }],
-    isLoginDialogOpen:false,
-    isAuthorized:false,
-    username:'',
-    setIsAuthorized:()=>{} ,
-    setUsername:()=>{} ,
-    setCreatedEvents:()=>{},
-    sendNotification:()=>{},
-    websocketDialogElement:(<></>)
-  };
+  constructor(props) {
+    super(props);
+    this.state={
+      openAddEventDialog:false,
+      allEvents:[],
+      createdEvents:[],
+      snackbar: [{
+        isOpen: false,
+        message: "",
+        severity: ""
+      }],
+      isLoginDialogOpen:false,
+      isAuthorized:false,
+      username:'',
+      setIsAuthorized:this.setIsAuthorized ,
+      setUsername:this.setUsername ,
+      setCreatedEvents:this.setCreatedEvents,
+      sendNotification:this.sendNotification,
+      websocketDialogElement:(<></>)
+    };
+  }
+
 
   MANAGE_EVENT_PAGE=1;
   ALL_EVENTS_PAGE=2;
 
   componentDidMount() {
     this.getAllEvents();
-    this.setState({
-      setCreatedEvents:this.setCreatedEvents,
-      sendNotification:this.sendNotification,
-      setIsAuthorized: this.setIsAuthorized,
-      setUsername: this.setUsername,
-      isAuthorized:false
-    })
     this.checkJwtValidation();
     this.connectWebSocket();
+    console.log("->>>>>>>>>>>>>>>>>>>>hello=-=-=-=-=-");
   }
 
   checkJwtValidation = ()=>{
@@ -116,13 +114,14 @@ class App extends Component{
     SockJS = new SockJS('/sendNotification');
     stompClient = Stomp.over(SockJS);
     stompClient.connect({}, this.onConnected, this.onError);
+
+
   }
   onConnected = () => {
     if(this.state.isAuthorized)
       stompClient.subscribe('/notify/reply/'+getUsername(), this.onMessageReceived);
-    else if(!this.state.isAuthorized){
-      stompClient.subscribe('', this.onMessageReceived);
-    }
+    else
+      stompClient.subscribe('/notify/reply/'+getUsername(), this.onMessageReceived);
   }
   sendNotification = ( participantDTO, assignedEvent) => {
     let notificationDTO = {
@@ -132,8 +131,7 @@ class App extends Component{
       eventTitle: assignedEvent.title,
       eventUniqueName: assignedEvent.uniqueName
     };
-      stompClient.send('/app/sendNotification', {}, JSON.stringify(notificationDTO));
-      console.log("sendNotification");
+    stompClient.send('/app/sendNotification', {}, JSON.stringify(notificationDTO));
   }
   onMessageReceived = (payload) => {
     let message = JSON.parse(payload.body);
@@ -211,14 +209,12 @@ class App extends Component{
     let headers = {
       'Authorization': `Bearer ${localStorage.getItem("Authorization")}`
     };
-    let requestObject = {
-      eventObject
-    };
     axios.post("/manageevent/addevent",eventObject,{
       headers:headers
     })
         .then(response => {
-          this.snackbarOpen("Event added successfully", "success")
+          this.snackbarOpen("Event added successfully", "success");
+          this.getAllEvents();
         })
         .catch(error => {
           if (error.response.status === 400) {
@@ -226,8 +222,6 @@ class App extends Component{
           }
           console.log(error.response);
         });
-    console.log("event: "+eventObject);
-    this.getAllEvents();
   }
   // ADD EVENT FUNCTIONS END //
 

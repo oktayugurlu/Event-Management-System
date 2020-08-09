@@ -1,35 +1,45 @@
 package com.etkinlikyonetimi.intern.usecases.managesurvey.service;
 
+import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Application;
+import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Participant;
+import com.etkinlikyonetimi.intern.usecases.assignevent.repository.ParticipantRepository;
+import com.etkinlikyonetimi.intern.usecases.common.exception.ParticipantAlreadyAnswerSurveyException;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.EventRepository;
+import com.etkinlikyonetimi.intern.usecases.managesurvey.entity.SurveyAnswer;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.entity.SurveyQuestion;
+import com.etkinlikyonetimi.intern.usecases.managesurvey.repository.SurveyAnswerRepository;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.repository.SurveyQuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ManageSurveyService {
     private final SurveyQuestionRepository surveyQuestionRepository;
+    private final SurveyAnswerRepository surveyAnswerRepository;
     private final EventRepository eventRepository;
+    private final ParticipantRepository participantRepository;
 
     public void createSurvey(List<SurveyQuestion> surveyQuestions, String eventUniqueName) {
         Optional<Event> event = eventRepository.findByUniqueName(eventUniqueName);
         if(event.isPresent() && event.get().getEndDateTime().isAfter(LocalDateTime.now())){
             List<String> questionContentFromEvent = getStringContentFromEventsSurveyQuestionField(event.get());
-            surveyQuestions.forEach( surveyQuestion ->
-                    saveQuestionIfNotExistOnDatabase(
-                            event.get(),
-                            questionContentFromEvent,
-                            surveyQuestion
-                    )
+            surveyQuestions.forEach(
+                    surveyQuestion ->
+                        saveQuestionIfNotExistOnDatabase(
+                                event.get(),
+                                questionContentFromEvent,
+                                surveyQuestion
+                        )
             );
             deleteSurveyQuestionIfNotExistOnRequest(event.get(), surveyQuestions);
         }
@@ -67,4 +77,53 @@ public class ManageSurveyService {
         }
     }
 
+    public void saveSurveyAnswers(List<SurveyAnswer> surveyAnswerList, String eventUniqueName) {
+        Optional<Event> event = eventRepository.findByUniqueName(eventUniqueName);
+        Optional<Participant> participantFromDatabase= participantRepository.findParticipantBySsn(
+                surveyAnswerList.get(0).getParticipant().getSsn());
+        if(event.isPresent() && participantFromDatabase.isPresent()
+                && checkIsParticipantApplyThisEvent(event.get(), participantFromDatabase.get())
+                && event.get().getEndDateTime().isBefore(LocalDateTime.now())
+                && checkParticipantDontAnswerThisSurveyBefore(participantFromDatabase.get(), event.get())
+        ){
+            surveyAnswerList.forEach(surveyAnswer->
+                    setQuestionAnswerFieldsAndSave(
+                            surveyAnswer,
+                            event.get(),
+                            participantFromDatabase.get()
+                    ));
+        }
+        else{
+            throw new EntityNotFoundException();
+        }
+    }
+
+    private void setQuestionAnswerFieldsAndSave(SurveyAnswer surveyAnswer, Event event, Participant participant){
+        event.getSurveyQuestionSet()
+                .stream()
+                .filter(surveyQuestion->surveyQuestion.getContent()
+                        .equals(surveyAnswer.getSurveyQuestion().getContent())
+                ).forEach(surveyQuestion->{
+                    surveyAnswer.setParticipant(participant);
+                    surveyAnswer.setSurveyQuestion(surveyQuestionRepository.findByEventAndContent(event,surveyQuestion.getContent()));
+                    surveyAnswerRepository.save(surveyAnswer);
+        });
+    }
+
+    private boolean checkParticipantDontAnswerThisSurveyBefore(Participant participant, Event event) {
+        if(surveyAnswerRepository.findAllByParticipantAndEvent(participant, event).isEmpty())
+            return true;
+        else
+            throw new ParticipantAlreadyAnswerSurveyException("Zaten bu etkinliğin anketine cevap verdiniz!", 500);
+    }
+
+    private boolean checkIsParticipantApplyThisEvent(Event event, Participant participant){
+        Set<Application> applicationFromEvent = event.getAppliedParticipantSet();
+        Set<Application> applicationFromParticipant = participant.getAppliedEvents();
+        return !applicationFromParticipant.stream()
+                .filter(applicationFromEvent::contains)
+                .collect(Collectors.toSet())
+                .isEmpty();
+
+    }
 }

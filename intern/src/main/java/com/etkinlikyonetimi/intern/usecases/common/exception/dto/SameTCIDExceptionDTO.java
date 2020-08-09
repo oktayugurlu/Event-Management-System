@@ -1,4 +1,4 @@
-package com.etkinlikyonetimi.intern.usecases.assignevent.exception;
+package com.etkinlikyonetimi.intern.usecases.common.exception.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SameTCIDException extends RuntimeException{
+public class SameTCIDExceptionDTO {
     private String message;
     private Integer code;
 }

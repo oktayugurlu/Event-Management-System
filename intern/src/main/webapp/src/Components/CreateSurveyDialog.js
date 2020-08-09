@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
 import {makeStyles, withStyles} from '@material-ui/core/styles';
 import AddIcon from '@material-ui/icons/Add';
-import Alert from "@material-ui/lab/Alert";
-import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
+import { ValidatorForm} from 'react-material-ui-form-validator';
 import Dialog from "@material-ui/core/Dialog";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -24,8 +23,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 class CreateSurveyDialog extends Component{
-
-
 
     lastAddedSequenceQuestionId=0;
 
@@ -165,16 +162,15 @@ class CreateSurveyDialog extends Component{
 
     handleSubmit = () =>{
         let questionSet = Object.keys(this.state.questionValueObject).map((key)=>{
-            return this.createQuestionObject(this.state.questionValueObject[key],[]);
+            return this.createQuestionObject(this.state.questionValueObject[key]);
         });
         this.props.handleSubmit(questionSet);
     };
 
 
-    createQuestionObject = (item, surveyAnswerSet) =>{
+    createQuestionObject = (item) =>{
         return {
-            content: item,
-            surveyAnswerSet: surveyAnswerSet
+            content: item
         };
     }
 

@@ -1,4 +1,4 @@
-package com.etkinlikyonetimi.intern.usecases.assignevent.exception;
+package com.etkinlikyonetimi.intern.usecases.common.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class QuotaIsFullException extends RuntimeException {
+public class ParticipantAlreadyAnswerSurveyException extends RuntimeException{
     public String message;
     public Integer code;
 }

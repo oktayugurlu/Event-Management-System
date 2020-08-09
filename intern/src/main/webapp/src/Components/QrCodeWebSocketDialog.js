@@ -45,7 +45,7 @@ export default class QrCodeWebSocketDialog extends Component{
                         justify="center"
                         alignItems="center"
                     >
-                        <img src={URL.createObjectURL(this.props.qrCodeImage)} />
+                        <img src={URL.createObjectURL(this.props.qrCodeImage)}  alt={'qr-code'}/>
                     </Grid>
                 </>
             );

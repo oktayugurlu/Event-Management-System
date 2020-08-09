@@ -17,18 +17,6 @@ export default class SurveyRadioButton extends Component{
                         label="Top"
                         labelPlacement="top"
                     />
-                    <FormControlLabel
-                        value="top"
-                        control={<Radio color="primary" />}
-                        label="Top"
-                        labelPlacement="top"
-                    />
-                    <FormControlLabel
-                        value="top"
-                        control={<Radio color="primary" />}
-                        label="Top"
-                        labelPlacement="top"
-                    />
                     <FormControlLabel value="end" control={<Radio color="primary" />} label="End" />
                 </RadioGroup>
             </FormControl>

@@ -2,13 +2,12 @@ package com.etkinlikyonetimi.intern.usecases.assignevent.service;
 
 import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Answer;
 import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Participant;
-import com.etkinlikyonetimi.intern.usecases.assignevent.exception.QuotaIsFullException;
-import com.etkinlikyonetimi.intern.usecases.assignevent.exception.SameTCIDException;
+import com.etkinlikyonetimi.intern.usecases.common.exception.QuotaIsFullException;
+import com.etkinlikyonetimi.intern.usecases.common.exception.SameTCIDException;
 import com.etkinlikyonetimi.intern.usecases.assignevent.repository.AnswerRepository;
 import com.etkinlikyonetimi.intern.usecases.assignevent.repository.ParticipantRepository;
 import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Application;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
-import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Question;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.ApplicationRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.EventRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.QuestionRepository;

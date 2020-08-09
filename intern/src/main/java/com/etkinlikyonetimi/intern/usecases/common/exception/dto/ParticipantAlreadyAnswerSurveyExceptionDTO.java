@@ -1,4 +1,4 @@
-package com.etkinlikyonetimi.intern.usecases.assignevent.dto;
+package com.etkinlikyonetimi.intern.usecases.common.exception.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SameTCIDExceptionDTO {
+public class ParticipantAlreadyAnswerSurveyExceptionDTO {
     private String message;
     private Integer code;
 }

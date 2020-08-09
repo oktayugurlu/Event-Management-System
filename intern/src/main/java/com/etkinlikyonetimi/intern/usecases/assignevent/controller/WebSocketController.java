@@ -28,7 +28,8 @@ public class WebSocketController {
     @MessageMapping("/sendNotification")
     public void sendPrivateMessage(@Payload NotificationDTO notificationDTO) throws IllegalAccessException {
         simpMessagingTemplate.convertAndSend(
-                 "/notify/reply/"+webSocketService.findEventsCreator(notificationDTO.getEventUniqueName()).trim(),
+                 "/notify/reply/"
+                         + webSocketService.findEventsCreator(notificationDTO.getEventUniqueName()).trim(),
                 notificationDTO);
 
     }
