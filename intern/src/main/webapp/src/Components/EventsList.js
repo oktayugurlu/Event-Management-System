@@ -13,10 +13,11 @@ import AssignEventDialog from "./AssignEventDialog";
 import QrCodeWebSocketDialog from "./QrCodeWebSocketDialog";
 import Divider from "@material-ui/core/Divider";
 import BarChart from "./BarChart";
-import {GlobalStateContext} from "./contexts/GlobalStateContext";
+import {AppStateContext} from "./contexts/AppStateContext";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
+import {BackdropContext} from "./contexts/BackdropContext";
 
 
 export default function EventsList(props) {
@@ -38,8 +39,8 @@ export default function EventsList(props) {
     const ALL_EVENTS_NUMBER_OF_PARTICIPANTS=0;
     //BARCHART CONSTANTS
 
-    const createdEventsContext = useContext(GlobalStateContext);
-
+    const createdEventsContext = useContext(AppStateContext);
+    const backdropContext = useContext(BackdropContext);
 
 
     const titleStyle = {
@@ -132,8 +133,6 @@ export default function EventsList(props) {
     };
 
     const handleSubmitUpdateEvent = (eventObject) => {
-        console.log("eventObject: ");
-        console.log(eventObject);
         let headers = {
             'Authorization': `Bearer ${getJwsToken()}`
         };
@@ -148,7 +147,7 @@ export default function EventsList(props) {
             }).catch(error => {
             if(error.response.status === 500 || error.response.status === 500)
                 props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
-            console.log(error.response);
+
         });
         setUpdatedDialogElement(<div/>);
         setOpenUpdateDialog(false);
@@ -158,7 +157,6 @@ export default function EventsList(props) {
 
     const onChangePageNumber = (event, value) => {
         setPage(value-1);
-        console.log(value);
     };
     const calculateNumberOfPage = () => {
         if(props.whichPage===MANAGE_EVENT_PAGE){
@@ -212,7 +210,7 @@ export default function EventsList(props) {
 
     const handleSubmitAssignEvent = (participant, eventUniqueName, assignedEvent) => {
         setAssignEventDialogElement(<div/>);
-
+        // backdropContext.setOpenBackdropScreen();
         axios.post("/assignevent/assign/"+eventUniqueName.toString(),
             participant,{responseType: 'blob'})
             .then((response) => {
@@ -226,6 +224,7 @@ export default function EventsList(props) {
                         whichDialogContent={QR_CODE_COMPONENT}
                     />);
                 createdEventsContext.sendNotification(participant,assignedEvent);
+
             }).catch( error => {
                         if (error.response.status === 400) {
                             props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
@@ -245,18 +244,13 @@ export default function EventsList(props) {
     const promiseToJSONParserIncludeFunction = (promise)=>{
         let errorMessage = {};
         promise.text().then(result=> {
-            console.log("before");
-            console.log("%O",result);
             errorMessage = JSON.parse(result);
-            console.log(errorMessage);
             if(errorMessage.code === 500){
-                console.log("before");
                 props.snackbarOpen(errorMessage.message, "error");
             }
         });
     }
     const handleCloseAssignEventDialog = () => {
-        console.log("adasdsadasdasdasdsda")
         setAssignEventDialogElement(<div/>);
         props.getAllEvents();
     }
@@ -276,7 +270,10 @@ export default function EventsList(props) {
             return(
                 <Grid container direction="column" spacing={3}>
                     <Grid item style={{marginLeft: '40px', marginRight: '40px', marginTop: '40px'}}>
-                        <BarChart whichChart={ALL_EVENTS_NUMBER_OF_PARTICIPANTS}/>
+                        <BarChart
+                            title={"Katılımcı Sayısı"}
+                            whichChart={ALL_EVENTS_NUMBER_OF_PARTICIPANTS}
+                        />
                     </Grid>
                     <Grid item>
                         <Divider variant="middle"/>

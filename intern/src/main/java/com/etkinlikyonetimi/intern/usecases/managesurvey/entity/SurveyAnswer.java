@@ -2,6 +2,7 @@ package com.etkinlikyonetimi.intern.usecases.managesurvey.entity;
 
 import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Participant;
 import com.etkinlikyonetimi.intern.usecases.common.entity.BaseEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,7 @@ public class SurveyAnswer extends BaseEntity {
     private Integer point;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "participant_id")
     private Participant participant;
 

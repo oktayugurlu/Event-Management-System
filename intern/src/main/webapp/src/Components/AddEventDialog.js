@@ -104,7 +104,6 @@ class AddEventDialog extends Component{
     extractQuestionObjectToQuestionElementFromEventDTO = (questionSet) =>{
         let createdQuestionElementObject={};
         let createdQuestionValueObject={};
-        console.log(questionSet);
         questionSet.forEach(
             (questionObject,index)=> {
                 let elementFromEventDTO = this.createQuestionElementFromEventDTO(questionObject.content, index);
@@ -186,7 +185,6 @@ class AddEventDialog extends Component{
     };
 
     onChangeQuestion = (event) => {
-        console.log("onchange: %O",this.state.questionValueObject);
         let questionValueObjectCopy = {...this.state.questionValueObject};
         let changedId = event.target.name;
         questionValueObjectCopy[changedId] = event.target.value;
@@ -210,7 +208,6 @@ class AddEventDialog extends Component{
     };
 
     handleSubmit = () =>{
-        console.log(this.state.selectedEndDateTime.toISOString());
         if(this.state.selectedEndDateTime>this.state.selectedStartDateTime && this.isMarkSelectFromMap()) { // Everything is ok, the form can be submitted.
             let questionSet = Object.keys(this.state.questionValueObject).map(
                 (key) =>{
@@ -269,7 +266,6 @@ class AddEventDialog extends Component{
     }
 
 
-
     isStartDateAndEndDateValid = (selectedStartDateTime, selectedEndDateTime) =>{
         let currentDate = new Date();
 
@@ -324,7 +320,6 @@ class AddEventDialog extends Component{
         });
     }
     onChangeMarkerInput = (location ) => {
-        console.log( location );
         this.setState({
             marker: location
         })
@@ -365,7 +360,7 @@ class AddEventDialog extends Component{
                         onSubmit={this.handleSubmit}
                         // onError={errors => console.log(errors)}
                     >
-                        <DialogTitle id="scroll-dialog-title">Add Event</DialogTitle>
+                        <DialogTitle id="scroll-dialog-title">Etkinlik Ekle</DialogTitle>
                         <DialogContent>
                             <TextValidator
                                 label="Etkinlik ID"

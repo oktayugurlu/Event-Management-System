@@ -10,16 +10,18 @@ import {
 } from '@devexpress/dx-react-chart-material-ui';
 
 import { EventTracker } from '@devexpress/dx-react-chart';
-import {GlobalStateContext} from "./contexts/GlobalStateContext";
+import {AppStateContext} from "./contexts/AppStateContext";
 import { Animation } from '@devexpress/dx-react-chart';
+import axios from "axios";
+import {getJwsToken} from "./authentication/LocalStorageService";
 
 
 const ALL_EVENTS_NUMBER_OF_PARTICIPANTS=0;
 const LAST_TEN_DAY_PARTICIPANTS=1;
-/*const SURVEY_RESULTS=2;*/
+const SURVEY_RESULTS=2;
 
 export default class BarChart extends React.PureComponent {
-    static contextType = GlobalStateContext;
+    static contextType = AppStateContext;
 
     constructor(props) {
         super(props);
@@ -38,11 +40,53 @@ export default class BarChart extends React.PureComponent {
             this.preprocessLastnDaysChart(10);
         else if(this.props.whichChart===ALL_EVENTS_NUMBER_OF_PARTICIPANTS)
             this.preprocessNumberOfParticipant();
-    }
-    componentWillUnmount() {
-        console.log("Grafik oluyor");
+        else if(this.props.whichChart===SURVEY_RESULTS)
+            this.preprocessSurveyResult();
     }
 
+    //******** SURVEY_RESULTS *********//
+    preprocessSurveyResult = ()=>{
+        let headers = {
+            'Authorization': `Bearer ${getJwsToken()}`
+        };
+        axios.post("/managesurvey/getsurvey/"+this.props.surveyEvent.uniqueName, {},{
+            headers:headers
+        })
+            .then(response => {
+                let surveyAnswers = response.data;
+
+                this.setState({
+                    data:this.calculatePointMeanForEachQuestion(
+                        this.props.surveyEvent.surveyQuestionSet, surveyAnswers),
+                    valueField: "pointMean",
+                    argumentField:"questionContent"
+                });
+            });
+    }
+    calculatePointMeanForEachQuestion=(surveyQuestions, surveyAnswers)=>{
+
+        let dataRows=[];
+        surveyQuestions.forEach(
+            (question,index)=>{
+                let questionTotalPoint=0;
+                let questionFrequency=0;
+                surveyAnswers.forEach(answer=>{
+                    if(question.content===answer.surveyQuestion.content){
+                        questionFrequency++;
+                        questionTotalPoint+=answer.point;
+                    }
+                });
+                let pointMean = questionTotalPoint/questionFrequency;
+                dataRows.push({
+                    questionContent:'Soru-'+(index+1),
+                    pointMean:pointMean
+                });
+            }
+        );
+        return dataRows;
+    }
+
+    //******** LAST_TEN_DAY_PARTICIPANTS *********//
     preprocessLastnDaysChart = (lastnday)=>{
         this.setState({
             data:this.createDataRows(lastnday),
@@ -58,7 +102,8 @@ export default class BarChart extends React.PureComponent {
             let numberOfApplicationThisDay = this.findNumberOfApplicationsThisDay(
                 last.getDate(),
                 last.getMonth()+1,
-                last.getFullYear());
+                last.getFullYear()
+            );
             dataRow = {
                 numberOfApplicationThisDay: numberOfApplicationThisDay,
                 date: last.toString().slice(0,15)
@@ -80,12 +125,14 @@ export default class BarChart extends React.PureComponent {
                     && applicationDate.getMonth()+1 === applicationMonth
                     && applicationDate.getFullYear() === applicationYear
                 )
-                    participantCounter++;
+                participantCounter++;
             }
         );
         return participantCounter;
     }
 
+
+    //******** ALL_EVENTS_NUMBER_OF_PARTICIPANTS *********//
     preprocessNumberOfParticipant = ()=>{
         const pureData = this.context.createdEvents;
         let preprocessedData = pureData.map(
@@ -115,15 +162,16 @@ export default class BarChart extends React.PureComponent {
                     data={chartData}
                     rotated
                 >
-                    <ArgumentAxis />
-                    <ValueAxis />
+                    <ArgumentAxis/>
+                    <ValueAxis allowDecimals={false}/>
                     <BarSeries
+
                         valueField={valueField}
                         argumentField={argumentField}
                         color="#FF7043"
                     />
                     <Title
-                        text="Katılımcı Sayısı"
+                        text={this.props.title}
                     />
                     <Animation />
                     <EventTracker />

@@ -16,4 +16,6 @@ public interface SurveyAnswerMapper {
     SurveyAnswer mapToEntity(SurveyAnswerDTO surveyAnswer);
 
     List<SurveyAnswer> mapToEntity(List<SurveyAnswerDTO> surveyAnswerList);
+
+
 }

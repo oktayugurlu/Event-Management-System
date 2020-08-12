@@ -17,7 +17,7 @@ import {green} from '@material-ui/core/colors';
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import ParticipantsDetailDialog from "./ParticipantsDetailDialog";
-import {GlobalStateContext} from "./contexts/GlobalStateContext";
+import {AppStateContext} from "./contexts/AppStateContext";
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import SurveyDialog from "./CreateSurveyDialog";
 import {getJwsToken} from "./authentication/LocalStorageService";
@@ -78,7 +78,7 @@ export default function EventCard(props) {
     const classes = useStyles();
   /*  const timer = React.useRef();*/
 
-    const createdEventsContext = useContext(GlobalStateContext);
+    const createdEventsContext = useContext(AppStateContext);
 
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
@@ -171,29 +171,8 @@ export default function EventCard(props) {
                                             aria-label="save"
                                             color="primary"
                                             onClick={()=>props.handleClickOpenAssignDialog(props.eventObject)}
-                                            disabled={checkStartDateIsNotUpToDate( new Date())}
                                         >
                                             <AddIcon />
-                                        </Fab>
-                                    </span>
-                                </Box>
-                            </Tooltip>
-                        </div>
-                        <div className={classes.wrapper}>
-                            <Tooltip title={checkEndDateIsUpToDate(new Date())
-                                                ? "Anket etkinlik bitince aktif olacak"
-                                                : "Anketi doldurun"}
-                                     aria-label="add">
-                                <Box component="span" display="block">
-                                    <span>
-                                        <Fab
-                                            aria-label="survey"
-                                            color="inherit"
-                                            style={{colorInherit:"#FF7F00"}}
-                                            onClick={()=>handleClickOpenFillSurveyButton()}
-                                            disabled={checkEndDateIsUpToDate(new Date())}
-                                        >
-                                            <AssessmentIcon/>
                                         </Fab>
                                     </span>
                                 </Box>
@@ -245,7 +224,6 @@ export default function EventCard(props) {
 
     //********* FILL SURVEY BUTTONS **********//
     const handleClickOpenFillSurveyButton = ()=>{
-        console.log("acildi");
         setFillSurveyDialogElement(
             <FillSurveyDialog
                 openDialog={true}
@@ -260,7 +238,6 @@ export default function EventCard(props) {
         setFillSurveyDialogElement(<></>);
     }
     const handleSubmitFillSurveyButton= (surveyAnswers)=>{
-        console.log("surveyAnswers: %O", surveyAnswers);
         let headers = {
             'Authorization': `Bearer ${getJwsToken()}`
         };
@@ -299,7 +276,6 @@ export default function EventCard(props) {
         setSurveyDialogElement(<></>);
     }
     const handleSubmitManageSurveyButton= (surveyQuestions)=>{
-        console.log("surveyQuestions: %O", surveyQuestions);
         let headers = {
             'Authorization': `Bearer ${getJwsToken()}`
         };

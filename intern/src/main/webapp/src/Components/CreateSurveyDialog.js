@@ -12,6 +12,9 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import 'date-fns';
 import Grid from '@material-ui/core/Grid';
 import EventQuestion from "./EventQuestion";
+import BarChart from "./BarChart";
+import Divider from "@material-ui/core/Divider";
+import Typography from "@material-ui/core/Typography";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -21,6 +24,8 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: theme.palette.background.paper,
     },
 }));
+
+const SURVEY_RESULTS=2;
 
 class CreateSurveyDialog extends Component{
 
@@ -52,10 +57,6 @@ class CreateSurveyDialog extends Component{
             isThereSameContent.forEach(function(isTrue) { if(isTrue) counts += 1;});
             return !(counts>1);
         });
-    };
-
-    componentWillUnmount() {
-        ValidatorForm.removeValidationRule('isContentUnique');
     };
 
 
@@ -94,8 +95,6 @@ class CreateSurveyDialog extends Component{
         );
     }
     onClickDeleteQuestion = (deletedId)=>{
-        console.log("selam");
-        console.log("onchange: %O",this.state.questionValueObject);
         let questionElementObjectToDeleteElement = {...this.state.questionElementObject};
         let questionValueObjectToDeleteValue = {...this.state.questionValueObject};
         delete questionElementObjectToDeleteElement[deletedId];
@@ -144,7 +143,6 @@ class CreateSurveyDialog extends Component{
     };
 
     onChangeQuestion = (event) => {
-        console.log("onchange: %O",this.state.questionValueObject);
         let questionValueObjectCopy = {...this.state.questionValueObject};
         let changedId = event.target.name;
         questionValueObjectCopy[changedId] = event.target.value;
@@ -191,26 +189,45 @@ class CreateSurveyDialog extends Component{
                     <ValidatorForm
                         onSubmit={this.handleSubmit}
                     >
-                        <DialogTitle id="scroll-dialog-title">Add Event</DialogTitle>
+                        <DialogTitle id="scroll-dialog-title">
+                            {this.props.event.title + " - Anketi Güncelle"}
+                        </DialogTitle>
                         <DialogContent>
-                            {this.exportQuestionElementFromJSONAsArray( )}
-
-                            <Grid container direction="row"
-                                  justify="center"
-                                  alignItems="center">
-                                <Button
-                                    style={{
-                                        marginTop:'22px'
-                                    }}
-                                    variant="contained"
-                                    color="default"
-                                    className={classes.button}
-                                    onClick={this.handleAddQuestionButton}
-                                    startIcon={<AddIcon />}
-                                >
-                                    Soru Ekle
-                                </Button>
+                            <Grid container direction="column" spacing={2}>
+                                {this.exportQuestionElementFromJSONAsArray( )}
+                                <Grid container direction="row"
+                                      justify="center"
+                                      alignItems="center">
+                                    <Button
+                                        style={{
+                                            marginTop:'22px',
+                                            marginBottom:'22px'
+                                        }}
+                                        variant="contained"
+                                        color="default"
+                                        className={classes.button}
+                                        onClick={this.handleAddQuestionButton}
+                                        startIcon={<AddIcon />}
+                                    >
+                                        Soru Ekle
+                                    </Button>
+                                </Grid>
+                                <Grid item>
+                                    <Divider variant="middle"/>
+                                </Grid>
+                                <Grid item>
+                                    <Typography variant="h5" gutterBottom>
+                                        Sorulara verilen cevaplarin puan ortalamasi
+                                    </Typography>
+                                </Grid>
+                                <Grid item>
+                                    <BarChart
+                                        surveyEvent={this.props.event}
+                                        whichChart={SURVEY_RESULTS}
+                                    />
+                                </Grid>
                             </Grid>
+
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={this.props.handleClose} color="primary">

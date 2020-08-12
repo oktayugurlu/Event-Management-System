@@ -74,6 +74,7 @@ export default class ParticipantsDetailDialog extends Component{
                             </Grid>
                             <Grid item>
                                 <BarChart
+                                    title={"Katılımcı Sayısı"}
                                     openedEventForUserDetail={this.props.openedEvent}
                                     whichChart={LAST_TEN_DAY_PARTICIPANTS}
                                 />

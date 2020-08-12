@@ -114,9 +114,9 @@ class ParticipantTable extends Component{
             let newParticipant = this.deleteAnswerSetFromParticipant(application.participant);
 
             this.props.openedEvent.questionSet.forEach(
-                (question,index)=>{
+                (question)=>{
                     this.extractAnswerSetAsQuestionAnswerKeyValueForJSON(newParticipant
-                        ,question,application,index );
+                        ,question,application );
                 }
             );
             return newParticipant;
@@ -146,9 +146,16 @@ class ParticipantTable extends Component{
             ssn: participant.ssn,
         };
     }
-    extractAnswerSetAsQuestionAnswerKeyValueForJSON = (newParticipant, question, application, index)=>{
-        newParticipant[question.content] = application.participant.answerSet[index].content;
+    extractAnswerSetAsQuestionAnswerKeyValueForJSON = (newParticipant, question, application)=>{
+        newParticipant[question.content] = this.getParticipantAnswerOfQuestionIfExist(application, question.content);
         return newParticipant;
+    }
+
+    getParticipantAnswerOfQuestionIfExist=(application, questionContent)=>{
+        console.log(application.participant.answerSet);
+        return application.participant.answerSet.filter(
+            answer=>answer.question.content === questionContent
+        )[0];
     }
 
     handleChangePage = (event, newPage) => {

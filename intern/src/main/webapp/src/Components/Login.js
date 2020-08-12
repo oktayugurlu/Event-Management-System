@@ -14,11 +14,11 @@ import {
     getJwsToken,
     setJwsToken, setUsername
 } from "./authentication/LocalStorageService";
-import {GlobalStateContext} from "./contexts/GlobalStateContext";
+import {AppStateContext} from "./contexts/AppStateContext";
 
 
 class Login extends Component {
-    static contextType = GlobalStateContext;
+    static contextType = AppStateContext;
 
     constructor(props) {
         super(props);

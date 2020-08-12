@@ -1,5 +1,6 @@
 package com.etkinlikyonetimi.intern.usecases.assignevent.service;
 
+import com.etkinlikyonetimi.intern.usecases.assignevent.dto.ParticipantDTO;
 import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Answer;
 import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Participant;
 import com.etkinlikyonetimi.intern.usecases.common.exception.QuotaIsFullException;
@@ -16,12 +17,15 @@ import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
+import javax.persistence.EntityNotFoundException;
+import javax.swing.text.html.parser.Entity;
 import javax.transaction.Transactional;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +37,8 @@ public class AssignEventService {
     private final QuestionRepository questionRepository;
     private final MailSenderService mailSenderService;
     private final ApplicationRepository applicationRepository;
+
+     
 
     @Transactional
     public BufferedImage assign(Participant participantFromRequest, String eventUniqueName, List<Answer> answerList) throws Exception {
@@ -59,7 +65,7 @@ public class AssignEventService {
         BufferedImage bufferedImage = createQrCode(participant,eventUniqueName);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageIO.write(bufferedImage , "png", byteArrayOutputStream);
-        byte[] imageInByte = byteArrayOutputStream.toByteArray();
+        // byte[] imageInByte = byteArrayOutputStream.toByteArray();
         return bufferedImage;
     }
     private Participant setIfParticipantIsNotExist(Participant participantFromRequest){
@@ -133,5 +139,30 @@ public class AssignEventService {
                 String.format(trlocale, "%s",subject),
                 fileName
         );
+    }
+
+    public List<Application> getAppliedEventsBySSN(Participant participant) {
+        Optional<Participant> participantFromDatabase = participantRepository.findParticipantBySsn(participant.getSsn());
+
+        if(participantFromDatabase.isPresent())
+            return getEventsNotAnsweredItsSurveyByParticipant(participantFromDatabase.get().getAppliedEvents());
+        else
+            throw new EntityNotFoundException();
+    }
+
+    private List<Application> getEventsNotAnsweredItsSurveyByParticipant(Set<Application> appliedEvents) {
+
+        return appliedEvents
+                .stream()
+                .filter(
+                        application-> application
+                                .getParticipant()
+                                .getSurveyAnswerSet()
+                                .stream().noneMatch(surveyAnswer -> surveyAnswer
+                                        .getSurveyQuestion()
+                                        .getEvent()
+                                        .getId().equals(application.getEvent().getId()))
+                )
+                .collect(Collectors.toList());
     }
 }

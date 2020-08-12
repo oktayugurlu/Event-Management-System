@@ -7,7 +7,7 @@ import {DialogActions} from "@material-ui/core";
 import Button from '@material-ui/core/Button';
 import 'date-fns';
 import Grid from '@material-ui/core/Grid';
-import {GlobalStateContext} from "../contexts/GlobalStateContext";
+import {AppStateContext} from "../contexts/AppStateContext";
 import Alert from "@material-ui/lab/Alert";
 import SurveyTableToFill from "./SurveyTableToFill";
 import TextField from "@material-ui/core/TextField";
@@ -31,7 +31,7 @@ const radioButtonValuesAsNumber = [ 'Katılmıyorum',
 
 class FillSurveyDialog extends Component{
 
-    static contextType = GlobalStateContext;
+    static contextType = AppStateContext;
     participant={}
 
     constructor(props) {
@@ -52,7 +52,6 @@ class FillSurveyDialog extends Component{
 
     //******* Survey Table Functions ******//
     handleSubmitSurvey=()=>{
-        console.log("submit: %O",this.state.questionAnswerMap);
         let surveyAnswerObjectList = Object.keys(this.state.questionAnswerMap).map(
             key=>{
                 return this.createSurveyAnswerObject(this.state.questionAnswerMap[key], key);
@@ -75,7 +74,6 @@ class FillSurveyDialog extends Component{
         };
     }
     handleChangeRadioButtons = (event) => {
-        console.log(event.target.name);
         let copyQuestionAnswerMap = {...this.state.questionAnswerMap};
         let indexOfValue = radioButtonValuesAsNumber.indexOf(event.target.value);
         copyQuestionAnswerMap[event.target.name] = indexOfValue;

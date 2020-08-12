@@ -1,6 +1,7 @@
 package com.etkinlikyonetimi.intern.usecases.assignevent.entity;
 
 import com.etkinlikyonetimi.intern.usecases.common.entity.BaseEntity;
+import com.etkinlikyonetimi.intern.usecases.managesurvey.entity.SurveyAnswer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,5 +40,7 @@ public class Participant extends BaseEntity {
     //Bi-directional fields
     @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
     private Set<Answer> answerSet;
+    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
+    private Set<SurveyAnswer> surveyAnswerSet;
 
 }

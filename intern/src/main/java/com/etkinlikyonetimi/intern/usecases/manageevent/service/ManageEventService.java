@@ -29,7 +29,7 @@ public class ManageEventService {
         System.out.println(LocalDateTime.now());
         return eventRepository.findAllByOrderByTitleAsc()
                 .stream()
-                .filter(event -> event.getEndDateTime().plusDays(3).isAfter(LocalDateTime.now()))
+                .filter(event -> event.getStartDateTime().isAfter(LocalDateTime.now()))
                 .collect(Collectors.toList());
     }
 
@@ -123,7 +123,7 @@ public class ManageEventService {
     public List<Event> listAllCreatedEventsByUser() {
         Optional<CorporateUser> user = getAuthenticatedUserFromPrincipal();
         return user.isPresent()
-                ? List.copyOf(user.get().getEventSet())
+                ? eventRepository.findByCorporateUserOrderByTitleAsc(user.get())
                 : List.of();
     }
 

@@ -227,12 +227,9 @@ export default class AssignEventDialog extends Component{
             ...this.state.questionAnswerMap
         };
         questionAnswerMapCopy[question] = answer;
-        console.log("hello question: %O",question);
-        console.log("hello: %O",questionAnswerMapCopy);
         this.setState({
             questionAnswerMap: questionAnswerMapCopy
         });
-        console.log("hellothis.state.questionAnswerMap: %O",this.state.questionAnswerMap);
     }
 
     handleSubmit = ()=>{
@@ -243,8 +240,6 @@ export default class AssignEventDialog extends Component{
         }
     }
     setAnswerSetForParticipantDTO=()=>{
-        console.log("sssss");
-        console.log(this.props.assignedEvent.questionSet);
         return this.props.assignedEvent.questionSet.map((question)=>{
             return {
                 content: this.state.questionAnswerMap[question.content],

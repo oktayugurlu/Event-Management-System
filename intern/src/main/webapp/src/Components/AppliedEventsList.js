@@ -181,56 +181,45 @@ export default class EventsList extends Component{
     }
 
     handleClickSubmitSSN = ()=>{
-        let participantFromEvent={};
-        let appliedEvents=[];
-        this.props.allEvents.forEach(
-            event=>{
-                for(let i=0;i<event.appliedParticipantSet.length;i++){
-                    if(event.appliedParticipantSet[i].participant.ssn===this.state.ssn){
-                        participantFromEvent = event.appliedParticipantSet[i].participant;
-                        break;
-                    }
-                }
+        this.findParticipantAndAppliedEventsBySSN();
+    }
+
+    findParticipantAndAppliedEventsBySSN=()=>{
+        let participant={
+            ssn:this.state.ssn
+        }
+        axios.post("/assignevent/getappliedevents",participant)
+            .then(response =>{
+                let applications=response.data;
+                this.setAppliedEventsAndParticipantFromApplication(response.data);
+            })
+            .catch(error => {
+                this.setState({
+                    isSubmitSSNClicked:true
+                })
+            });
+    }
+
+    setAppliedEventsAndParticipantFromApplication = (applications)=>{
+        let participantFromBackend={};
+        console.log("applications: %O",applications);
+        let appliedEvents = applications.map(
+            applicationWithEventDTO=>{
+                participantFromBackend= applicationWithEventDTO.applicationDTO.participant;
+                console.log(applicationWithEventDTO.eventDTO);
+                return applicationWithEventDTO.eventDTO;
             }
         );
-        axios.post("/managesurvey/participantanswers", participantFromEvent)
-            .then(response => {
-                let surveyAnswers = response.data;
-                this.props.allEvents.map(
-                  event => event.appliedParticipantSet
-                      .forEach(
-                          application=>{
-                              if(application.participant.ssn===this.state.ssn){
-                                  if(event.surveyQuestionSet.length>0 && surveyAnswers.length >0) {
-                                      if(event.surveyQuestionSet.filter(
-                                          surveyQuestion => surveyQuestion.content!==surveyAnswers[0].surveyQuestion.content)===[])
-                                          appliedEvents.push(event);
-                                  }
-                                  else{
-                                      appliedEvents.push(event);
-                                  }
-                              }
-                          }
-                          ));
-                this.setState({
-                    appliedEvents:appliedEvents
-                });
-            });
+        console.log(appliedEvents);
+        console.log(participantFromBackend);
         this.setState({
-            participant:participantFromEvent,
-            isParticipantExist:!this.isEmpty(participantFromEvent),
+            isParticipantExist:participantFromBackend!=={},
+            appliedEvents:[...appliedEvents],
+            participant: {...participantFromBackend},
             isSubmitSSNClicked:true
         });
     }
 
-    isEmpty(obj) {
-        for(let prop in obj) {
-            if(obj.hasOwnProperty(prop)) {
-                return false;
-            }
-        }
-        return JSON.stringify(obj) === JSON.stringify({});
-    }
 
     handleOnChangeSSNInput = (event)=>{
         this.setState({

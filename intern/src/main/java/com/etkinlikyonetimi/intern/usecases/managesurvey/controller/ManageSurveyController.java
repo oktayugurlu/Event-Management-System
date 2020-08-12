@@ -2,6 +2,7 @@ package com.etkinlikyonetimi.intern.usecases.managesurvey.controller;
 
 import com.etkinlikyonetimi.intern.usecases.assignevent.dto.ParticipantDTO;
 import com.etkinlikyonetimi.intern.usecases.assignevent.mapper.ParticipantMapper;
+import com.etkinlikyonetimi.intern.usecases.managesurvey.dto.ParticipantWithoutSurveyAnswerDTO;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.dto.SurveyAnswerDTO;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.dto.SurveyQuestionDTO;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.entity.SurveyAnswer;
@@ -40,15 +41,23 @@ public class ManageSurveyController {
     @PostMapping("/fillsurvey/{eventUniqueName}")
     public void fillSurvey(@RequestBody List<SurveyAnswerDTO> surveyAnswerDTOS,
                            @PathVariable @Size(min=1, max=50) String eventUniqueName){
-        System.out.println("hellooooo");
+        ParticipantWithoutSurveyAnswerDTO participant = surveyAnswerDTOS.get(0).getParticipant();
         List<SurveyAnswer> surveyAnswerList = surveyAnswerMapper.mapToEntity(surveyAnswerDTOS);
-        manageSurveyService.saveSurveyAnswers(surveyAnswerList, eventUniqueName);
+        manageSurveyService.saveSurveyAnswers(surveyAnswerList, eventUniqueName, participant);
     }
 
-    @PostMapping("participantanswers")
+/*    @PostMapping("participantanswers")
     public List<SurveyAnswerDTO> getParticipantSurveyAnswers(@RequestBody ParticipantDTO participantDTO ){
         List<SurveyAnswer> surveyAnswers =
                 manageSurveyService.findSurveyAnswersByParticipant(participantMapper.mapToEntity(participantDTO));
+        return surveyAnswerMapper.mapToDto(surveyAnswers);
+    }*/
+
+    @PostMapping("getsurvey/{eventUniqueName}")
+    public List<SurveyAnswerDTO> getSurveyByEvent(
+            @PathVariable @Size(min=1, max=50) String eventUniqueName
+    ){
+        List<SurveyAnswer> surveyAnswers = manageSurveyService.getSurveyByEvent(eventUniqueName);
         return surveyAnswerMapper.mapToDto(surveyAnswers);
     }
 }

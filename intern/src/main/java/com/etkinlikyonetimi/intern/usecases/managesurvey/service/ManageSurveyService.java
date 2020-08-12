@@ -6,6 +6,7 @@ import com.etkinlikyonetimi.intern.usecases.assignevent.repository.ParticipantRe
 import com.etkinlikyonetimi.intern.usecases.common.exception.ParticipantAlreadyAnswerSurveyException;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.EventRepository;
+import com.etkinlikyonetimi.intern.usecases.managesurvey.dto.ParticipantWithoutSurveyAnswerDTO;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.entity.SurveyAnswer;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.entity.SurveyQuestion;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.repository.SurveyAnswerRepository;
@@ -31,7 +32,7 @@ public class ManageSurveyService {
 
     public void createSurvey(List<SurveyQuestion> surveyQuestions, String eventUniqueName) {
         Optional<Event> event = eventRepository.findByUniqueName(eventUniqueName);
-        if(event.isPresent() && event.get().getEndDateTime().isAfter(LocalDateTime.now())){
+        if(event.isPresent()){
             List<String> questionContentFromEvent = getStringContentFromEventsSurveyQuestionField(event.get());
             surveyQuestions.forEach(
                     surveyQuestion ->
@@ -77,10 +78,14 @@ public class ManageSurveyService {
         }
     }
 
-    public void saveSurveyAnswers(List<SurveyAnswer> surveyAnswerList, String eventUniqueName) {
+    //After participant submit survey's answers
+    public void saveSurveyAnswers(List<SurveyAnswer> surveyAnswerList,
+                                  String eventUniqueName,
+                                  ParticipantWithoutSurveyAnswerDTO participant
+                                  ) {
         Optional<Event> event = eventRepository.findByUniqueName(eventUniqueName);
         Optional<Participant> participantFromDatabase= participantRepository.findParticipantBySsn(
-                surveyAnswerList.get(0).getParticipant().getSsn());
+                participant.getSsn());
         if(event.isPresent() && participantFromDatabase.isPresent()
                 && checkIsParticipantApplyThisEvent(event.get(), participantFromDatabase.get())
                 && event.get().getEndDateTime().isBefore(LocalDateTime.now())
@@ -127,7 +132,11 @@ public class ManageSurveyService {
 
     }
 
-    public List<SurveyAnswer> findSurveyAnswersByParticipant(Participant participant) {
+/*    public List<SurveyAnswer> findSurveyAnswersByParticipant(Participant participant) {
         return surveyAnswerRepository.findByParticipantSSN(participant.getSsn());
+    }*/
+
+    public List<SurveyAnswer> getSurveyByEvent(String eventUniqueName) {
+        return surveyAnswerRepository.findByEventUniqueName(eventUniqueName);
     }
 }
