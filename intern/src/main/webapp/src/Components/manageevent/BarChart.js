@@ -10,10 +10,10 @@ import {
 } from '@devexpress/dx-react-chart-material-ui';
 
 import { EventTracker } from '@devexpress/dx-react-chart';
-import {AppStateContext} from "./contexts/AppStateContext";
+import {AppStateContext} from "../contexts/AppStateContext";
 import { Animation } from '@devexpress/dx-react-chart';
 import axios from "axios";
-import {getJwsToken} from "./authentication/LocalStorageService";
+import {getJwsToken} from "../authentication/LocalStorageService";
 
 
 const ALL_EVENTS_NUMBER_OF_PARTICIPANTS=0;

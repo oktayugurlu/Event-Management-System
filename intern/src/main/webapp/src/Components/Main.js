@@ -3,7 +3,7 @@ import '../index.css';
 import React, {Component} from "react";
 
 import PrimarySearchAppBar from './PrimarySearchAppBar';
-import AddEventDialog from './AddEventDialog';
+import AddEventDialog from './manageevent/AddEventDialog';
 import 'fontsource-roboto';
 //material ui
 import { withStyles } from '@material-ui/core/styles';

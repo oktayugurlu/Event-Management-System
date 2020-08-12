@@ -17,7 +17,7 @@ import {DateTimePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import trLocale from "date-fns/locale/tr";
 
 
-import Map from './Map';
+import Map from '../Map';
 import EventQuestion from "./EventQuestion";
 
 
