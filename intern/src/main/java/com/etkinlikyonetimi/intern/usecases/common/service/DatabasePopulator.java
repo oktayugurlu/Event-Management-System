@@ -25,7 +25,7 @@ public class DatabasePopulator {
     private final QuestionRepository questionRepository;
 
     public void insertEvent(){
-        /*CorporateUser corporateUser =new CorporateUser("admin", "1234",Set.of());
+/*        CorporateUser corporateUser =new CorporateUser("admin", "1234",Set.of());
         CorporateUser corporateUser1 =new CorporateUser("admin1", "admin",Set.of());
         CorporateUser corporateUser2 =new CorporateUser("admin2", "admin",Set.of());
         CorporateUser corporateUser3 =new CorporateUser("admin3", "admin",Set.of());
@@ -49,6 +49,7 @@ public class DatabasePopulator {
                 Set.of(),
                 List.of(),
                 Set.of(),
+                Set.of(),
                 Set.of()
                 ));
         eventRepository.save(new Event(
@@ -64,6 +65,7 @@ public class DatabasePopulator {
                 "Çukurambar. Çukurambar Mahallesi, 1111. Sokak, X Blok, No 22, Çankaya,",
                 Set.of(),
                 List.of(),
+                Set.of(),
                 Set.of(),
                 Set.of()
         ));
@@ -81,6 +83,7 @@ public class DatabasePopulator {
                 Set.of(),
                 List.of(),
                 Set.of(),
+                Set.of(),
                 Set.of()
         ));
         eventRepository.save(new Event(
@@ -97,6 +100,7 @@ public class DatabasePopulator {
                 Set.of(),
                 List.of(),
                 Set.of(),
+                Set.of(),
                 Set.of()
         ));
         Event event = eventRepository.save(new Event(
@@ -112,6 +116,7 @@ public class DatabasePopulator {
                 "Çukurambar. Çukurambar Mahallesi, 1111. Sokak, X Blok, No 22, Çankaya,",
                 Set.of(),
                 List.of(),
+                Set.of(),
                 Set.of(),
                 Set.of()
         ));

@@ -1,18 +1,16 @@
 package com.etkinlikyonetimi.intern.usecases.manageparticipant.service;
 
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Answer;
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Lots;
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Participant;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.*;
 import com.etkinlikyonetimi.intern.usecases.common.exception.QuotaIsFullException;
 import com.etkinlikyonetimi.intern.usecases.common.exception.SameTCIDException;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.repository.AnswerRepository;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.repository.LotsRepository;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.repository.ParticipantRepository;
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Application;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.ApplicationRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.EventRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.QuestionRepository;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.repository.QuestionAskedByParticipantRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +36,7 @@ public class ManageParticipantService {
     private final MailSenderService mailSenderService;
     private final ApplicationRepository applicationRepository;
     private final LotsRepository lotsRepository;
+    private final QuestionAskedByParticipantRepository questionAskedByParticipantRepository;
 
      
 
@@ -185,5 +184,22 @@ public class ManageParticipantService {
             throw new EntityNotFoundException();
         }
 
+    }
+
+    public void addQuestionAskedByParticipant(QuestionAskedByParticipant questionAskedByParticipant, String eventUniqueName) {
+        Optional<Event> eventFromDB = eventRepository.findByUniqueName(eventUniqueName);
+        Optional<Participant> participantFromDB = participantRepository.findParticipantBySsn(questionAskedByParticipant.getParticipant().getSsn());
+
+        if(participantFromDB.isPresent() && eventFromDB.isPresent()){
+            if(!checkIfParticipantNotAssignSameEvent(participantFromDB.get(), eventFromDB.get())){
+                questionAskedByParticipant.setParticipant(participantFromDB.get());
+                questionAskedByParticipant.setEvent(eventFromDB.get());
+                questionAskedByParticipantRepository.save(questionAskedByParticipant);
+            }else{
+                throw new EntityNotFoundException();
+            }
+        }else{
+            throw new EntityNotFoundException();
+        }
     }
 }

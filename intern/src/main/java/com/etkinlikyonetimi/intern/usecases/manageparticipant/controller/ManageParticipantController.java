@@ -4,12 +4,9 @@ package com.etkinlikyonetimi.intern.usecases.manageparticipant.controller;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.ApplicationWithEventDTO;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.LotsDTO;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.ParticipantDTO;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.QuestionAskedByParticipantDTO;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Application;
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Lots;
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.mapper.AnswerMapper;
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.mapper.ApplicationMapper;
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.mapper.LotsMapper;
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.mapper.ParticipantMapper;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.mapper.*;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.service.ManageParticipantService;
 import com.etkinlikyonetimi.intern.usecases.manageevent.mapper.EventMapper;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +32,7 @@ public class ManageParticipantController {
     private final ApplicationMapper applicationMapper;
     private final EventMapper eventMapper;
     private final LotsMapper lotsMapper;
+    private final QuestionAskedByParticipantMapper questionAskedByParticipantMapper;
 
     @PostMapping(value = "/assign/{eventUniqueName}", produces = MediaType.IMAGE_PNG_VALUE)
     public BufferedImage assignAndReturnQrCode(@PathVariable @Size(max = 50, min = 1) String eventUniqueName,
@@ -64,5 +62,12 @@ public class ManageParticipantController {
     public LotsDTO drawingLots(@RequestBody @Valid LotsDTO lotsDTO,
                                @PathVariable @Size(max = 50, min = 1) String eventUniqueName){
         return lotsMapper.mapToDto(manageParticipantService.drawingLots(lotsMapper.mapToEntity(lotsDTO), eventUniqueName));
+    }
+
+    @PostMapping(value="/askquestion/{eventUniqueName}")
+    public void drawingLots(@RequestBody @Valid QuestionAskedByParticipantDTO questionAskedByParticipantDTO,
+                               @PathVariable @Size(max = 50, min = 1) String eventUniqueName){
+    manageParticipantService.addQuestionAskedByParticipant(
+            questionAskedByParticipantMapper.mapToEntity(questionAskedByParticipantDTO), eventUniqueName);
     }
 }

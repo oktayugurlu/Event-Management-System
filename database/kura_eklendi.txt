@@ -80,6 +80,14 @@ CREATE SEQUENCE public.lots_seq
 ALTER SEQUENCE public.lots_seq
     OWNER TO postgres;
 	
+CREATE SEQUENCE public.question_asked_by_participant_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    CACHE 1;
+ALTER SEQUENCE public.question_asked_by_participant_seq
+    OWNER TO postgres;	
 	
 CREATE TABLE public.corporate_user
 (
@@ -270,6 +278,27 @@ CREATE TABLE public.lots
     last_modified_date timestamp without time zone,
     "version" bigint,  
 	gift_message character varying(255) COLLATE pg_catalog."default",
+	participant_id bigint,
+	event_id bigint,
+    PRIMARY KEY ("id"),
+    FOREIGN KEY (participant_id)
+        REFERENCES public.participant ("id") MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    FOREIGN KEY (event_id)
+        REFERENCES public.event ("id") MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+
+CREATE TABLE public.question_asked_by_participant
+(
+    "id" bigint NOT NULL default nextval('question_asked_by_participant_seq'),
+    creation_date timestamp without time zone,
+    last_modified_date timestamp without time zone,
+    "version" bigint,  
+	"content" character varying(255) COLLATE pg_catalog."default",
 	participant_id bigint,
 	event_id bigint,
     PRIMARY KEY ("id"),

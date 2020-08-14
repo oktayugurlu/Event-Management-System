@@ -2,6 +2,7 @@ package com.etkinlikyonetimi.intern.usecases.manageevent.entity;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Application;
 import com.etkinlikyonetimi.intern.usecases.common.entity.BaseEntity;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Lots;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.QuestionAskedByParticipant;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.entity.SurveyQuestion;
 import lombok.*;
 
@@ -64,4 +65,6 @@ public class Event extends BaseEntity {
     @OneToMany(mappedBy = "event")
     private Set<Lots> lotsSet;
 
+    @OneToMany(mappedBy = "event")
+    private Set<QuestionAskedByParticipant> questionAskedByParticipantSet;
 }

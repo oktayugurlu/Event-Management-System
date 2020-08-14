@@ -2,7 +2,7 @@ package com.etkinlikyonetimi.intern.usecases.manageevent.dto;
 
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.ApplicationDTO;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.LotsDTO;
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Lots;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.QuestionAskedByParticipantDTO;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.dto.SurveyQuestionDTO;
 import lombok.*;
 
@@ -70,6 +70,8 @@ public class EventDTO {
     private Set<SurveyQuestionDTO> surveyQuestionSet;
 
     private Set<LotsDTO> lotsSet;
+
+    private Set<QuestionAskedByParticipantDTO> questionAskedByParticipantSet;
 
     @AssertTrue(message = "Katılımcı sayısı kotadan fazla olamaz!")
     public boolean isLessThanOrEqualQuota(){
