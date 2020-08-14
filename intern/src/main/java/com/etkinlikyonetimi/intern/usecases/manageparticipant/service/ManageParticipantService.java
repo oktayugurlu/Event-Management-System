@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -190,7 +191,9 @@ public class ManageParticipantService {
         Optional<Event> eventFromDB = eventRepository.findByUniqueName(eventUniqueName);
         Optional<Participant> participantFromDB = participantRepository.findParticipantBySsn(questionAskedByParticipant.getParticipant().getSsn());
 
-        if(participantFromDB.isPresent() && eventFromDB.isPresent()){
+        if(participantFromDB.isPresent() && eventFromDB.isPresent()
+                && eventFromDB.get().getStartDateTime().isBefore(LocalDateTime.now())
+                && eventFromDB.get().getEndDateTime().isAfter(LocalDateTime.now())){
             if(!checkIfParticipantNotAssignSameEvent(participantFromDB.get(), eventFromDB.get())){
                 questionAskedByParticipant.setParticipant(participantFromDB.get());
                 questionAskedByParticipant.setEvent(eventFromDB.get());
