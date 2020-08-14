@@ -1,8 +1,8 @@
 package com.etkinlikyonetimi.intern.usecases.managesurvey.service;
 
-import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Application;
-import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Participant;
-import com.etkinlikyonetimi.intern.usecases.assignevent.repository.ParticipantRepository;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Application;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Participant;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.repository.ParticipantRepository;
 import com.etkinlikyonetimi.intern.usecases.common.exception.ParticipantAlreadyAnswerSurveyException;
 import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.EventRepository;
@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

@@ -1,6 +1,9 @@
 package com.etkinlikyonetimi.intern.usecases.managesurvey.dto;
 
 import lombok.*;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 @Setter
@@ -9,6 +12,10 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @ToString
 public class SurveyAnswerDTO {
+
+    @NotNull
+    @Min(value = 0)
+    @Max(value=4)
     private Integer point;
 
     @NotNull

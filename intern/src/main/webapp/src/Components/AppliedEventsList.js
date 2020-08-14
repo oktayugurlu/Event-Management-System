@@ -22,17 +22,13 @@ export default class EventsList extends Component{
 
     APPLIED_EVENTS_PAGE=3;
     CARD_IMAGE_URL='https://images.all-free-download.com/images/graphiclarge/team_meeting_background_table_stationery_gathering_people_icons_6838493.jpg';
-
-    constructor(props) {
-        super(props);
-        this.state={
-            ssn:'',
-            participant:{},
-            isParticipantExist:false,
-            page:0,
-            isSubmitSSNClicked:false,
-            appliedEvents:[]
-        }
+    state={
+        ssn:'',
+        participant:{},
+        isParticipantExist:false,
+        page:0,
+        isSubmitSSNClicked:false,
+        appliedEvents:[]
     }
 
     renderAppliedEventsPage = ()=>{
@@ -188,7 +184,7 @@ export default class EventsList extends Component{
         let participant={
             ssn:this.state.ssn
         }
-        axios.post("/assignevent/getappliedevents",participant)
+        axios.post("/manageparticipant/getappliedevents",participant)
             .then(response =>{
                 let applications=response.data;
                 this.setAppliedEventsAndParticipantFromApplication(response.data);

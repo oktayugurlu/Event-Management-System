@@ -10,7 +10,6 @@ import ParticipantTable from "./ParticipantTable";
 import BarChart from "./BarChart";
 import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography";
-import CasinoIcon from '@material-ui/icons/Casino';
 import Button from "@material-ui/core/Button";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -33,16 +32,8 @@ export default class ParticipantsDetailDialog extends Component{
         console.log("QR COMPONENT AYAGA KALKTI!!!!");
     }
 
-    castingLots=()=>{
-        let numberOfParticipants = this.props.openedEvent.appliedParticipantSet.length;
-        let luckyParticipant = this.getRandomInt(0,numberOfParticipants-1);
-    }
 
-    getRandomInt = (min, max)=> {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+
 
     render() {
         return (
@@ -98,22 +89,7 @@ export default class ParticipantsDetailDialog extends Component{
                             <Grid>
                                 <ParticipantTable openedEvent={this.props.openedEvent}/>
                             </Grid>
-                            <Grid container direction="row"
-                                  justify="center"
-                                  alignItems="center">
-                                <Button
-                                    style={{
-                                        marginTop:'22px',
-                                        marginBottom:'22px'
-                                    }}
-                                    variant="contained"
-                                    color="primary"
-                                    onClick={this.castingLots}
-                                    startIcon={<CasinoIcon/>}
-                                >
-                                    Kura Çek
-                                </Button>
-                            </Grid>
+
                         </Grid>
                     </DialogContent>
                 </Dialog>

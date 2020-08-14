@@ -1,7 +1,6 @@
 package com.etkinlikyonetimi.intern.usecases.managesurvey.controller;
 
-import com.etkinlikyonetimi.intern.usecases.assignevent.dto.ParticipantDTO;
-import com.etkinlikyonetimi.intern.usecases.assignevent.mapper.ParticipantMapper;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.mapper.ParticipantMapper;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.dto.ParticipantWithoutSurveyAnswerDTO;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.dto.SurveyAnswerDTO;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.dto.SurveyQuestionDTO;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Size;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor

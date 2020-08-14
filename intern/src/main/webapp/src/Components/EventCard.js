@@ -25,6 +25,9 @@ import axios from "axios";
 import FillSurveyDialog from "./surveyforparticipant/FillSurveyDialog";
 import Tooltip from "@material-ui/core/Tooltip";
 import Box from "@material-ui/core/Box";
+import CasinoIcon from '@material-ui/icons/Casino';
+import ManageLotsDialog from "./manageevent/ManageLotsDialog";
+
 const useStyles = makeStyles((theme) => ({
     root: {
         minWidth: 275,
@@ -76,18 +79,18 @@ const useStyles = makeStyles((theme) => ({
 
 export default function EventCard(props) {
     const classes = useStyles();
-  /*  const timer = React.useRef();*/
 
     const createdEventsContext = useContext(AppStateContext);
 
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
     const APPLIED_EVENTS_PAGE=3;
-/*    const SURVEY_RESULTS=2;*/
 
+    // DIALOG ELEMENTS //
     const [participantsDetailDialogElement, setParticipantsDetailDialogElement] = React.useState(<></>);
     const [surveyDialogElement, setSurveyDialogElement] = React.useState(<></>);
     const [fillSurveyDialogElement, setFillSurveyDialogElement] = React.useState(<></>);
+    const [manageLotsDialogElement, setManageLotsDialogElement] = React.useState(<></>);
 
     const selectCardActionButtons = ()=>{
         if(props.whichPage === MANAGE_EVENT_PAGE){
@@ -132,7 +135,7 @@ export default function EventCard(props) {
                         </Tooltip>
                     </div>
                     <div className={classes.wrapper}>
-                        <Tooltip title="Etkinlikleri yönet" aria-label="add">
+                        <Tooltip title="Anketi yönet" aria-label="add">
                             <Box component="span" display="block">
                                 <span>
                                     <Fab
@@ -143,6 +146,22 @@ export default function EventCard(props) {
                                         disabled={checkStartDateIsNotUpToDate()}
                                     >
                                         <AssessmentIcon/>
+                                    </Fab>
+                                </span>
+                            </Box>
+                        </Tooltip>
+                    </div>
+                    <div className={classes.wrapper}>
+                        <Tooltip title="Çekiliş" aria-label="add">
+                            <Box component="span" display="block">
+                                <span>
+                                    <Fab
+                                        aria-label="survey"
+                                        color="inherit"
+                                        style={{colorInherit:"#FF7F00"}}
+                                        onClick={()=>handleClickOpenManageLotsButton()}
+                                    >
+                                        <CasinoIcon/>
                                     </Fab>
                                 </span>
                             </Box>
@@ -214,12 +233,28 @@ export default function EventCard(props) {
             );
         }
     }
+
     const checkStartDateIsNotUpToDate = (compareWith)=>{
         return props.eventObject.startDateTime <= compareWith;
     }
     const checkEndDateIsUpToDate = (compareWith)=>{
         return props.eventObject.endDateTime > compareWith;
     }
+
+    //********* MANAGE LOTS *************//
+    const handleClickOpenManageLotsButton =()=>{
+        setManageLotsDialogElement(
+            <ManageLotsDialog
+                openDialog={true}
+                handleClose={handleCloseManageLotsButton}
+                openedEvent={props.eventObject}
+            />
+        );
+    }
+    const handleCloseManageLotsButton = ()=>{
+        setManageLotsDialogElement(<></>);
+    }
+
 
 
     //********* FILL SURVEY BUTTONS **********//
@@ -238,12 +273,7 @@ export default function EventCard(props) {
         setFillSurveyDialogElement(<></>);
     }
     const handleSubmitFillSurveyButton= (surveyAnswers)=>{
-        let headers = {
-            'Authorization': `Bearer ${getJwsToken()}`
-        };
-        axios.post("/managesurvey/fillsurvey/"+props.eventObject.uniqueName, surveyAnswers, {
-            headers:headers
-        })
+        axios.post("/managesurvey/fillsurvey/"+props.eventObject.uniqueName, surveyAnswers)
             .then((response) => {
                 if(response.data===''){
                     props.snackbarOpen("Anket başarı ile dolduruldu!", "success");
@@ -294,7 +324,6 @@ export default function EventCard(props) {
         handleCloseManageSurveyButton();
     }
 
-
     //********* PARTICIPANT DETAILS **********//
     const handleCloseParticipantsDetailDialog = (title) => {
         setParticipantsDetailDialogElement(<></>);
@@ -331,6 +360,7 @@ export default function EventCard(props) {
             {surveyDialogElement}
             {fillSurveyDialogElement}
             {participantsDetailDialogElement}
+            {manageLotsDialogElement}
             <Grid
                 container
                 direction="row"

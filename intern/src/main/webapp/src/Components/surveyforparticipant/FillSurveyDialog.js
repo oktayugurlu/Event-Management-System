@@ -94,7 +94,9 @@ class FillSurveyDialog extends Component{
                         onClose={this.props.handleClose}
                         fullWidth={true}
                         maxWidth={'lg'}>
-                        <DialogTitle id="scroll-dialog-title">Kullanıcı Anketi</DialogTitle>
+                        <DialogTitle id="scroll-dialog-title">
+                            {this.props.event.title+" - Kullanıcı Anketi"}
+                        </DialogTitle>
                         <DialogContent dividers>
                             <Grid
                                 container

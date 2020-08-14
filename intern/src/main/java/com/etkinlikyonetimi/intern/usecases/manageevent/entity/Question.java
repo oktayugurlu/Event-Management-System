@@ -1,6 +1,6 @@
 package com.etkinlikyonetimi.intern.usecases.manageevent.entity;
 
-import com.etkinlikyonetimi.intern.usecases.assignevent.entity.Answer;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Answer;
 import com.etkinlikyonetimi.intern.usecases.common.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor

@@ -110,7 +110,7 @@ export default class AssignEventDialog extends Component{
                     ...prevState.participant,
                     ssn: tcId.trim()
                 }
-            }))
+            }));
     }
     handleOnChangeName = (event) => {
         const name = event.target.value;
@@ -120,7 +120,7 @@ export default class AssignEventDialog extends Component{
                     ...prevState.participant,
                     name: name.trim()
                 }
-            }))
+            }));
     }
     handleOnChangeSurname = (event) => {
         const surname = event.target.value;
@@ -130,7 +130,7 @@ export default class AssignEventDialog extends Component{
                     ...prevState.participant,
                     surname: surname.trim()
                 }
-            }))
+            }));
     }
     handleOnChangeMail = (event) => {
         const mail = event.target.value;
@@ -140,7 +140,7 @@ export default class AssignEventDialog extends Component{
                     ...prevState.participant,
                     mail: mail.trim()
                 }
-            }))
+            }));
     }
     //***** SET STATE VARIABLES END *****//
 

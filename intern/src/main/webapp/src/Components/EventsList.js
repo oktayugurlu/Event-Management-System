@@ -141,7 +141,7 @@ export default function EventsList(props) {
             headers:headers
         })
             .then((response) => {
-                if(response.data==='') props.snackbarOpen(eventObject.uniqueName+" başarıyla güncellendi!", "success");
+                if(response.data==='') props.snackbarOpen(eventObject.title+" başarıyla güncellendi!", "success");
                 else props.snackbarOpen(response.data, "error");
                 props.getAllEvents();
             }).catch(error => {
@@ -210,8 +210,7 @@ export default function EventsList(props) {
 
     const handleSubmitAssignEvent = (participant, eventUniqueName, assignedEvent) => {
         setAssignEventDialogElement(<div/>);
-        // backdropContext.setOpenBackdropScreen();
-        axios.post("/assignevent/assign/"+eventUniqueName.toString(),
+        axios.post("/manageparticipant/assign/"+eventUniqueName.toString(),
             participant,{responseType: 'blob'})
             .then((response) => {
                 setQrCodeDialogElement(
@@ -258,7 +257,7 @@ export default function EventsList(props) {
     const handleCloseQrCodeDialog = (title) => {
         // qrCodeImage="";
         setQrCodeDialogElement(<></>);
-        props.snackbarOpen("You assign to "+title+" successfully", "success");
+        props.snackbarOpen(title+" etkinliğine başarılı bir şekilde kaydoldun", "success");
     };
     //**** ASSIGN EVENT FUNCTIONS END ****//
 

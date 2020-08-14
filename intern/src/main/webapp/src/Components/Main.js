@@ -262,7 +262,7 @@ class Main extends Component{
             headers:headers
         })
             .then(response => {
-                this.snackbarOpen("Event added successfully", "success");
+                this.snackbarOpen(eventObject.title+" başarıyla eklendi", "success");
                 this.getAllEvents();
             })
             .catch(error => {

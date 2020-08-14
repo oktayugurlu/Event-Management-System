@@ -9,7 +9,7 @@ import {
     Tooltip,
 } from '@devexpress/dx-react-chart-material-ui';
 
-import { EventTracker } from '@devexpress/dx-react-chart';
+import {AreaSeries, EventTracker} from '@devexpress/dx-react-chart';
 import {AppStateContext} from "../contexts/AppStateContext";
 import { Animation } from '@devexpress/dx-react-chart';
 import axios from "axios";
@@ -23,6 +23,7 @@ const SURVEY_RESULTS=2;
 export default class BarChart extends React.PureComponent {
     static contextType = AppStateContext;
 
+    questionFrequencyForSurvey = 0;
     constructor(props) {
         super(props);
 
@@ -37,7 +38,7 @@ export default class BarChart extends React.PureComponent {
 
     componentDidMount() {
         if(this.props.whichChart===LAST_TEN_DAY_PARTICIPANTS)
-            this.preprocessLastnDaysChart(10);
+            this.preprocessLastnDaysChart(15);
         else if(this.props.whichChart===ALL_EVENTS_NUMBER_OF_PARTICIPANTS)
             this.preprocessNumberOfParticipant();
         else if(this.props.whichChart===SURVEY_RESULTS)
@@ -54,7 +55,6 @@ export default class BarChart extends React.PureComponent {
         })
             .then(response => {
                 let surveyAnswers = response.data;
-
                 this.setState({
                     data:this.calculatePointMeanForEachQuestion(
                         this.props.surveyEvent.surveyQuestionSet, surveyAnswers),
@@ -77,9 +77,11 @@ export default class BarChart extends React.PureComponent {
                     }
                 });
                 let pointMean = questionTotalPoint/questionFrequency;
+                this.questionFrequencyForSurvey = questionFrequency;
                 dataRows.push({
                     questionContent:'Soru-'+(index+1),
-                    pointMean:pointMean
+                    pointMean:pointMean,
+                    questionFrequency:questionFrequency
                 });
             }
         );
@@ -152,6 +154,14 @@ export default class BarChart extends React.PureComponent {
         });
     }
 
+    renderTitle =()=>{
+        if(this.props.whichChart ===SURVEY_RESULTS){
+            return this.props.title + this.questionFrequencyForSurvey ;
+        }
+        else{
+            return this.props.title;
+        }
+    }
 
     render() {
         const { data: chartData, targetItem, valueField, argumentField } = this.state;
@@ -171,7 +181,7 @@ export default class BarChart extends React.PureComponent {
                         color="#FF7043"
                     />
                     <Title
-                        text={this.props.title}
+                        text={this.renderTitle()}
                     />
                     <Animation />
                     <EventTracker />

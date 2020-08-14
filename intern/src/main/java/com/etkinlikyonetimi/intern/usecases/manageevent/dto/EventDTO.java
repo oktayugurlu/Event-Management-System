@@ -1,10 +1,10 @@
 package com.etkinlikyonetimi.intern.usecases.manageevent.dto;
 
-import com.etkinlikyonetimi.intern.usecases.assignevent.dto.ApplicationDTO;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.ApplicationDTO;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.LotsDTO;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Lots;
 import com.etkinlikyonetimi.intern.usecases.managesurvey.dto.SurveyQuestionDTO;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
@@ -68,6 +68,8 @@ public class EventDTO {
     private List<QuestionDTO> questionSet;
 
     private Set<SurveyQuestionDTO> surveyQuestionSet;
+
+    private Set<LotsDTO> lotsSet;
 
     @AssertTrue(message = "Katılımcı sayısı kotadan fazla olamaz!")
     public boolean isLessThanOrEqualQuota(){

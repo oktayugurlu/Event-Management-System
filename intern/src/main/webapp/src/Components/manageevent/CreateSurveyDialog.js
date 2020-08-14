@@ -189,10 +189,10 @@ class CreateSurveyDialog extends Component{
                     <ValidatorForm
                         onSubmit={this.handleSubmit}
                     >
-                        <DialogTitle id="scroll-dialog-title">
+                        <DialogTitle id="scroll-dialog-title" >
                             {this.props.event.title + " - Anketi Güncelle"}
                         </DialogTitle>
-                        <DialogContent>
+                        <DialogContent dividers={true}>
                             <Grid container direction="column" spacing={2}>
                                 {this.exportQuestionElementFromJSONAsArray( )}
                                 <Grid container direction="row"
@@ -217,13 +217,14 @@ class CreateSurveyDialog extends Component{
                                 </Grid>
                                 <Grid item>
                                     <Typography variant="h5" gutterBottom>
-                                        Sorulara verilen cevaplarin puan ortalamasi
+                                        {"Sorulara verilen cevaplarin puan ortalamasi"}
                                     </Typography>
                                 </Grid>
                                 <Grid item>
                                     <BarChart
                                         surveyEvent={this.props.event}
                                         whichChart={SURVEY_RESULTS}
+                                        title={"Katılımcı Sayısı:"}
                                     />
                                 </Grid>
                             </Grid>
