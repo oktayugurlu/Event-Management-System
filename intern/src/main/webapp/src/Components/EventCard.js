@@ -16,17 +16,19 @@ import AddIcon from '@material-ui/icons/Add';
 import {green} from '@material-ui/core/colors';
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
-import ParticipantsDetailDialog from "./manageevent/ParticipantsDetailDialog";
+import ParticipantsDetailDialog from "./manageeventpage/ParticipantsDetailDialog";
 import {AppStateContext} from "./contexts/AppStateContext";
 import AssessmentIcon from '@material-ui/icons/Assessment';
-import SurveyDialog from "./manageevent/CreateSurveyDialog";
+import SurveyDialog from "./manageeventpage/CreateSurveyDialog";
 import {getJwsToken} from "./authentication/LocalStorageService";
 import axios from "axios";
-import FillSurveyDialog from "./surveyforparticipant/FillSurveyDialog";
+import FillSurveyDialog from "./appliedeventspage/FillSurveyDialog";
 import Tooltip from "@material-ui/core/Tooltip";
 import Box from "@material-ui/core/Box";
 import CasinoIcon from '@material-ui/icons/Casino';
-import ManageLotsDialog from "./manageevent/ManageLotsDialog";
+import ManageLotsDialog from "./manageeventpage/ManageLotsDialog";
+import PlaceIcon from '@material-ui/icons/Place';
+import MapDialog from "./appliedeventspage/MapDialog"
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -77,6 +79,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+
 export default function EventCard(props) {
     const classes = useStyles();
 
@@ -91,6 +94,7 @@ export default function EventCard(props) {
     const [surveyDialogElement, setSurveyDialogElement] = React.useState(<></>);
     const [fillSurveyDialogElement, setFillSurveyDialogElement] = React.useState(<></>);
     const [manageLotsDialogElement, setManageLotsDialogElement] = React.useState(<></>);
+    const [showMapDialogElement, setShowMapDialogElement] = React.useState(<></>);
 
     const selectCardActionButtons = ()=>{
         if(props.whichPage === MANAGE_EVENT_PAGE){
@@ -103,7 +107,11 @@ export default function EventCard(props) {
                 >
                     <div className={classes.wrapper}
                     >
-                        <Tooltip title="Etkinliği güncelle" aria-label="add">
+                        <Tooltip title={
+                            checkStartDateIsNotUpToDate(new Date())
+                                ? "Etkinlik bitiş tarihinden sonra güncellenemez!"
+                                : "Etkinliği güncelle"
+                            } aria-label="add">
                             <Box component="span" display="block">
                                 <span>
                                     <Fab
@@ -119,7 +127,11 @@ export default function EventCard(props) {
                         </Tooltip>
                     </div>
                     <div className={classes.wrapper}>
-                        <Tooltip title="Sil" aria-label="add">
+                        <Tooltip title={
+                            checkStartDateIsNotUpToDate(new Date())
+                                ? "Etkinlik bitiş tarihinden sonra silinemez!"
+                                : "Sil"} aria-label="add"
+                        >
                             <Box component="span" display="block">
                                 <span>
                                     <Fab
@@ -135,7 +147,11 @@ export default function EventCard(props) {
                         </Tooltip>
                     </div>
                     <div className={classes.wrapper}>
-                        <Tooltip title="Anketi yönet" aria-label="add">
+                        <Tooltip title={
+                            checkEndDateIsOutOfDate(new Date())
+                                ? "Anket, bitiş tarihinden sonra güncellenemez!"
+                                : "Anketi yönet"} aria-label="add"
+                        >
                             <Box component="span" display="block">
                                 <span>
                                     <Fab
@@ -143,7 +159,7 @@ export default function EventCard(props) {
                                         color="inherit"
                                         style={{colorInherit:"#FF7F00"}}
                                         onClick={()=>handleClickOpenManageSurveyButton()}
-                                        disabled={checkStartDateIsNotUpToDate()}
+                                        disabled={checkEndDateIsOutOfDate(new Date())}
                                     >
                                         <AssessmentIcon/>
                                     </Fab>
@@ -210,18 +226,15 @@ export default function EventCard(props) {
                     alignItems="center"
                 >
                     <div className={classes.wrapper}>
-                        <Tooltip title={checkEndDateIsUpToDate(new Date())
-                            ? "Anket etkinlik bitince aktif olacak"
-                            : "Anketi doldurun"}
+                        <Tooltip title={returnTooltipAboutSurveyToParticipant()}
                                  aria-label="add">
                             <Box component="span" display="block">
-                                    <span>
+                                    <span color="inherit">
                                         <Fab
                                             aria-label="survey"
-                                            color="inherit"
-                                            style={{colorInherit:"#FF7F00"}}
+                                            style={{colorInherit:"#FFFBD6"}}
                                             onClick={()=>handleClickOpenFillSurveyButton()}
-                                            disabled={checkEndDateIsUpToDate(new Date())}
+                                            disabled={checkEndDateIsUpToDate(new Date()) || !isEventHasSurveyQuestion()}
                                         >
                                             <AssessmentIcon/>
                                         </Fab>
@@ -229,9 +242,109 @@ export default function EventCard(props) {
                             </Box>
                         </Tooltip>
                     </div>
+                    <div className={classes.wrapper}>
+                        <Tooltip title={"Etkinliğin Konumu"} aria-label="add">
+                            <Box component="span" display="block">
+                                <span>
+                                    <Fab
+                                        aria-label="place"
+                                        color="primary"
+                                        onClick={()=>handleClickShowMapDialogButton()}
+                                    >
+                                        <PlaceIcon/>
+                                    </Fab>
+                                </span>
+                            </Box>
+                        </Tooltip>
+                    </div>
                 </Grid>
             );
         }
+    }
+    const returnTooltipAboutSurveyToParticipant = ()=>{
+        if(checkEndDateIsUpToDate(new Date()))
+            return "Anket etkinlik bitince aktif olacak";
+        else {
+            if(isEventHasSurveyQuestion())
+                return "Anketi doldurun";
+            else
+                return "Mevcut bir anket bulunmamakta";
+        };
+    }
+    const isEventHasSurveyQuestion = ()=>{
+        return props.eventObject.surveyQuestionSet.length !== 0;
+    }
+    const renderCardActionAreaAndCardContent =()=>{
+        if(props.whichPage === MANAGE_EVENT_PAGE){
+            return (
+                <CardActionArea disabled={props.whichPage!==MANAGE_EVENT_PAGE} onClick={handleOpenParticipantsDetailDialog}>
+                    {justRenderCardContent()}
+                </CardActionArea>
+            );
+        }
+        else{
+            return justRenderCardContent();
+        }
+    }
+
+    const justRenderCardContent = ()=>{
+        return (
+            <CardContent>
+                <Grid
+                    container
+                    direction="row"
+                    justify="flex-start"
+                    alignItems="center"
+                >
+                    <Grid item md={3}>
+                        <CardMedia
+                            className={classes.media}
+                            image={props.imageOfEvent!=null ? ( props.imageOfEvent) : '../../static/image/social.png'}
+                            title={props.eventObject.title}
+                        />
+                    </Grid>
+                    <Grid item md={1}/>
+                    <Grid item md={8} >
+                        <Grid
+                            container
+                            direction="column"
+                            justify="flex-start"
+                            alignItems="baseline"
+                        >
+                            <Typography className={classes.title}>
+                                {props.eventObject.title}
+                            </Typography>
+                            <br/>
+
+                            {renderEventDetailsIfInManagePage()}
+                            <Typography style={{marginTop:'5px'}} variant="body2" component="p" >
+                                <b>Adres: </b> {props.eventObject.address}
+                            </Typography>
+                            <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
+                                <b>Başlangıç Tarihi: </b> {props.eventObject.startDateTime.toLocaleString('tr-TR').slice(0,16)}
+                            </Typography>
+                            <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
+                                <b>Bitiş Tarihi: </b> {props.eventObject.endDateTime.toLocaleString('tr-TR').slice(0,16)}
+                            </Typography>
+                            <Typography style={{marginTop:'5px'}} variant="body2" component="p">
+                                <b style={{float:'left'}}>{"Detaylar:"}</b>{'\u00A0'}
+                                {props
+                                    ?  props.eventObject.notes.length > 250
+                                        ? props.eventObject.notes.substring(0, 250) + "..."
+                                        : props.eventObject.notes
+                                    : " " }
+
+                                <br />
+                            </Typography>
+                            {renderQuestingAskingLinkIfValid()}
+                        </Grid>
+                    </Grid>
+                    <Grid item md={8} >
+
+                    </Grid>
+                </Grid>
+            </CardContent>
+        );
     }
 
     const checkStartDateIsNotUpToDate = (compareWith)=>{
@@ -239,6 +352,22 @@ export default function EventCard(props) {
     }
     const checkEndDateIsUpToDate = (compareWith)=>{
         return props.eventObject.endDateTime > compareWith;
+    }
+    const checkEndDateIsOutOfDate = (compareWith)=>{
+        return props.eventObject.endDateTime < compareWith;
+    }
+    //********* SHOW MAP DIALOG IN APPLIED EVENTS PAGE *************//
+    const handleClickShowMapDialogButton =()=>{
+        setShowMapDialogElement(
+            <MapDialog
+                openDialog={true}
+                handleClose={handleCloseShowMapDialogButton}
+                assignedEvent={props.eventObject}
+            />
+        );
+    }
+    const handleCloseShowMapDialogButton = ()=>{
+        setShowMapDialogElement(<></>);
     }
 
     //********* MANAGE LOTS *************//
@@ -340,7 +469,8 @@ export default function EventCard(props) {
 
     const renderEventDetailsIfInManagePage = ()=>{
         if(props.whichPage === MANAGE_EVENT_PAGE)
-        return (<>
+        return (
+            <>
                 <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
                     <b>Etinlik ID: </b> {props.eventObject.uniqueName}
                 </Typography>
@@ -355,12 +485,32 @@ export default function EventCard(props) {
     }
     //********* PARTICIPANT DETAILS **********//
 
+    const renderQuestingAskingLinkIfValid =()=>{
+        /*let now = new Date();
+        if(props.eventObject.startDateTime<now && props.eventObject.endDateTime>now){
+            return (
+                <CardActions>
+                    <Typography  variant="body1" display={"inline"} align="right">
+                        <Link component={RouterLink} to={{
+                            pathname: "/listappliedevents/askQuestion",
+                            query: {ssn: props.participant.ssn, uniqueName: props.eventObject.uniqueName}
+                        }}
+                        >
+                            Etkinlik hakkında soru sormak için buraya tıkla
+                        </Link>
+                    </Typography>
+                </CardActions>
+            );
+        }*/
+    }
+
     return (
         <Card className={classes.root} >
             {surveyDialogElement}
             {fillSurveyDialogElement}
             {participantsDetailDialogElement}
             {manageLotsDialogElement}
+            {showMapDialogElement}
             <Grid
                 container
                 direction="row"
@@ -368,66 +518,7 @@ export default function EventCard(props) {
                 alignItems="center"
             >
                 <Grid item md={10}>
-                    <CardActionArea disabled={props.whichPage!==MANAGE_EVENT_PAGE} onClick={handleOpenParticipantsDetailDialog}>
-                        <CardContent>
-                            <Grid
-                                container
-                                direction="row"
-                                justify="flex-start"
-                                alignItems="center"
-                            >
-                                <Grid item md={3}>
-                                    <CardMedia
-                                        className={classes.media}
-                                        image={props.imageOfEvent!=null ? ( props.imageOfEvent) : '../../static/image/social.png'}
-                                        title={props.eventObject.title}
-                                    />
-                                </Grid>
-                                <Grid item md={1}/>
-                                <Grid item md={8} >
-                                    <Grid
-                                        container
-                                        direction="column"
-                                        justify="flex-start"
-                                        alignItems="baseline"
-                                    >
-                                        <Typography className={classes.title}>
-                                            {props.eventObject.title}
-                                        </Typography>
-                                        <br/>
-
-                                        {renderEventDetailsIfInManagePage()}
-                                        <Typography style={{marginTop:'5px'}} variant="body2" component="p" >
-                                            <b>Adres: </b> {props.eventObject.address}
-                                        </Typography>
-                                        <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
-                                            <b>Başlangıç Tarihi: </b> {props.eventObject.startDateTime.toLocaleString('tr-TR').slice(0,16)}
-                                        </Typography>
-                                        <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
-                                            <b>Bitiş Tarihi: </b> {props.eventObject.endDateTime.toLocaleString('tr-TR').slice(0,16)}
-                                        </Typography>
-                                        <Typography style={{marginTop:'5px'}} variant="body2" component="p">
-                                            <b style={{float:'left'}}>{"Detaylar:"}</b>{'\u00A0'}
-                                             {props
-                                                ?  props.eventObject.notes.length > 250
-                                                    ? props.eventObject.notes.substring(0, 250) + "..."
-                                                    : props.eventObject.notes
-                                                : " " }
-
-                                            <br />
-                                        </Typography>
-                                    </Grid>
-                                </Grid>
-                                <Grid item md={8} >
-
-                                </Grid>
-                            </Grid>
-
-                            <Typography className={classes.pos} color="textSecondary">
-                            </Typography>
-
-                        </CardContent>
-                    </CardActionArea>
+                    {renderCardActionAreaAndCardContent()}
                 </Grid>
                 <Grid item md={2}>
                     <Grid container alignItems="center" justify="center">

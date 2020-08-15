@@ -118,7 +118,7 @@ export default class AssignEventDialog extends Component{
             prevState => ({
                 participant:{
                     ...prevState.participant,
-                    name: name.trim()
+                    name: name
                 }
             }));
     }
@@ -167,7 +167,7 @@ export default class AssignEventDialog extends Component{
                     </Grid>
                     <Grid item xs>
                         <TextField
-                            label={"Name"}
+                            label={"Ad"}
                             value={this.state.participant.name}
                             onChange={this.handleOnChangeName}
                             error={this.isValueEmpty(this.state.participant.name)}
@@ -176,7 +176,7 @@ export default class AssignEventDialog extends Component{
                         />
                         {" "}
                         <TextField
-                            label={"Surname"}
+                            label={"Soyad"}
                             value={this.state.participant.surname}
                             onChange={this.handleOnChangeSurname}
                             error={this.isValueEmpty(this.state.participant.surname)}
@@ -213,7 +213,7 @@ export default class AssignEventDialog extends Component{
                                     event.target.value)
                             }
                             error={this.isValueEmpty(this.state.questionAnswerMap[question.content])}
-                            helperText={this.isValueEmpty(this.state.questionAnswerMap[question.content])?'This field is required!':''}
+                            helperText={this.isValueEmpty(this.state.questionAnswerMap[question.content])?'Bu alan gerekli!':''}
                             inputProps={{ maxLength: 50}}
                             fullWidth
                         />
@@ -235,6 +235,7 @@ export default class AssignEventDialog extends Component{
     handleSubmit = ()=>{
         if(this.checkIsFormValid()){
             let participantCopy = Object.assign({},this.state.participant);
+            participantCopy.name.trim()
             participantCopy['answerSet'] = [...this.setAnswerSetForParticipantDTO()];
             this.props.handleSubmitAssignEvent(participantCopy, this.props.assignedEvent.uniqueName, this.props.assignedEvent);
         }

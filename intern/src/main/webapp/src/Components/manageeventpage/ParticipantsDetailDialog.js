@@ -73,7 +73,7 @@ export default class ParticipantsDetailDialog extends Component{
                         <Grid container direction="column" spacing={5}>
                             <Grid item>
                                 <Typography variant="h5" gutterBottom>
-                                    Son 10 Günün Başvuru İstatistiği
+                                    Son 15 Günün Başvuru İstatistiği
                                 </Typography>
                             </Grid>
                             <Grid item>

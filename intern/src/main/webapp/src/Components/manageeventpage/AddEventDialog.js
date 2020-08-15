@@ -16,14 +16,9 @@ import DateFnsUtils from '@date-io/date-fns';
 import {DateTimePicker, MuiPickersUtilsProvider,} from '@material-ui/pickers';
 import trLocale from "date-fns/locale/tr";
 
-
 import Map from '../Map';
 import EventQuestion from "./EventQuestion";
 
-
-/*function Alert(props) {
-    return <MuiAlert elevation={6} variant="filled" {...props} />;
-}*/
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -58,10 +53,6 @@ class AddEventDialog extends Component{
     }
 
     componentDidMount() {
-        ValidatorForm.addValidationRule('isTitleUnique', (value) => {
-            let isThereSameUniqueNameArray =  this.props.allEvents.map((event)=> event.uniqueName===value );
-            return !isThereSameUniqueNameArray.includes(true);
-        });
         if (this.props.isEventUpdated){
             this.extractQuestionObjectToQuestionElementFromEventDTO(this.props.updatedEvent.questionSet);
             this.setState( {
@@ -95,7 +86,6 @@ class AddEventDialog extends Component{
     };
 
     componentWillUnmount() {
-        ValidatorForm.removeValidationRule('isTitleUnique');
         ValidatorForm.removeValidationRule('isContentUnique');
         ValidatorForm.removeValidationRule('isValid');
     };
@@ -211,18 +201,24 @@ class AddEventDialog extends Component{
         if(this.state.selectedEndDateTime>this.state.selectedStartDateTime && this.isMarkSelectFromMap()) { // Everything is ok, the form can be submitted.
             let questionSet = Object.keys(this.state.questionValueObject).map(
                 (key) =>{
-                return this.createQuestionObject(this.state.questionValueObject[key]);
-            });
+                    return this.createQuestionObject(this.state.questionValueObject[key]);
+                });
+
+            let uniqueTimestamp = this.state.uniqueName;
+            if(!this.props.isEventUpdated){
+                uniqueTimestamp = this.createUniqueID();
+            }
+
             let updatedObject = {
-                uniqueName: this.state.uniqueName,
-                title: this.state.title,
+                uniqueName: uniqueTimestamp,
+                title: this.state.title.trim(),
                 longitude: this.state.marker.lng,
                 latitude: this.state.marker.lat,
                 startDateTime: this.addHours(this.state.selectedStartDateTime,3).toISOString(),
                 endDateTime: this.addHours(this.state.selectedEndDateTime,3).toISOString(),
                 quota: this.state.quota,
-                notes: this.state.notes,
-                address: this.state.address,
+                notes: this.state.notes.trim(),
+                address: this.state.address.trim(),
                 appliedParticipantSet: [],
                 questionSet: questionSet
             };
@@ -230,6 +226,18 @@ class AddEventDialog extends Component{
             this.props.handleSubmit(updatedObject);
         }
     };
+
+    createUniqueID = ()=>{
+        let now = new Date();
+        let uniqueTimestamp = now.getFullYear().toString(); // 2011
+        uniqueTimestamp += (now.getMonth < 9 ? '0' : '') + now.getMonth().toString();
+        uniqueTimestamp += ((now.getDate < 10) ? '0' : '') + now.getDate().toString();
+        uniqueTimestamp += now.getHours();
+        uniqueTimestamp += now.getMinutes();
+        uniqueTimestamp += now.getSeconds();
+        uniqueTimestamp += now.getMilliseconds();
+        return uniqueTimestamp;
+    }
 
     addHours = (date,offset) => {
         date.setTime(date.getTime() + (offset*60*60*1000));
@@ -368,8 +376,6 @@ class AddEventDialog extends Component{
                                 name="id"
                                 inputProps={{ maxLength: 50 }}
                                 value={this.state.uniqueName}
-                                validators={!this.props.isEventUpdated ? ['required','isTitleUnique', 'isValid' ]:['required']}
-                                errorMessages={!this.props.isEventUpdated ?['Bu alan gerekli','Bu ID ile bir etkinlik mevcut!','Bu isim doğru formatta değil']:['Bu alan gerekli']}
                                 fullWidth
                                 disabled={this.props.isEventUpdated}
                             />
@@ -382,6 +388,7 @@ class AddEventDialog extends Component{
                                 validators={['required']}
                                 errorMessages={['Bu alan gerekli']}
                                 fullWidth
+                                style={{marginTop:'10px'}}
                             />
                             <TextValidator
                                 label="Adres"
@@ -394,6 +401,7 @@ class AddEventDialog extends Component{
                                 validators={['required']}
                                 errorMessages={['Bu alan gerekli']}
                                 fullWidth
+                                style={{marginTop:'10px'}}
                             />
                             <TextValidator
                                 label="Detaylar"
@@ -406,6 +414,7 @@ class AddEventDialog extends Component{
                                 validators={['required']}
                                 errorMessages={['Bu alan gerekli']}
                                 fullWidth
+                                style={{marginTop:'10px'}}
                             />
                             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={trLocale}>
                                 <Grid container justify="space-between">

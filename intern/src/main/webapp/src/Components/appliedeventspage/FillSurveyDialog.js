@@ -10,9 +10,6 @@ import Grid from '@material-ui/core/Grid';
 import {AppStateContext} from "../contexts/AppStateContext";
 import Alert from "@material-ui/lab/Alert";
 import SurveyTableToFill from "./SurveyTableToFill";
-import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Radio from "@material-ui/core/Radio";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -52,12 +49,14 @@ class FillSurveyDialog extends Component{
 
     //******* Survey Table Functions ******//
     handleSubmitSurvey=()=>{
-        let surveyAnswerObjectList = Object.keys(this.state.questionAnswerMap).map(
-            key=>{
-                return this.createSurveyAnswerObject(this.state.questionAnswerMap[key], key);
-            }
-        );
-        this.props.handleSubmit(surveyAnswerObjectList);
+        if( this.checkAllRadioButtonsFilled()){
+            let surveyAnswerObjectList = Object.keys(this.state.questionAnswerMap).map(
+                key=>{
+                    return this.createSurveyAnswerObject(this.state.questionAnswerMap[key], key);
+                }
+            );
+            this.props.handleSubmit(surveyAnswerObjectList);
+        }
     }
     createSurveyAnswerObject = (answerPoint,key)=>{
         let surveyQuestionObject={};
@@ -82,6 +81,24 @@ class FillSurveyDialog extends Component{
             questionAnswerMap: {...copyQuestionAnswerMap}
         });
     };
+
+    renderErrorAlertIfMissingParts= () =>{
+        if(!this.checkAllRadioButtonsFilled())
+            return (
+                <Alert severity="error">Lütfen tüm soruları doldurun!</Alert>
+            );
+    }
+
+    checkAllRadioButtonsFilled = ()=>{
+        let isValid = true;
+        Object.keys(this.state.questionAnswerMap).forEach(
+            key=>{
+                if(this.state.questionAnswerMap[key] === "")
+                    isValid = false;
+            }
+        );
+        return isValid;
+    }
 
     render() {
         const { classes } = this.props;
@@ -110,6 +127,12 @@ class FillSurveyDialog extends Component{
                             </Grid>
                         </DialogContent>
                         <DialogActions>
+                            <Grid container
+                                  direction={"column"}
+                                  alignItems={"stretch"}
+                            >
+                                {this.renderErrorAlertIfMissingParts()}
+                            </Grid>
                             <Button onClick={this.props.handleClose} color="primary">
                                 İptal
                             </Button>

@@ -25,7 +25,6 @@ public class ManageSurveyController {
     private final ManageSurveyService manageSurveyService;
     private final SurveyQuestionMapper surveyQuestionMapper;
     private final SurveyAnswerMapper surveyAnswerMapper;
-    private final ParticipantMapper participantMapper;
 
     @PostMapping("/createsurvey/{eventUniqueName}")
     public void saveSurvey(@RequestBody List<SurveyQuestionDTO> surveyQuestionDTOS,
@@ -44,12 +43,6 @@ public class ManageSurveyController {
         manageSurveyService.saveSurveyAnswers(surveyAnswerList, eventUniqueName, participant);
     }
 
-/*    @PostMapping("participantanswers")
-    public List<SurveyAnswerDTO> getParticipantSurveyAnswers(@RequestBody ParticipantDTO participantDTO ){
-        List<SurveyAnswer> surveyAnswers =
-                manageSurveyService.findSurveyAnswersByParticipant(participantMapper.mapToEntity(participantDTO));
-        return surveyAnswerMapper.mapToDto(surveyAnswers);
-    }*/
 
     @PostMapping("getsurvey/{eventUniqueName}")
     public List<SurveyAnswerDTO> getSurveyByEvent(

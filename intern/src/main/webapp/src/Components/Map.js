@@ -7,8 +7,8 @@ import {
 
 const libraries = ["places"];
 const mapContainerStyle = {
-    height: "80vh",
-    width: "60vw",
+    height: "60vh",
+    width: "40vw",
 };
 const options = {
     disableDefaultUI: true,
@@ -71,7 +71,6 @@ export default function Map(props) {
                  <Marker
                      key={`${marker.lat}-${marker.lng}`}
                      position={{ lat: props.staticMarker.lat, lng: props.staticMarker.lng }}
-
 
                  />
              );

@@ -77,7 +77,8 @@ export default class BarChart extends React.PureComponent {
                     }
                 });
                 let pointMean = questionTotalPoint/questionFrequency;
-                this.questionFrequencyForSurvey = questionFrequency;
+                this.questionFrequencyForSurvey =
+                    this.returnBiggestFrequencyToPrintNumberOfParticipant(questionFrequency, this.questionFrequencyForSurvey);
                 dataRows.push({
                     questionContent:'Soru-'+(index+1),
                     pointMean:pointMean,
@@ -86,6 +87,11 @@ export default class BarChart extends React.PureComponent {
             }
         );
         return dataRows;
+    }
+    returnBiggestFrequencyToPrintNumberOfParticipant=(newQuestionFrequency, beforeQuestionFrequency)=>{
+        return newQuestionFrequency>beforeQuestionFrequency
+                ? newQuestionFrequency
+                : beforeQuestionFrequency;
     }
 
     //******** LAST_TEN_DAY_PARTICIPANTS *********//

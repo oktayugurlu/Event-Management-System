@@ -3,7 +3,7 @@ import '../index.css';
 import React, {Component} from "react";
 
 import PrimarySearchAppBar from './PrimarySearchAppBar';
-import AddEventDialog from './manageevent/AddEventDialog';
+import AddEventDialog from './manageeventpage/AddEventDialog';
 import 'fontsource-roboto';
 //material ui
 import { withStyles } from '@material-ui/core/styles';
@@ -443,6 +443,7 @@ class Main extends Component{
                                     />)}
                                 />
                                 <Route path="/" component={() => this.routeManageEventPageIfAuthorized()}/>
+                                <Route path="/listappliedevents/askQuestion" component={() => "hello"}/>
                             </Switch>
                         </Grid>
                         {/* Page contents end */}
@@ -454,7 +455,7 @@ class Main extends Component{
 
                     </Grid>
                 </Router>
-                <Snackbar open={this.state.snackbar.isOpen} autoHideDuration={2000} onClose={this.snackbarClose}>
+                <Snackbar open={this.state.snackbar.isOpen} autoHideDuration={2500} onClose={this.snackbarClose}>
                     <Alert onClose={this.snackbarClose} severity={this.state.snackbar.severity}>
                         {this.state.snackbar.message}
                     </Alert>

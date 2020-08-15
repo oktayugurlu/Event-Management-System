@@ -7,12 +7,12 @@ import EventCard from './EventCard';
 import Grid from '@material-ui/core/Grid';
 import Pagination from "@material-ui/lab/Pagination";
 import axios from "axios";
-import AddEventDialog from "./manageevent/AddEventDialog";
+import AddEventDialog from "./manageeventpage/AddEventDialog";
 import {getJwsToken} from "./authentication/LocalStorageService";
 import AssignEventDialog from "./AssignEventDialog";
 import QrCodeWebSocketDialog from "./QrCodeWebSocketDialog";
 import Divider from "@material-ui/core/Divider";
-import BarChart from "./manageevent/BarChart";
+import BarChart from "./manageeventpage/BarChart";
 import {AppStateContext} from "./contexts/AppStateContext";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
@@ -50,7 +50,6 @@ export default function EventsList(props) {
 
     const printEvents = ()=>{
         const printedEvents = (props.whichPage===MANAGE_EVENT_PAGE) ? createdEventsContext.createdEvents : props.allEvents;
-
         if(printedEvents.length>0)
             return(
                 <Grid item>

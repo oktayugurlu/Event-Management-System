@@ -15,5 +15,5 @@ public class QuestionAskedByParticipantDTO {
     @Size(min = 1, max = 500, message = "Karakter sayısı 1 ile 255 arasında olmalı")
     private String content;
 
-    private Participant participant;
+    private ParticipantDTO participant;
 }

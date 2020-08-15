@@ -127,15 +127,27 @@ class ParticipantTable extends Component{
             <TableRow hover role="checkbox" tabIndex={-1} key={row.ssn}>
                 {this.state.columns.map((column) => {
                     const value = row[column.id];
-                    console.log("value: %O",column.format);
                     return (
                         <TableCell key={column.id} align={column.align}>
-                            {typeof value === "string" ? value : value.content}
+                            {this.handleParticipantInformation(value)}
                         </TableCell>
                     );
                 })}
             </TableRow>
         );
+    }
+
+    handleParticipantInformation = (value)=>{
+        console.log("value: %O",value);
+        if(value === undefined){ //Question is not answered
+            return "";
+        }
+        else if(value.content === undefined){ //This is not an answer, just another participant information
+            return value;
+        }
+        else { //Question is answered
+            return value.content
+        }
     }
 
     render() {
