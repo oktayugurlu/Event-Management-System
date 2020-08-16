@@ -505,6 +505,7 @@ export default function EventCard(props) {
     //********* PARTICIPANT DETAILS DIALOG **********//
     const handleCloseParticipantsDetailDialog = () => {
         setParticipantsDetailDialogElement(<></>);
+        mainStatesContext.getAllEvents();
     };
     const handleOpenParticipantsDetailDialog = () => {
         setParticipantsDetailDialogElement((
@@ -561,6 +562,7 @@ export default function EventCard(props) {
                 open={isOpenAreYouSureDialog}
                 handleClose={closeAreYouSureDialog}
                 event={props.eventObject}
+                message={props.eventObject.title+" etkinliğini silmeyi onaylıyor musunuz?"}
             />
 
             <Grid

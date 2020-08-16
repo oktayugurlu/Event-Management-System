@@ -85,11 +85,16 @@ public class ManageEventService {
         List<Question> questionListOnDatabase = questionRepository.findByEvent(updatedEvent);
         questionListOnDatabase.stream()
                 .filter(question -> !isQuestionContentExistOnEventField(question, requestEvent))
-                .forEach(questionRepository::delete);
+                .forEach(question->{
+                    System.out.println("-------------------question---------------");
+                    System.out.println(question.getContent());
+                    questionRepository.delete(question);
+                });
     }
     private boolean isQuestionContentExistOnEventField(Question questionFromEventField, Event requestEvent){
         for(Question question:requestEvent.getQuestionSet()){
-            return question.getContent().equals(questionFromEventField.getContent());
+            if(question.getContent().equals(questionFromEventField.getContent()))
+                return true;
         }
         return false;
     }

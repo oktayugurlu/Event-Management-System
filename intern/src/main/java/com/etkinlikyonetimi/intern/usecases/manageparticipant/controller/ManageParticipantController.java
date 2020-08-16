@@ -1,6 +1,8 @@
 package com.etkinlikyonetimi.intern.usecases.manageparticipant.controller;
 
 
+import com.etkinlikyonetimi.intern.usecases.manageevent.dto.EventDTO;
+import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Event;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.ApplicationWithEventDTO;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.LotsDTO;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.ParticipantDTO;
@@ -69,5 +71,12 @@ public class ManageParticipantController {
                                @PathVariable @Size(max = 50, min = 1) String eventUniqueName){
     manageParticipantService.addQuestionAskedByParticipant(
             questionAskedByParticipantMapper.mapToEntity(questionAskedByParticipantDTO), eventUniqueName);
+    }
+
+    @PostMapping(value="/deleteapplication/{eventUniqueName}")
+    public EventDTO deleteApplication(@RequestBody @Valid ParticipantDTO participantDTO,
+                                      @PathVariable @Size(max = 50, min = 1) String eventUniqueName){
+        final Event event = manageParticipantService.deleteApplication(participantDTO.getSsn(), eventUniqueName);
+        return eventMapper.mapToDto(event);
     }
 }

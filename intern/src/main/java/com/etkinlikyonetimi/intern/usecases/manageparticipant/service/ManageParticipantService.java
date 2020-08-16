@@ -11,6 +11,7 @@ import com.etkinlikyonetimi.intern.usecases.manageevent.repository.ApplicationRe
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.EventRepository;
 import com.etkinlikyonetimi.intern.usecases.manageevent.repository.QuestionRepository;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.repository.QuestionAskedByParticipantRepository;
+import com.etkinlikyonetimi.intern.usecases.managesurvey.repository.SurveyAnswerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,8 +39,7 @@ public class ManageParticipantService {
     private final ApplicationRepository applicationRepository;
     private final LotsRepository lotsRepository;
     private final QuestionAskedByParticipantRepository questionAskedByParticipantRepository;
-
-     
+    private final SurveyAnswerRepository surveyAnswerRepository;
 
     @Transactional
     public BufferedImage assign(Participant participantFromRequest, String eventUniqueName, List<Answer> answerList) throws Exception {
@@ -208,4 +208,31 @@ public class ManageParticipantService {
             throw new EntityNotFoundException();
         }
     }
+    @Transactional
+    public Event deleteApplication(String ssn, String eventUniqueName) {
+        Optional<Event> eventFromDB = eventRepository.findByUniqueName(eventUniqueName);
+        Optional<Participant> participantFromDB =
+                participantRepository.findParticipantBySsn(ssn);
+        if(participantFromDB.isPresent() && eventFromDB.isPresent()){
+            applicationRepository.deleteByParticipantAndEvent(participantFromDB.get(), eventFromDB.get());
+            deleteDeletedParticipantsRowsFromAnswerTables(participantFromDB.get(),eventFromDB.get());
+            Optional<Event> updatedEvent = eventRepository.findByUniqueName(eventFromDB.get().getUniqueName());
+            updatedEvent.get().setQuota(updatedEvent.get().getQuota()+1);
+            return eventRepository.save(updatedEvent.get());
+        }else{
+            throw new EntityNotFoundException();
+        }
+    }
+
+    @Transactional
+    public void deleteDeletedParticipantsRowsFromAnswerTables(Participant participant, Event event) {
+        event.getQuestionSet().forEach(
+                question ->
+                        answerRepository.deleteAllByParticipantAndQuestion(
+                                participant, question
+                        )
+        );
+
+    }
+
 }

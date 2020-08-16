@@ -32,15 +32,15 @@ export default class AreYouSureDialog extends Component{
                     <DialogTitle id="alert-dialog-slide-title">{"Emin misin?"}</DialogTitle>
                     <DialogContent dividers>
                         <DialogContentText id="alert-dialog-slide-description">
-                            {this.props.event.title+" etkinliğini silmekte emin misiniz?"}
+                            {this.props.message}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={this.props.handleClose} color="primary">
-                            Değilim
+                            Hayir
                         </Button>
                         <Button onClick={this.props.runThisFunctionIfYes} color="primary">
-                            Eminim
+                            Evet
                         </Button>
                     </DialogActions>
                 </Dialog>

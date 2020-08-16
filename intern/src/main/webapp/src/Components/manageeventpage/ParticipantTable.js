@@ -8,6 +8,13 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
+import AreYouSureDialog from "../AreYouSureDialog";
+import DeleteIcon from '@material-ui/icons/Delete';
+import {getJwsToken} from "../authentication/LocalStorageService";
+import axios from "axios";
+import {AppStateContext} from "../contexts/AppStateContext";
+import IconButton from "@material-ui/core/IconButton";
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles({
     root: {
@@ -20,33 +27,53 @@ const useStyles = makeStyles({
 
 class ParticipantTable extends Component{
 
+    static contextType = AppStateContext;
+
     constructor(props) {
         super(props);
         this.state = {
+            isOpenAreYouSureDialog: false,
+            event: {...this.props.openedEvent},
             page:0,
             rowsPerPage:10,
             rows:[],
+            deletedParticipantSSN:'',
+            isDeletedSuccessfully:false,
             columns:[
-                { id: 'name', label: 'Adı', minWidth: 170 },
-                { id: 'surname', label: 'Soyadı', minWidth: 100 },
+                {   id: 'actions',
+                    label:'Sil',
+                    minWidth: 50,
+                    align: 'center',
+                },
+                {   id: 'name',
+                    label: 'Adı',
+                    minWidth: 120,
+                    align: 'left',
+                },
+                {   id: 'surname',
+                    label: 'Soyadı',
+                    minWidth: 100,
+                    align: 'left',
+                },
                 {
                     id: 'email',
                     label: 'Email',
                     minWidth: 170,
-                    align: 'right',
+                    align: 'left',
                 },
                 {
                     id: 'ssn',
                     label: 'TC\u00a0Kimlik\u00a0No',
                     minWidth: 170,
-                    align: 'right'
+                    align: 'left'
                 }
             ]
         };
+        console.log("CONSTRUCTOR CALISTI");
     }
 
     componentDidMount() {
-        this.createColumnsAndRows(this.props.openedEvent.appliedParticipantSet);
+        this.createColumnsAndRows(this.state.event.appliedParticipantSet);
     }
 
     createColumnsAndRows=(applications)=>{
@@ -63,7 +90,7 @@ class ParticipantTable extends Component{
         return applications.map((application)=>{
             let newParticipant = this.deleteAnswerSetFromParticipant(application.participant);
 
-            this.props.openedEvent.questionSet.forEach(
+            this.state.event.questionSet.forEach(
                 (question)=>{
                     this.extractAnswerSetAsQuestionAnswerKeyValueForJSON(newParticipant
                         ,question,application );
@@ -74,14 +101,14 @@ class ParticipantTable extends Component{
     }
 
     addQuestionToColumn = (columns)=>{
-        this.props.openedEvent.questionSet.forEach(
+        this.state.event.questionSet.forEach(
             (question)=>{
                 columns.push(
                     {
                         id: question.content,
                         label: question.content,
                         minWidth: 170,
-                        align: 'right',
+                        align: 'left',
                     }
                 )
             }
@@ -126,6 +153,15 @@ class ParticipantTable extends Component{
         return (
             <TableRow hover role="checkbox" tabIndex={-1} key={row.ssn}>
                 {this.state.columns.map((column) => {
+                    if(column.id ==='actions'){
+                        return(
+                            <TableCell key={'actions'}  align={'center'}>
+                                <IconButton aria-label="delete" onClick={()=>{this.openAreYouSureDialog(row.ssn)}} >
+                                    <DeleteIcon style={{color:'red'}}/>
+                                </IconButton>
+                            </TableCell>
+                        );
+                    }
                     const value = row[column.id];
                     return (
                         <TableCell key={column.id} align={column.align}>
@@ -135,6 +171,48 @@ class ParticipantTable extends Component{
                 })}
             </TableRow>
         );
+    }
+
+    //********* ARE YOU SURE DIALOG *********//
+    openAreYouSureDialog = (deletedParticipantSSN)=>{
+        this.setState({
+            isOpenAreYouSureDialog:true,
+            deletedParticipantSSN:deletedParticipantSSN
+        });
+    }
+    closeAreYouSureDialog = ()=>{
+        this.setState({
+            isOpenAreYouSureDialog:false
+        });
+    }
+    handleClickSureButtonInAreYouSureDialog=()=>{
+        this.deleteApplicationFromBackend();
+    }
+    deleteApplicationFromBackend = ()=>{
+        let deletedParticipant={};
+        this.state.event.appliedParticipantSet.forEach((application)=>{
+            if(application.participant.ssn === this.state.deletedParticipantSSN){
+                deletedParticipant=application.participant;
+            }
+        });
+        let headers = {
+            'Authorization': `Bearer ${getJwsToken()}`
+        };
+        axios.post("/manageparticipant/deleteapplication/"+this.state.event.uniqueName,
+            deletedParticipant,
+            {
+                headers:headers
+            }
+        ).then((response) => {
+            console.log(response.data);
+            this.setState({
+                isOpenAreYouSureDialog:false,
+                event: {...response.data},
+                isDeletedSuccessfully:true
+            },()=>this.createColumnsAndRows(this.state.event.appliedParticipantSet));
+            /*this.context.snackbarOpen(this.state.deletedParticipantSSN+" TC'sine sahip kişi başarıyla silindi", "success"
+            );*/
+        }).catch(error => console.log(error));
     }
 
     handleParticipantInformation = (value)=>{
@@ -152,40 +230,57 @@ class ParticipantTable extends Component{
 
     render() {
         return (
-            <Paper>
-                <TableContainer >
-                    <Table stickyHeader aria-label="sticky table">
-                        <TableHead>
-                            <TableRow>
-                                {this.state.columns.map((column) => (
-                                    <TableCell
-                                        key={column.id}
-                                        align={column.align}
-                                        style={{ minWidth: column.minWidth }}
-                                    >
-                                        {column.label}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {this.state.rows.slice(this.state.page * this.state.rowsPerPage,
-                                this.state.page * this.state.rowsPerPage + this.state.rowsPerPage).map((row) => {
-                                    return this.renderEachRowByLookingIsAnswerObjectOrString(row)
-                            })}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[10, 25, 100]}
-                    component="div"
-                    count={this.state.rows.length}
-                    rowsPerPage={this.state.rowsPerPage}
-                    page={this.state.page}
-                    onChangePage={this.handleChangePage}
-                    onChangeRowsPerPage={this.handleChangeRowsPerPage}
+            <div>
+                <AreYouSureDialog
+                    runThisFunctionIfYes={this.handleClickSureButtonInAreYouSureDialog}
+                    open={this.state.isOpenAreYouSureDialog}
+                    handleClose={this.closeAreYouSureDialog}
+                    event={this.props.eventObject}
+                    message={this.state.deletedParticipantSSN+" TC'sine sahip kişi silinsin mi?"}
                 />
-            </Paper>
+
+                <Paper>
+                    <TableContainer >
+                        <Table stickyHeader aria-label="sticky table">
+                            <TableHead>
+                                <TableRow>
+                                    {this.state.columns.map((column) => (
+                                        <TableCell
+                                            key={column.label}
+                                            align={column.align}
+                                            style={{ minWidth: column.minWidth }}
+                                        >
+                                            {column.label}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {this.state.rows.slice(this.state.page * this.state.rowsPerPage,
+                                    this.state.page * this.state.rowsPerPage + this.state.rowsPerPage).map((row) => {
+                                    return this.renderEachRowByLookingIsAnswerObjectOrString(row)
+                                })}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                    <TablePagination
+                        rowsPerPageOptions={[10, 25, 100]}
+                        component="div"
+                        count={this.state.rows.length}
+                        rowsPerPage={this.state.rowsPerPage}
+                        page={this.state.page}
+                        onChangePage={this.handleChangePage}
+                        onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                    />
+                </Paper>
+                {this.state.isDeletedSuccessfully
+                    ?(<Alert severity="success">
+                        {this.state.deletedParticipantSSN+" TC'sine sahip kişi başarıyla silindi"}
+                    </Alert>)
+                    :''
+                }
+            </div>
+
         );
     }
 

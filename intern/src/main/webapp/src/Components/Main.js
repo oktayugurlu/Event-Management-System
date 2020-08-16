@@ -87,7 +87,8 @@ class Main extends Component{
                 functionAfterClickedUndo:()=>{}
             },
             openSnackbarToUndo:this.openSnackbarToUndo,
-            closeUndoSnackbar:this.closeUndoSnackbar
+            closeUndoSnackbar:this.closeUndoSnackbar,
+            snackbarOpen:this.snackbarOpen
         };
     }
 
