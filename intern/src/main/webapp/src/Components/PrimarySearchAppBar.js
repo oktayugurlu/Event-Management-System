@@ -65,6 +65,10 @@ const useStyles = makeStyles((theme) => ({
         display: 'none',
         [theme.breakpoints.up('md')]: {
             display: 'flex',
+        },[theme.breakpoints.up('sm')]: {
+            display: 'flex',
+        },[theme.breakpoints.up('xs')]: {
+            display: 'flex',
         },
     },
 }));

@@ -11,6 +11,7 @@ import BarChart from "./BarChart";
 import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
+import QuestionAskedByParticipantTable from "./QuestionAskedByParticipantTable";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -58,7 +59,7 @@ export default class ParticipantsDetailDialog extends Component{
                             alignItems="flex-start"
                         >
                             <Grid item>
-                                {this.props.openedEvent.title+ " - Başvuranların Bilgileri"}
+                                {this.props.openedEvent.title+ " - Katılımcı Detayları"}
                             </Grid>
                             <Grid item>
                                 <IconButton onClick={()=>this.props.handleClose(this.props.title)}>
@@ -70,7 +71,7 @@ export default class ParticipantsDetailDialog extends Component{
 
                     </DialogTitle>
                     <DialogContent dividers>
-                        <Grid container direction="column" spacing={5}>
+                        <Grid container direction="column" spacing={4}>
                             <Grid item>
                                 <Typography variant="h5" gutterBottom>
                                     Son 15 Günün Başvuru İstatistiği
@@ -86,8 +87,24 @@ export default class ParticipantsDetailDialog extends Component{
                             <Grid item>
                                 <Divider variant="middle"/>
                             </Grid>
-                            <Grid>
+                            <Grid item>
+                                <Typography variant="h5" gutterBottom>
+                                    Katılımcı Bilgileri
+                                </Typography>
+                            </Grid>
+                            <Grid item>
                                 <ParticipantTable openedEvent={this.props.openedEvent}/>
+                            </Grid>
+                            <Grid item>
+                                <Divider variant="middle"/>
+                            </Grid>
+                            <Grid item>
+                                <Typography variant="h5" gutterBottom>
+                                    Katılımcılardan Gelen Sorular
+                                </Typography>
+                            </Grid>
+                            <Grid item>
+                                <QuestionAskedByParticipantTable openedEvent={this.props.openedEvent}/>
                             </Grid>
 
                         </Grid>
@@ -96,6 +113,4 @@ export default class ParticipantsDetailDialog extends Component{
             </div>
         );
     }
-
-
 }

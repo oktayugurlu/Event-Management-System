@@ -187,17 +187,20 @@ public class ManageParticipantService {
 
     }
 
-    public void addQuestionAskedByParticipant(QuestionAskedByParticipant questionAskedByParticipant, String eventUniqueName) {
+    public void addQuestionAskedByParticipant(List<QuestionAskedByParticipant> questionsAskedByParticipant, String eventUniqueName) {
         Optional<Event> eventFromDB = eventRepository.findByUniqueName(eventUniqueName);
-        Optional<Participant> participantFromDB = participantRepository.findParticipantBySsn(questionAskedByParticipant.getParticipant().getSsn());
+        Optional<Participant> participantFromDB =
+                participantRepository.findParticipantBySsn(questionsAskedByParticipant.get(0).getParticipant().getSsn());
 
         if(participantFromDB.isPresent() && eventFromDB.isPresent()
                 && eventFromDB.get().getStartDateTime().isBefore(LocalDateTime.now())
                 && eventFromDB.get().getEndDateTime().isAfter(LocalDateTime.now())){
             if(!checkIfParticipantNotAssignSameEvent(participantFromDB.get(), eventFromDB.get())){
-                questionAskedByParticipant.setParticipant(participantFromDB.get());
-                questionAskedByParticipant.setEvent(eventFromDB.get());
-                questionAskedByParticipantRepository.save(questionAskedByParticipant);
+                questionsAskedByParticipant.forEach(questions->{
+                    questions.setParticipant(participantFromDB.get());
+                    questions.setEvent(eventFromDB.get());
+                    questionAskedByParticipantRepository.save(questions);
+                });
             }else{
                 throw new EntityNotFoundException();
             }

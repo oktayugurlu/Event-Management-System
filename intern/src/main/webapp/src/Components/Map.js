@@ -8,7 +8,7 @@ import {
 const libraries = ["places"];
 const mapContainerStyle = {
     height: "60vh",
-    width: "40vw",
+    width: "60vw",
 };
 const options = {
     disableDefaultUI: true,
@@ -62,8 +62,6 @@ export default function Map(props) {
                  <Marker
                      key={`${marker.lat}-${marker.lng}`}
                      position={{ lat: props.updatedMarker.lat, lng: props.updatedMarker.lng }}
-
-
                  />
              );
          if(props.isStatic){
@@ -105,7 +103,7 @@ export default function Map(props) {
                     <GoogleMap
                         id="map"
                         mapContainerStyle={mapContainerStyle}
-                        zoom={8}
+                        zoom={13}
                         center={center}
                         options={options}
                         onClick={onMapClick}

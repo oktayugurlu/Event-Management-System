@@ -65,7 +65,7 @@ public class ManageParticipantController {
     }
 
     @PostMapping(value="/askquestion/{eventUniqueName}")
-    public void drawingLots(@RequestBody @Valid QuestionAskedByParticipantDTO questionAskedByParticipantDTO,
+    public void drawingLots(@RequestBody @Valid List<QuestionAskedByParticipantDTO> questionAskedByParticipantDTO,
                                @PathVariable @Size(max = 50, min = 1) String eventUniqueName){
     manageParticipantService.addQuestionAskedByParticipant(
             questionAskedByParticipantMapper.mapToEntity(questionAskedByParticipantDTO), eventUniqueName);

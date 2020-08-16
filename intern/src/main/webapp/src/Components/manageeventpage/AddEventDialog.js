@@ -369,16 +369,18 @@ class AddEventDialog extends Component{
                         // onError={errors => console.log(errors)}
                     >
                         <DialogTitle id="scroll-dialog-title">Etkinlik Ekle</DialogTitle>
-                        <DialogContent>
-                            <TextValidator
-                                label="Etkinlik ID"
-                                onChange={this.handleChangeUniqueNameInput}
-                                name="id"
-                                inputProps={{ maxLength: 50 }}
-                                value={this.state.uniqueName}
-                                fullWidth
-                                disabled={this.props.isEventUpdated}
-                            />
+                        <DialogContent dividers>
+                            <div hidden={!this.props.isEventUpdated}>
+                                <TextValidator
+                                    label="Etkinlik ID"
+                                    onChange={this.handleChangeUniqueNameInput}
+                                    name="id"
+                                    inputProps={{ maxLength: 50 }}
+                                    value={this.state.uniqueName}
+                                    fullWidth
+                                    disabled={true}
+                                />
+                            </div>
                             <TextValidator
                                 label="Etkinlik İsmi"
                                 onChange={this.handleChangeTitleInput}
@@ -395,7 +397,7 @@ class AddEventDialog extends Component{
                                 onChange={this.handleChangeAddressInput}
                                 name="address"
                                 multiline
-                                rows={4}
+                                rows={3}
                                 inputProps={{ maxLength: 255 }}
                                 value={this.state.address}
                                 validators={['required']}
@@ -408,7 +410,7 @@ class AddEventDialog extends Component{
                                 onChange={this.handleChangeNotesInput}
                                 name="notes"
                                 multiline
-                                rows={4}
+                                rows={3}
                                 inputProps={{ maxLength: 255 }}
                                 value={this.state.notes}
                                 validators={['required']}

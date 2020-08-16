@@ -11,10 +11,7 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import 'date-fns';
 import Grid from '@material-ui/core/Grid';
-import EventQuestion from "./EventQuestion";
-import BarChart from "./BarChart";
-import Divider from "@material-ui/core/Divider";
-import Typography from "@material-ui/core/Typography";
+import EventQuestion from "../manageeventpage/EventQuestion";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -25,7 +22,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const SURVEY_RESULTS=2;
 
 class CreateSurveyDialog extends Component{
 
@@ -41,8 +37,6 @@ class CreateSurveyDialog extends Component{
     }
 
     componentDidMount() {
-        this.extractQuestionObjectToQuestionElementFromEventDTO(this.props.event.surveyQuestionSet);
-
         ValidatorForm.addValidationRule('isContentUnique', (value) => {
             let questionValueObjectRef = this.state.questionValueObject
             let isThereSameContent = Object.keys(questionValueObjectRef).map(function(key) {
@@ -54,41 +48,6 @@ class CreateSurveyDialog extends Component{
         });
     };
 
-
-    extractQuestionObjectToQuestionElementFromEventDTO = (questionSet) =>{
-        let createdQuestionElementObject={};
-        let createdQuestionValueObject={};
-        questionSet.forEach(
-            (questionObject,index)=> {
-                let elementFromEventDTO = this.createQuestionElementFromEventDTO(questionObject.content, index);
-                createdQuestionElementObject['q_'+this.lastAddedSequenceQuestionId]=elementFromEventDTO;
-                createdQuestionValueObject['q_'+this.lastAddedSequenceQuestionId] = questionObject.content;
-            });
-        this.setState({
-            questionElementObject:createdQuestionElementObject,
-            questionValueObject:createdQuestionValueObject
-        });
-    };
-    createQuestionElementFromEventDTO = (questionValue, index)=>{
-        let id = ++this.lastAddedSequenceQuestionId;
-        return (
-            <Grid key={'q_'+ id}
-                  container
-                  direction="row"
-                  justify="space-between"
-                  alignItems="flex-end"
-            >
-                <EventQuestion onChange = {this.onChangeQuestion}
-                               questionCounter={index+1}
-                               updatedQuestion={questionValue}
-                               name={'q_'+id}
-                />
-                <IconButton aria-label="delete" onClick = {()=>this.onClickDeleteQuestion('q_'+id)}>
-                    <DeleteIcon style={{color:'red'}}/>
-                </IconButton>
-            </Grid>
-        );
-    }
     onClickDeleteQuestion = (deletedId)=>{
         let questionElementObjectToDeleteElement = {...this.state.questionElementObject};
         let questionValueObjectToDeleteValue = {...this.state.questionValueObject};
@@ -157,17 +116,17 @@ class CreateSurveyDialog extends Component{
         let questionSet = Object.keys(this.state.questionValueObject).map((key)=>{
             return this.createQuestionObject(this.state.questionValueObject[key]);
         });
+        console.log(questionSet);
         this.props.handleSubmit(questionSet);
     };
 
 
     createQuestionObject = (item) =>{
         return {
-            content: item
+            content: item,
+            participant: this.props.participant
         };
     }
-
-
 
     render() {
         const { classes } = this.props;
@@ -185,7 +144,7 @@ class CreateSurveyDialog extends Component{
                         onSubmit={this.handleSubmit}
                     >
                         <DialogTitle id="scroll-dialog-title" >
-                            {this.props.event.title + " - Anketi Güncelle"}
+                            {this.props.event.title + " için Soru Sor"}
                         </DialogTitle>
                         <DialogContent dividers={true}>
                             <Grid container direction="column" spacing={2}>
@@ -206,21 +165,6 @@ class CreateSurveyDialog extends Component{
                                     >
                                         Soru Ekle
                                     </Button>
-                                </Grid>
-                                <Grid item>
-                                    <Divider variant="middle"/>
-                                </Grid>
-                                <Grid item>
-                                    <Typography variant="h5" gutterBottom>
-                                        {"Sorulara verilen cevaplarin puan ortalamasi"}
-                                    </Typography>
-                                </Grid>
-                                <Grid item>
-                                    <BarChart
-                                        surveyEvent={this.props.event}
-                                        whichChart={SURVEY_RESULTS}
-                                        title={"Katılımcı Sayısı:"}
-                                    />
                                 </Grid>
                             </Grid>
 

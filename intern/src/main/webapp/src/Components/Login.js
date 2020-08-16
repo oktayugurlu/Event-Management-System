@@ -87,8 +87,7 @@ class Login extends Component {
                   justify="center"
                   alignItems="center"
                   style={{ minHeight: '100vh',
-                      backgroundColor: '#F9B769'
-
+                      backgroundColor: '#F9B769',
                   }}
             >
                 <Grid item md={6} style={{minWidth:'80vh'}}>
@@ -96,7 +95,12 @@ class Login extends Component {
                         onSubmit={this.handleFormSubmit}
                         // onError={errors => console.log(errors)}
                     >
-                        <Card style={{backgroundColor:'#EDEBE9'}}>
+                        <Card style={{
+                            backgroundColor:'#EDEBE9',
+                            borderStyle: 'solid',
+                            borderWidth: '2px',
+                            borderColor:'#F6931E'
+                        }}>
                             <CardContent>
                                 <Grid
                                     direction="column"

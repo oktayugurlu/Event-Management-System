@@ -1,6 +1,4 @@
 package com.etkinlikyonetimi.intern.usecases.manageparticipant.dto;
-
-import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Participant;
 import lombok.*;
 
 import javax.validation.constraints.Size;

@@ -30,6 +30,7 @@ import {AppStateContext} from "./contexts/AppStateContext";
 import QrCodeWebSocketDialog from "./QrCodeWebSocketDialog";
 import AppliedEventsList from "./AppliedEventsList";
 import {withRouter,BrowserRouter as Router, Route, Link, Switch} from 'react-router-dom';
+import Hidden from "@material-ui/core/Hidden";
 
 const styles = theme =>  ({
     root: {
@@ -45,7 +46,7 @@ function Alert(props) {
 }
 
 
-const BACKGROUND_URL='url(https://previews.123rf.com/images/notkoo2008/notkoo20081412/notkoo2008141200034/34479086-seamless-doodle-coffee-pattern-background.jpg)';
+const BACKGROUND_URL='url(http://www.asce.fau.edu/wp-content/uploads/2017/10/Blue-Leaves-01.png)';
 
 let stompClient=null;
 const WEBSOCKET_COMPONENT=1;
@@ -347,6 +348,35 @@ class Main extends Component{
         )
     }
 
+    renderLeftMenuCard = (classes)=>{
+        return (
+            <Card className={classes.root} variant="outlined" style={{backgroundColor: '#F6931E'}}>
+                <List component="nav" aria-label="main mailbox folders">
+
+                    <Link to={"/allevents"} style={{textDecoration: 'none'}}>
+                        <ListItem button>
+                            <ListItemIcon>
+                                <EventNoteIcon/>
+                            </ListItemIcon>
+                            <ListItemText primary="Etkinliğe Katıl" style={{color: 'white'}}/>
+                        </ListItem>
+                    </Link>
+                    <Divider/>
+                    <Link to={"/listappliedevents"} style={{textDecoration: 'none'}}>
+                        <ListItem button>
+                            <ListItemIcon>
+                                <EventAvailableIcon/>
+                            </ListItemIcon>
+                            <ListItemText primary="Katıldığın Etkinlikler" style={{color: 'white'}}/>
+                        </ListItem>
+                    </Link>
+
+                    {this.getAddAndManageEventButtonIfAuthorized()}
+                </List>
+            </Card>
+        );
+    }
+
     render(){
         const { classes } = this.props;
         return (
@@ -358,12 +388,13 @@ class Main extends Component{
                     <PrimarySearchAppBar/>
                     {this.state.websocketDialogElement}
                     {/* Add event Modal start */}
-                    <AddEventDialog openAddEventDialog={this.state.openAddEventDialog}
-                                    handleClose={this.handleCloseAddEvent}
-                                    handleSubmit={this.handleSubmitAddEvent}
-                                    allEvents={this.state.allEvents}
-                                    isAddEventDialogMountedForUpdate={false}
-                                    updatedEvent={{}}
+                    <AddEventDialog
+                        openAddEventDialog={this.state.openAddEventDialog}
+                        handleClose={this.handleCloseAddEvent}
+                        handleSubmit={this.handleSubmitAddEvent}
+                        allEvents={this.state.allEvents}
+                        isAddEventDialogMountedForUpdate={false}
+                        updatedEvent={{}}
                     />
                     {/* Add event Modal end */}
                     <Grid
@@ -371,58 +402,72 @@ class Main extends Component{
                         direction="row"
                         justify="flex-start"
                         alignItems="stretch"
-                        style={{    marginTop: '64px'}}
+                        style={{    marginTop: '50px'}}
                     >
                         {/* Left Menu start*/}
-                        <Grid item md={3}
-                              style={{backgroundImage: 'url(https://previews.123rf.com/images/notkoo2008/notkoo20081412/notkoo2008141200034/34479086-seamless-doodle-coffee-pattern-background.jpg)'}}>
-
-                            <Grid
-                                container
-                                direction="column"
-                                justify="flex-start"
-                                alignItems="stretch"
-                                style={{minHeight: '100vh'}}
-                            >
-                                <Grid item style={{height: '11vh'}}/>
+                        <Hidden mdDown>
+                            <Grid item md={3} smDown="hidden"
+                                  style={{
+                                      backgroundAttachment: 'fixed',
+                                      backgroundImage: BACKGROUND_URL,
+                                  }}>
                                 <Grid
                                     container
                                     direction="column"
-                                    justify="center"
-                                    alignItems="center"
+                                    justify="flex-start"
+                                    alignItems="stretch"
+                                    style={{
+                                        minHeight: '100vh',
+                                        position:"fixed",
+                                        right: '37.5%',
+                                    }}
+
                                 >
-                                    <Card className={classes.root} variant="outlined" style={{backgroundColor: '#F6931E'}}>
-                                        <List component="nav" aria-label="main mailbox folders">
-
-                                            <Link to={"/allevents"} style={{textDecoration: 'none'}}>
-                                                <ListItem button>
-                                                    <ListItemIcon>
-                                                        <EventNoteIcon/>
-                                                    </ListItemIcon>
-                                                    <ListItemText primary="Etkinliğe Katıl" style={{color: 'white'}}/>
-                                                </ListItem>
-                                            </Link>
-                                            <Divider/>
-                                            <Link to={"/listappliedevents"} style={{textDecoration: 'none'}}>
-                                                <ListItem button>
-                                                    <ListItemIcon>
-                                                        <EventAvailableIcon/>
-                                                    </ListItemIcon>
-                                                    <ListItemText primary="Katıldığın Etkinlikler" style={{color: 'white'}}/>
-                                                </ListItem>
-                                            </Link>
-
-                                            {this.getAddAndManageEventButtonIfAuthorized()}
-                                        </List>
-                                    </Card>
+                                    <Grid item style={{height: '4vh'}}/>
+                                    <Grid
+                                        container
+                                        direction="column"
+                                        justify="center"
+                                        alignItems="center"
+                                    >
+                                        {this.renderLeftMenuCard(classes)}
+                                    </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
+                        </Hidden>
+                        <Hidden mdUp>
+                            <Grid item md={3} smDown="hidden" xs={12} sm={12}
+                                  style={{
+                                      backgroundAttachment: 'fixed',
+                                      backgroundImage: BACKGROUND_URL,
+                                  }}>
+                                <Grid
+                                    container
+                                    direction="column"
+                                    justify="flex-start"
+                                    alignItems="stretch"
+                                    style={{
+                                        minHeight: '100vh',
+                                    }}
+
+                                >
+                                    <Grid item style={{height: '4vh'}}/>
+                                    <Grid
+                                        container
+                                        direction="column"
+                                        justify="center"
+                                        alignItems="center"
+                                    >
+                                        {this.renderLeftMenuCard(classes)}
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                        </Hidden>
                         {/*Left Menu end*/}
 
                         {/* Page contents start */}
 
-                        <Grid item md={7} style={{backgroundColor:'#FBF4ED'}}>
+                        <Grid item md={7} xs={12} sm={12} style={{backgroundColor:'#FBF4ED'}}>
                             <Switch>
                                 <Route path="/allevents" component={() => (<EventsList allEvents={this.state.allEvents}
                                                                                        pageTitle={'Tüm Etkinlikler'}
@@ -447,12 +492,12 @@ class Main extends Component{
                             </Switch>
                         </Grid>
                         {/* Page contents end */}
-
-                        <Grid item md={2} style={{
-                            backgroundRepeat: 'repeat-y',
-                            backgroundImage: BACKGROUND_URL
-                        }}/>
-
+                        <Hidden smDown>
+                            <Grid item md={2} style={{
+                                backgroundImage: BACKGROUND_URL,
+                                backgroundAttachment: 'fixed'
+                            }}/>
+                        </Hidden>
                     </Grid>
                 </Router>
                 <Snackbar open={this.state.snackbar.isOpen} autoHideDuration={2500} onClose={this.snackbarClose}>

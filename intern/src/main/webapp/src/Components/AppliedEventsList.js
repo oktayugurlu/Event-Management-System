@@ -14,8 +14,6 @@ import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import Pagination from "@material-ui/lab/Pagination";
 import axios from "axios";
-import { MemoryRouter } from 'react-router';
-import {Link as RouterLink, Route, Switch} from 'react-router-dom';
 
 const ITEMS_PER_PAGE = 5;
 export default class EventsList extends Component{
@@ -44,33 +42,34 @@ export default class EventsList extends Component{
 
     renderAppliedEvents=()=>{
         return (
-                <Grid container direction="column" alignItems="stretch" >
-                    <Typography variant="h3" gutterBottom>
-                        {this.props.pageTitle}
-                    </Typography>
-                    <Grid item>
-                        <Divider variant="middle"/>
-                    </Grid>
-                    <Grid
-                        direction="column"
-                        container
-                    >
-                        {this.printEvents()}
-                        <Grid item style={{paddingTop:'20px', paddingBottom:'40px'}}>
-                            <Grid
-                                container
-                                direction="row"
-                                justify="center"
-                                alignItems="flex-start"
-                            >
-                                <Pagination count={this.calculateNumberOfPage()}
-                                            onChange={this.onChangePageNumber}/>
-                            </Grid>
+            <Grid container
+                  direction="column"
+                  alignItems="stretch"
+                  style={{minHeight:'100vh'}}>
+                <Typography variant="h3" gutterBottom style={{marginLeft:'40px', marginTop:'20px'}}>
+                    {this.props.pageTitle}
+                </Typography>
+                <Grid item>
+                    <Divider variant="middle"/>
+                </Grid>
+                <Grid
+                    direction="column"
+                    container
+                >
+                    {this.printEvents()}
+                    <Grid item style={{paddingTop:'20px', paddingBottom:'40px'}}>
+                        <Grid
+                            container
+                            direction="row"
+                            justify="center"
+                            alignItems="flex-start"
+                        >
+                            <Pagination count={this.calculateNumberOfPage()}
+                                        onChange={this.onChangePageNumber}/>
                         </Grid>
                     </Grid>
-
-
                 </Grid>
+            </Grid>
         );
     }
 
@@ -129,7 +128,7 @@ export default class EventsList extends Component{
 
     renderSubmitSSNCard = ()=>{
         return(
-            <Grid container>
+            <Grid container style={{minHeight:'100vh'}}>
                 <Grid item md={2}/>
                 <Grid item md={8}>
                     <Grid container direction="row" justify="center" alignItems="stretch">

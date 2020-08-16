@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {Component, useContext} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -29,6 +29,8 @@ import CasinoIcon from '@material-ui/icons/Casino';
 import ManageLotsDialog from "./manageeventpage/ManageLotsDialog";
 import PlaceIcon from '@material-ui/icons/Place';
 import MapDialog from "./appliedeventspage/MapDialog"
+import AskQuestionDialog from "./appliedeventspage/AskQuestionDialog";
+import AskQuestionButton from "./appliedeventspage/AskQuestionButton";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -79,7 +81,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-
 export default function EventCard(props) {
     const classes = useStyles();
 
@@ -89,12 +90,15 @@ export default function EventCard(props) {
     const ALL_EVENTS_PAGE=2;
     const APPLIED_EVENTS_PAGE=3;
 
+
+
     // DIALOG ELEMENTS //
     const [participantsDetailDialogElement, setParticipantsDetailDialogElement] = React.useState(<></>);
     const [surveyDialogElement, setSurveyDialogElement] = React.useState(<></>);
     const [fillSurveyDialogElement, setFillSurveyDialogElement] = React.useState(<></>);
     const [manageLotsDialogElement, setManageLotsDialogElement] = React.useState(<></>);
     const [showMapDialogElement, setShowMapDialogElement] = React.useState(<></>);
+    const [askQuestionDialogElement, setAskQuestionDialogElement] = React.useState(<></>);
 
     const selectCardActionButtons = ()=>{
         if(props.whichPage === MANAGE_EVENT_PAGE){
@@ -257,10 +261,17 @@ export default function EventCard(props) {
                             </Box>
                         </Tooltip>
                     </div>
+                    <AskQuestionButton
+                        checkEndDateIsUpToDate={checkEndDateIsUpToDate}
+                        checkStartDateIsNotUpToDate={checkStartDateIsNotUpToDate}
+                        handleClickOpenAskQuestionDialogButton={handleClickOpenAskQuestionDialogButton}
+                        classes={classes}
+                    />
                 </Grid>
             );
         }
     }
+
     const returnTooltipAboutSurveyToParticipant = ()=>{
         if(checkEndDateIsUpToDate(new Date()))
             return "Anket etkinlik bitince aktif olacak";
@@ -336,7 +347,6 @@ export default function EventCard(props) {
 
                                 <br />
                             </Typography>
-                            {renderQuestingAskingLinkIfValid()}
                         </Grid>
                     </Grid>
                     <Grid item md={8} >
@@ -356,7 +366,41 @@ export default function EventCard(props) {
     const checkEndDateIsOutOfDate = (compareWith)=>{
         return props.eventObject.endDateTime < compareWith;
     }
-    //********* SHOW MAP DIALOG IN APPLIED EVENTS PAGE *************//
+
+
+    //********* ASK TO INSTRUCTOR DIALOG *************//
+    const handleClickOpenAskQuestionDialogButton = ()=>{
+        setAskQuestionDialogElement(
+            <AskQuestionDialog
+                openDialog={true}
+                handleClose={handleCloseAskQuestionDialogButton}
+                handleSubmit={handleSubmitAskQuestionDialogButton}
+                event={props.eventObject}
+                participant={props.participant}
+            />
+        );
+    }
+    const handleSubmitAskQuestionDialogButton= (askedQuestions)=>{
+        axios.post("/manageparticipant/askquestion/"+props.eventObject.uniqueName, askedQuestions)
+            .then((response) => {
+                if(response.data===''){
+                    props.snackbarOpen("Sorular "+props.eventObject.title+" için başarıyla iletildi!", "success");
+                }
+                else props.snackbarOpen(response.data, "error");
+            }).catch(error => {
+            if(error.response.status === 400 || error.response.status === 500)
+                props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
+        });
+        handleCloseAskQuestionDialogButton();
+    }
+    const handleCloseAskQuestionDialogButton= ()=>{
+        setAskQuestionDialogElement(<></>);
+    }
+
+
+
+
+    //********* SHOW MAP DIALOG IN APPLIED EVENTS DIALOG *************//
     const handleClickShowMapDialogButton =()=>{
         setShowMapDialogElement(
             <MapDialog
@@ -370,7 +414,7 @@ export default function EventCard(props) {
         setShowMapDialogElement(<></>);
     }
 
-    //********* MANAGE LOTS *************//
+    //********* MANAGE LOTS DIALOG*************//
     const handleClickOpenManageLotsButton =()=>{
         setManageLotsDialogElement(
             <ManageLotsDialog
@@ -386,7 +430,7 @@ export default function EventCard(props) {
 
 
 
-    //********* FILL SURVEY BUTTONS **********//
+    //********* FILL SURVEY DIALOG **********//
     const handleClickOpenFillSurveyButton = ()=>{
         setFillSurveyDialogElement(
             <FillSurveyDialog
@@ -420,7 +464,7 @@ export default function EventCard(props) {
     }
 
 
-    //********* MANAGE SURVEY BUTTONS **********//
+    //********* MANAGE SURVEY DIALOG **********//
     const handleClickOpenManageSurveyButton = ()=>{
         setSurveyDialogElement(
             <SurveyDialog
@@ -453,7 +497,7 @@ export default function EventCard(props) {
         handleCloseManageSurveyButton();
     }
 
-    //********* PARTICIPANT DETAILS **********//
+    //********* PARTICIPANT DETAILS DIALOG **********//
     const handleCloseParticipantsDetailDialog = (title) => {
         setParticipantsDetailDialogElement(<></>);
     };
@@ -483,26 +527,8 @@ export default function EventCard(props) {
             </>
         );
     }
-    //********* PARTICIPANT DETAILS **********//
+    //********* PARTICIPANT DETAILS DIALOG**********//
 
-    const renderQuestingAskingLinkIfValid =()=>{
-        /*let now = new Date();
-        if(props.eventObject.startDateTime<now && props.eventObject.endDateTime>now){
-            return (
-                <CardActions>
-                    <Typography  variant="body1" display={"inline"} align="right">
-                        <Link component={RouterLink} to={{
-                            pathname: "/listappliedevents/askQuestion",
-                            query: {ssn: props.participant.ssn, uniqueName: props.eventObject.uniqueName}
-                        }}
-                        >
-                            Etkinlik hakkında soru sormak için buraya tıkla
-                        </Link>
-                    </Typography>
-                </CardActions>
-            );
-        }*/
-    }
 
     return (
         <Card className={classes.root} >
@@ -511,6 +537,7 @@ export default function EventCard(props) {
             {participantsDetailDialogElement}
             {manageLotsDialogElement}
             {showMapDialogElement}
+            {askQuestionDialogElement}
             <Grid
                 container
                 direction="row"

@@ -31,7 +31,7 @@ public class ManageSurveyService {
 
     public void createSurvey(List<SurveyQuestion> surveyQuestions, String eventUniqueName) {
         Optional<Event> event = eventRepository.findByUniqueName(eventUniqueName);
-        if(event.isPresent() && event.get().getEndDateTime().isBefore(LocalDateTime.now())){
+        if(event.isPresent() && event.get().getEndDateTime().isAfter(LocalDateTime.now())){
             List<String> questionContentFromEvent = getStringContentFromEventsSurveyQuestionField(event.get());
             surveyQuestions.forEach(
                     surveyQuestion ->
