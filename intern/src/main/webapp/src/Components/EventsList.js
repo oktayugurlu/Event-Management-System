@@ -39,8 +39,8 @@ export default function EventsList(props) {
     const ALL_EVENTS_NUMBER_OF_PARTICIPANTS=0;
     //BARCHART CONSTANTS
 
-    const createdEventsContext = useContext(AppStateContext);
     const backdropContext = useContext(BackdropContext);
+    const mainStatesContext = useContext(AppStateContext);
 
 
     const titleStyle = {
@@ -49,7 +49,7 @@ export default function EventsList(props) {
 
 
     const printEvents = ()=>{
-        const printedEvents = (props.whichPage===MANAGE_EVENT_PAGE) ? createdEventsContext.createdEvents : props.allEvents;
+        const printedEvents = (props.whichPage===MANAGE_EVENT_PAGE) ? mainStatesContext.createdEvents : props.allEvents;
         if(printedEvents.length>0)
             return(
                 <Grid item>
@@ -91,8 +91,8 @@ export default function EventsList(props) {
                             handleClose = {handleCloseUpdateEventDialog}
                             handleSubmit= {handleSubmitUpdateEvent}
                             handleClickOpenUpdateDialog={handleClickOpenUpdateDialog}
-                            handleClickDeleteEventButton={handleClickDeleteEventButton}
                             snackbarOpen={props.snackbarOpen}
+                            handleClickSureButtonToDeleteInFrontend={handleClickSureButtonToDeleteInFrontend}
                 />
             );
         }
@@ -103,7 +103,6 @@ export default function EventsList(props) {
                             imageOfEvent={CARD_IMAGE_URL}
                             handleClickOpenAssignDialog={handleClickOpenAssignDialog}
                             snackbarOpen={props.snackbarOpen}
-
                 />
             );
         }
@@ -159,10 +158,10 @@ export default function EventsList(props) {
     };
     const calculateNumberOfPage = () => {
         if(props.whichPage===MANAGE_EVENT_PAGE){
-            if(createdEventsContext.createdEvents.length % ITEMS_PER_PAGE !== 0)
-                return Math.trunc(createdEventsContext.createdEvents.length / ITEMS_PER_PAGE) +1;
+            if(mainStatesContext.createdEvents.length % ITEMS_PER_PAGE !== 0)
+                return Math.trunc(mainStatesContext.createdEvents.length / ITEMS_PER_PAGE) +1;
             else
-                return createdEventsContext.createdEvents.length / ITEMS_PER_PAGE;
+                return mainStatesContext.createdEvents.length / ITEMS_PER_PAGE;
         }else{
             if(props.allEvents.length % ITEMS_PER_PAGE !== 0)
                 return Math.trunc(props.allEvents.length / ITEMS_PER_PAGE) +1;
@@ -172,27 +171,6 @@ export default function EventsList(props) {
     }
 
 
-
-    const handleClickDeleteEventButton = (uniqueName)=>{
-        let headers = {
-            'Authorization': `Bearer ${getJwsToken()}`
-        };
-        axios.post("/manageevent/deleteevent/"+uniqueName,{},{
-            headers:headers
-        })
-            .then((response) => {
-                props.snackbarOpen(
-                    response.data, response.data==="Geçersiz silme işlemi!"
-                    ? "error"
-                    :"success");
-                props.getAllEvents();
-            })
-            .catch(error => {
-                if (error.response.status === 400) {
-                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
-                }
-            })
-    }
 
     //**** ASSIGN EVENT FUNCTIONS START ****//
     const handleClickOpenAssignDialog = (selectedEventToAssign) => {
@@ -221,7 +199,7 @@ export default function EventsList(props) {
                         dialogTitle={"Başvuru Bilgilerinizi İçeren QR Kod"}
                         whichDialogContent={QR_CODE_COMPONENT}
                     />);
-                createdEventsContext.sendNotification(participant,assignedEvent);
+                mainStatesContext.sendNotification(participant,assignedEvent);
 
             }).catch( error => {
                         if (error.response.status === 400) {
@@ -286,10 +264,53 @@ export default function EventsList(props) {
         }
     }
 
+    //******* DELETE EVENT functions start ********//
+    const handleDeleteEventFromBackend = (deletedEvent)=>{
+        let headers = {
+            'Authorization': `Bearer ${getJwsToken()}`
+        };
+        console.log(deletedEvent);
+        axios.post("/manageevent/deleteevent/"+deletedEvent.uniqueName,{},{
+            headers:headers
+        })
+            .then((response) => {
+                mainStatesContext.getAllEvents();
+            })
+            .catch(error => {
+                console.log(error);
+                if (error.response.status === 400) {
+                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
+                }
+            })
+    }
+    const handleClickSureButtonToDeleteInFrontend = (deletedEvent)=>{
+        let deletedIndex = -1;
+        let copyCreatedEvents = [...mainStatesContext.createdEvents];
+        copyCreatedEvents.forEach((event,index)=>{
+            if(deletedEvent.uniqueName === event.uniqueName)
+                deletedIndex=index;
+        });
+        copyCreatedEvents.splice(deletedIndex, 1);
+        mainStatesContext.setCreatedEvents(copyCreatedEvents);
+        let timeOutToDeleteFromBackend = setTimeout(()=>handleDeleteEventFromBackend(deletedEvent), 6000);
+        mainStatesContext.openSnackbarToUndo(deletedEvent.title+" başarıyla silindi!",()=> {
+            clearTimeout(timeOutToDeleteFromBackend);
+            mainStatesContext.getAllEvents();
+            mainStatesContext.closeUndoSnackbar();
+            props.snackbarOpen(deletedEvent.title+" etkinliği başarıyla geri alındı", "success");
+        });
+    }
+
+    //******* DELETE EVENT functions end ********//
 
     return (
-        <Grid container direction="column" alignItems="stretch" >
+        <Grid container
+              direction="column"
+              alignItems="stretch"
+              style={{ minHeight: '100vh'}}
+        >
             {qrCodeDialogElement}
+
             <Typography style={titleStyle} variant="h3" gutterBottom>
                 {props.pageTitle}
             </Typography>

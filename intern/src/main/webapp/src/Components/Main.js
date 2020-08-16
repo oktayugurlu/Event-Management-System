@@ -31,6 +31,7 @@ import QrCodeWebSocketDialog from "./QrCodeWebSocketDialog";
 import AppliedEventsList from "./AppliedEventsList";
 import {withRouter,BrowserRouter as Router, Route, Link, Switch} from 'react-router-dom';
 import Hidden from "@material-ui/core/Hidden";
+import Button from "@material-ui/core/Button";
 
 const styles = theme =>  ({
     root: {
@@ -67,6 +68,7 @@ class Main extends Component{
                 message: "",
                 severity: ""
             }],
+
             isLoginDialogOpen:false,
             isAuthorized:false,
             username:'',
@@ -78,7 +80,14 @@ class Main extends Component{
             websocketDialogElement:(<></>),
             getSearchedEvents:this.getSearchedEvents,
             copyOfAllEvents:[],
-            copyOfCreatedEvents:[]
+            copyOfCreatedEvents:[],
+            undoSnackbar:{
+                message:'',
+                isOpen:false,
+                functionAfterClickedUndo:()=>{}
+            },
+            openSnackbarToUndo:this.openSnackbarToUndo,
+            closeUndoSnackbar:this.closeUndoSnackbar
         };
     }
 
@@ -91,7 +100,6 @@ class Main extends Component{
         this.getAllEvents();
         this.checkJwtValidation();
         this.connectWebSocket();
-        console.log("->>>>>>>>>>>>>>>>>>>>hello=-=-=-=-=-");
         this.context.setOpenBackdropScreen();
     }
 
@@ -278,7 +286,7 @@ class Main extends Component{
     // SNACK BAR FUNCTIONS START //
     snackbarOpen = (message, severity) => {
         this.setState(prevState => {
-            let snackbar = {...prevState.snackbar}
+            let snackbar = {...prevState.snackbar};
             snackbar.isOpen = true;
             snackbar.message = message;
             snackbar.severity = severity;
@@ -287,12 +295,29 @@ class Main extends Component{
     }
     snackbarClose = () => {
         this.setState(prevState => {
-            let snackbar = {...prevState.snackbar}
+            let snackbar = {...prevState.snackbar};
             snackbar.isOpen = false;
             snackbar.message = "";
             snackbar.severity = "";
             return {snackbar};
         })
+    }
+    openSnackbarToUndo = (message, functionAfterClickedUndo)=>{
+        this.setState(prevState=>{
+            let undoSnackbar = {...prevState.undoSnackbar};
+            undoSnackbar.isOpen = true;
+            undoSnackbar.message = message;
+            undoSnackbar.functionAfterClickedUndo = functionAfterClickedUndo;
+            return {undoSnackbar};
+        });
+    }
+    closeUndoSnackbar = ()=>{
+        this.setState(prevState=>{
+            let undoSnackbar = {...prevState.undoSnackbar};
+            undoSnackbar.isOpen = false;
+            undoSnackbar.message = "";
+            return {undoSnackbar};
+        });
     }
     // SNACK BAR FUNCTIONS END
 
@@ -406,7 +431,7 @@ class Main extends Component{
                     >
                         {/* Left Menu start*/}
                         <Hidden mdDown>
-                            <Grid item md={3} smDown="hidden"
+                            <Grid item md={3}
                                   style={{
                                       backgroundAttachment: 'fixed',
                                       backgroundImage: BACKGROUND_URL,
@@ -505,6 +530,18 @@ class Main extends Component{
                         {this.state.snackbar.message}
                     </Alert>
                 </Snackbar>
+
+                {/*snackbar to undo deletion*/}
+                <Snackbar open={this.state.undoSnackbar.isOpen}
+                          autoHideDuration={6000}
+                          onClose={this.closeUndoSnackbar}
+                          action={
+                              <Button color="inherit" size="small" onClick={this.state.undoSnackbar.functionAfterClickedUndo}>
+                                  Undo
+                              </Button>
+                          }
+                          message={this.state.undoSnackbar.message}
+                />
             </AppStateContext.Provider>
         );
     }

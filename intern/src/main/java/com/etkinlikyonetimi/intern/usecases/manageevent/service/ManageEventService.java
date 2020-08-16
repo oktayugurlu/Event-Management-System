@@ -116,7 +116,7 @@ public class ManageEventService {
             return "Geçersiz silme işlemi!";
         else{
             eventRepository.deleteById(deletedEvent.get().getId());
-            return "Başarıyla silindi!";
+            return " başarıyla silindi!";
         }
     }
 

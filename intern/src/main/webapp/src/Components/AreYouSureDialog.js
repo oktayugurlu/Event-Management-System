@@ -6,59 +6,41 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Slide from '@material-ui/core/Slide';
-import {withStyles} from "@material-ui/core/styles";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-class AreYouSureDialog extends Component{
+export default class AreYouSureDialog extends Component{
     constructor(props) {
         super(props);
-        this.setState({
-           open:false
-        });
     }
-
-
-    handleClickOpen = () => {
-        this.setState({
-           open:true
-        });
-    };
-
-    handleClose = () => {
-        this.setState({
-            open:false
-        });
-    };
 
     render() {
         return (
             <div>
-                <Button variant="outlined" color="primary" onClick={this.props.handleClickOpen}>
-                    Slide in alert dialog
-                </Button>
                 <Dialog
-                    open={open}
+                    open={this.props.open}
                     TransitionComponent={Transition}
                     keepMounted
-                    onClose={this.handleClose}
+                    onClose={this.props.handleClose}
                     aria-labelledby="alert-dialog-slide-title"
                     aria-describedby="alert-dialog-slide-description"
+                    fullWidth={true}
+                    maxWidth={'sm'}
                 >
-                    <DialogTitle id="alert-dialog-slide-title">{"Use Google's location service?"}</DialogTitle>
-                    <DialogContent>
+                    <DialogTitle id="alert-dialog-slide-title">{"Emin misin?"}</DialogTitle>
+                    <DialogContent dividers>
                         <DialogContentText id="alert-dialog-slide-description">
-                            {this.props.event.title}
+                            {this.props.event.title+" etkinliğini silmekte emin misiniz?"}
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleClose} color="primary">
-                            Disagree
+                        <Button onClick={this.props.handleClose} color="primary">
+                            Değilim
                         </Button>
-                        <Button onClick={this.handleClose} color="primary">
-                            Agree
+                        <Button onClick={this.props.runThisFunctionIfYes} color="primary">
+                            Eminim
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -66,5 +48,3 @@ class AreYouSureDialog extends Component{
         );
     }
 }
-
-export default withStyles(useStyles)(AreYouSureDialog)

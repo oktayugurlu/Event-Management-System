@@ -1,4 +1,4 @@
-import React, {Component, useContext} from 'react';
+import React, {Component, useContext, useEffect, useLayoutEffect, useRef} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -31,6 +31,7 @@ import PlaceIcon from '@material-ui/icons/Place';
 import MapDialog from "./appliedeventspage/MapDialog"
 import AskQuestionDialog from "./appliedeventspage/AskQuestionDialog";
 import AskQuestionButton from "./appliedeventspage/AskQuestionButton";
+import AreYouSureDialog from "./AreYouSureDialog";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -84,11 +85,12 @@ const useStyles = makeStyles((theme) => ({
 export default function EventCard(props) {
     const classes = useStyles();
 
-    const createdEventsContext = useContext(AppStateContext);
+    const mainStatesContext = useContext(AppStateContext);
 
     const MANAGE_EVENT_PAGE=1;
     const ALL_EVENTS_PAGE=2;
     const APPLIED_EVENTS_PAGE=3;
+
 
 
 
@@ -99,6 +101,9 @@ export default function EventCard(props) {
     const [manageLotsDialogElement, setManageLotsDialogElement] = React.useState(<></>);
     const [showMapDialogElement, setShowMapDialogElement] = React.useState(<></>);
     const [askQuestionDialogElement, setAskQuestionDialogElement] = React.useState(<></>);
+
+    //**** states to are you sure dialog *****//
+    const [isOpenAreYouSureDialog, setIsOpenAreYouSureDialog] = React.useState(false);
 
     const selectCardActionButtons = ()=>{
         if(props.whichPage === MANAGE_EVENT_PAGE){
@@ -115,7 +120,7 @@ export default function EventCard(props) {
                             checkStartDateIsNotUpToDate(new Date())
                                 ? "Etkinlik bitiş tarihinden sonra güncellenemez!"
                                 : "Etkinliği güncelle"
-                            } aria-label="add">
+                        } aria-label="add">
                             <Box component="span" display="block">
                                 <span>
                                     <Fab
@@ -141,7 +146,7 @@ export default function EventCard(props) {
                                     <Fab
                                         aria-label="delete"
                                         color="secondary"
-                                        onClick={()=>props.handleClickDeleteEventButton(props.eventObject.uniqueName)}
+                                        onClick={openAreYouSureDialog}
                                         disabled={checkStartDateIsNotUpToDate( new Date())}
                                     >
                                         <DeleteIcon/>
@@ -191,7 +196,7 @@ export default function EventCard(props) {
             );
         }
         else if(props.whichPage===ALL_EVENTS_PAGE){
-            if(checkStartDateIsNotUpToDate( new Date()) && !createdEventsContext.isAuthorized){
+            if(checkStartDateIsNotUpToDate( new Date()) && !mainStatesContext.isAuthorized){
                 return ('');
             }
             else{
@@ -452,13 +457,13 @@ export default function EventCard(props) {
                     props.snackbarOpen("Anket başarı ile dolduruldu!", "success");
                 }
                 else props.snackbarOpen(response.data, "error");
-                createdEventsContext.getAllEvents();
+                mainStatesContext.getAllEvents();
             }).catch(error => {
-                if(error.response.status === 400)
-                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
-                if(error.response.data.code===500){
-                    props.snackbarOpen(error.response.data.message, "error");
-                }
+            if(error.response.status === 400)
+                props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
+            if(error.response.data.code===500){
+                props.snackbarOpen(error.response.data.message, "error");
+            }
         });
         handleCloseFillSurveyButton();
     }
@@ -487,7 +492,7 @@ export default function EventCard(props) {
         }).then((response) => {
             if(response.data==='') {
                 props.snackbarOpen("Anket başarı ile güncellendi", "success");
-                createdEventsContext.getAllEvents();
+                mainStatesContext.getAllEvents();
             }
             else props.snackbarOpen(response.data, "error");
         }).catch(error => {
@@ -498,7 +503,7 @@ export default function EventCard(props) {
     }
 
     //********* PARTICIPANT DETAILS DIALOG **********//
-    const handleCloseParticipantsDetailDialog = (title) => {
+    const handleCloseParticipantsDetailDialog = () => {
         setParticipantsDetailDialogElement(<></>);
     };
     const handleOpenParticipantsDetailDialog = () => {
@@ -513,21 +518,34 @@ export default function EventCard(props) {
 
     const renderEventDetailsIfInManagePage = ()=>{
         if(props.whichPage === MANAGE_EVENT_PAGE)
-        return (
-            <>
-                <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
-                    <b>Etinlik ID: </b> {props.eventObject.uniqueName}
-                </Typography>
-                <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
-                    <b>Kalan Kota: </b> {props.eventObject.quota}
-                </Typography>
-                <Typography style={{marginTop:'5px'}} variant="body2" component="p" >
-                    <b>Katılımcı Sayısı: </b> {props.eventObject.appliedParticipantSet.length}
-                </Typography>
-            </>
-        );
+            return (
+                <>
+                    <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
+                        <b>Etinlik ID: </b> {props.eventObject.uniqueName}
+                    </Typography>
+                    <Typography style={{marginTop:'5px'}}  variant="body2" component="p" >
+                        <b>Kalan Kota: </b> {props.eventObject.quota}
+                    </Typography>
+                    <Typography style={{marginTop:'5px'}} variant="body2" component="p" >
+                        <b>Katılımcı Sayısı: </b> {props.eventObject.appliedParticipantSet.length}
+                    </Typography>
+                </>
+            );
     }
     //********* PARTICIPANT DETAILS DIALOG**********//
+
+
+    //********* ARE YOU SURE DIALOG *********//
+    const openAreYouSureDialog = ()=>{
+        setIsOpenAreYouSureDialog(true);
+    }
+    const closeAreYouSureDialog = ()=>{
+        setIsOpenAreYouSureDialog(false);
+    }
+    const handleClickSureButtonInAreYouSureDialog=()=>{
+        props.handleClickSureButtonToDeleteInFrontend({...props.eventObject});
+        setIsOpenAreYouSureDialog(false);
+    }
 
 
     return (
@@ -538,6 +556,13 @@ export default function EventCard(props) {
             {manageLotsDialogElement}
             {showMapDialogElement}
             {askQuestionDialogElement}
+            <AreYouSureDialog
+                runThisFunctionIfYes={handleClickSureButtonInAreYouSureDialog}
+                open={isOpenAreYouSureDialog}
+                handleClose={closeAreYouSureDialog}
+                event={props.eventObject}
+            />
+
             <Grid
                 container
                 direction="row"
