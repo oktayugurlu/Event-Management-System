@@ -333,11 +333,13 @@ class AddEventDialog extends Component{
         })
     };
     handleStartDateChangeInput = (date) => {
+        date.setSeconds(0);
         this.setState({
             selectedStartDateTime: date
         });
     };
     handleEndDateChangeInput = (date) => {
+        date.setSeconds(0);
         this.setState({
             selectedEndDateTime: date
         })

@@ -14,6 +14,8 @@ import {AppStateContext} from "../contexts/AppStateContext";
 import { Animation } from '@devexpress/dx-react-chart';
 import axios from "axios";
 import {getJwsToken} from "../authentication/LocalStorageService";
+import Card from "@material-ui/core/Card";
+import {createRef} from "react";
 
 
 const ALL_EVENTS_NUMBER_OF_PARTICIPANTS=0;
@@ -128,12 +130,14 @@ export default class BarChart extends React.PureComponent {
         let participantCounter=0;
         this.props.openedEventForUserDetail.appliedParticipantSet.forEach(
             application=> {
-                let applicationDate = new Date(application.creationDate+'Z');
+                let applicationDate = new Date(application.creationDate);
                 if (applicationDate.getDate() === applicationDay
                     && applicationDate.getMonth()+1 === applicationMonth
                     && applicationDate.getFullYear() === applicationYear
-                )
-                participantCounter++;
+                ){
+
+                    participantCounter++;
+                }
             }
         );
         return participantCounter;
@@ -169,19 +173,21 @@ export default class BarChart extends React.PureComponent {
         }
     }
 
+    wrapper = createRef();
+
     render() {
         const { data: chartData, targetItem, valueField, argumentField } = this.state;
 
         return (
-            <Paper>
+            <Paper style={{backgroundColor:'#F1F3F4'}}>
                 <Chart
                     data={chartData}
                     rotated
+                    ref={this.wrapper}
                 >
                     <ArgumentAxis/>
                     <ValueAxis allowDecimals={false}/>
                     <BarSeries
-
                         valueField={valueField}
                         argumentField={argumentField}
                         color="#FF7043"

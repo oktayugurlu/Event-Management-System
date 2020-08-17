@@ -53,13 +53,17 @@ public class ManageParticipantController {
     // other missing informations.
     @PostMapping(value="/getappliedevents")
     public List<ApplicationWithEventDTO> getAppliedEvents(@RequestBody ParticipantDTO participantDTO){
-        List<Application> appliedApplications = manageParticipantService
-                .getAppliedEventsBySSN(participantMapper.mapToEntity(participantDTO));
-        List<ApplicationWithEventDTO> applicationWithEventDTOList = appliedApplications.stream()
-                .map(application -> new ApplicationWithEventDTO(applicationMapper.mapToDto(application),
-                        eventMapper.mapToDto(application.getEvent())
+        List<Application> appliedApplications =
+                manageParticipantService
+                        .getAppliedEventsBySSN(participantMapper.mapToEntity(participantDTO));
+
+        List<ApplicationWithEventDTO> applicationWithEventDTOList =
+                appliedApplications
+                        .stream()
+                        .map(application -> new ApplicationWithEventDTO(applicationMapper.mapToDto(application),
+                                eventMapper.mapToDto(application.getEvent())
                         ))
-                .collect(Collectors.toList());
+                        .collect(Collectors.toList());
         return applicationWithEventDTOList;
     }
 
@@ -84,7 +88,7 @@ public class ManageParticipantController {
     }
 
     @PostMapping(value="/updateparticipant")
-    public ParticipantDTO deleteApplication(@RequestBody @Valid ParticipantDTO participantDTO){
+    public ParticipantDTO updateParticipant(@RequestBody @Valid ParticipantDTO participantDTO){
         final Participant participant = manageParticipantService
                 .updateParticipant(participantMapper.mapToEntity(participantDTO));
         return participantMapper.mapToDto(participant);

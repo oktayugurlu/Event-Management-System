@@ -15,6 +15,9 @@ import EventQuestion from "./EventQuestion";
 import BarChart from "./BarChart";
 import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
+import Alert from "@material-ui/lab/Alert";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -168,6 +171,73 @@ class CreateSurveyDialog extends Component{
     }
 
 
+    renderUpdateEventElementsIfNowIsBeforeEndDate = (classes)=>{
+        if(this.checkEndDateIsOutOfDate(new Date()))
+            return (
+                <>
+                    <Grid container direction="column">
+                        <Alert severity="info" >
+                            Anket, bitiş tarihinden sonra güncellenemez!
+                        </Alert>
+                        <Card className={classes.root}
+                              variant="outlined"
+                              style={{backgroundColor:'#F1F3F4',marginTop:'10px'}}
+                        >
+                            <CardContent>
+                                <Typography  variant="h5" component="h2" gutterBottom>
+                                    Sorular
+                                </Typography>
+                                <Divider/>
+
+                                {this.renderQuestionAsList()}
+
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                    <Divider style={{marginTop:'20px'}}/>
+                </>
+            );
+        else
+            return (
+                <>
+                    {this.exportQuestionElementFromJSONAsArray( )}
+                    <Grid container direction="row"
+                          justify="center"
+                          alignItems="center">
+                        <Button
+                            style={{
+                                marginTop:'22px',
+                                marginBottom:'22px'
+                            }}
+                            variant="contained"
+                            color="default"
+                            className={classes.button}
+                            onClick={this.handleAddQuestionButton}
+                            startIcon={<AddIcon />}
+                        >
+                            Soru Ekle
+                        </Button>
+                    </Grid>
+                </>
+            );
+    }
+
+    checkEndDateIsOutOfDate = (compareWith)=>{
+        return this.props.event.endDateTime < compareWith;
+    }
+
+    renderQuestionAsList = () =>{
+        return this.props.event.surveyQuestionSet.map(
+            (question, index)=>{
+                return (
+                    <Typography  variant="body1" >
+                        &#183;{"Soru "+(index+1)+". "+question.content}
+                    </Typography>
+                );
+            }
+        );
+    }
+
 
     render() {
         const { classes } = this.props;
@@ -185,43 +255,69 @@ class CreateSurveyDialog extends Component{
                         onSubmit={this.handleSubmit}
                     >
                         <DialogTitle id="scroll-dialog-title" >
-                            {this.props.event.title + " - Anketi Güncelle"}
+                            {this.props.event.title + " - Anket Yönetimi"}
                         </DialogTitle>
                         <DialogContent dividers={true}>
+                            {this.renderUpdateEventElementsIfNowIsBeforeEndDate(classes)}
+                            <Grid item>
+                                <Divider variant="middle"/>
+                            </Grid>
                             <Grid container direction="column" spacing={2}>
-                                {this.exportQuestionElementFromJSONAsArray( )}
-                                <Grid container direction="row"
-                                      justify="center"
-                                      alignItems="center">
-                                    <Button
-                                        style={{
-                                            marginTop:'22px',
-                                            marginBottom:'22px'
-                                        }}
-                                        variant="contained"
-                                        color="default"
-                                        className={classes.button}
-                                        onClick={this.handleAddQuestionButton}
-                                        startIcon={<AddIcon />}
-                                    >
-                                        Soru Ekle
-                                    </Button>
-                                </Grid>
-                                <Grid item>
-                                    <Divider variant="middle"/>
-                                </Grid>
+
+
                                 <Grid item>
                                     <Typography variant="h5" gutterBottom>
                                         {"Sorulara verilen cevaplarin puan ortalamasi"}
                                     </Typography>
                                 </Grid>
                                 <Grid item>
-                                    <BarChart
-                                        surveyEvent={this.props.event}
-                                        whichChart={SURVEY_RESULTS}
-                                        title={"Katılımcı Sayısı:"}
-                                    />
+                                    <Grid container
+                                          direction={"row"}
+                                          justify="space-between"
+                                          alignItems="flex-start"
+                                    >
+                                        <Grid item md={8} sm={12}>
+                                            <BarChart
+                                                surveyEvent={this.props.event}
+                                                whichChart={SURVEY_RESULTS}
+                                                title={"Katılımcı Sayısı:"}
+                                            />
+                                        </Grid>
+                                        <Grid item md={3} sm={12}>
+                                            <Card className={classes.root}
+                                                  variant="outlined"
+                                                  style={{backgroundColor:'#F1F3F4'}}
+                                            >
+                                                <CardContent>
+                                                    <Typography  variant="h5" component="h2" gutterBottom>
+                                                        Puanların Karşılıkları
+                                                    </Typography>
+
+                                                    <Typography  variant="body2"  component="p">
+                                                        &#183;0 Puan: Kesinlikle katılmıyorum
+                                                    </Typography>
+
+                                                    <Typography  variant="body2"  component="p">
+                                                        &#183;1 Puan: Katılmıyorum
+                                                    </Typography>
+
+                                                    <Typography variant="body2"  component="p">
+                                                        &#183;2 Puan: Kararsızım
+                                                    </Typography>
+
+                                                    <Typography  variant="body2"  component="p">
+                                                        &#183;3 Puan: Katılıyorum
+                                                    </Typography>
+
+                                                    <Typography  variant="body2"  component="p">
+                                                        &#183;4 Puan: Kesinlikle katılıyorum
+                                                    </Typography>
+                                                </CardContent>
+                                            </Card>
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
+
                             </Grid>
 
                         </DialogContent>
@@ -229,7 +325,7 @@ class CreateSurveyDialog extends Component{
                             <Button onClick={this.props.handleClose} color="primary">
                                 İptal
                             </Button>
-                            <Button type="submit" color="primary">Gönder</Button>
+                            <Button disabled={this.checkEndDateIsOutOfDate(new Date())} type="submit" color="primary">Gönder</Button>
                         </DialogActions>
                     </ValidatorForm>
                 </Dialog>

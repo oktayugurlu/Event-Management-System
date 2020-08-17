@@ -17,6 +17,7 @@ import Alert from "@material-ui/lab/Alert";
 import SendIcon from '@material-ui/icons/Send';
 import axios from "axios";
 import {getJwsToken} from "../authentication/LocalStorageService";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,6 +42,7 @@ class ManageLotsDialog extends Component{
             giftSentSuccessfully:false,
             isSubmitClicked:false,
             alertMessage:'',
+            isLoading:false,
             openedEvent: {...this.props.openedEvent}
         }
     }
@@ -128,7 +130,7 @@ class ManageLotsDialog extends Component{
                             helperText={this.handleEmptyCheck(this.state.giftMessage)}
                             fullWidth={true}
                             onChange={this.handleGiftMessage}
-                            inputProps={{ maxLength: 255}}
+                            inputProps={{ maxLength: 25}}
                         />
                     </Grid>
                     <Grid item md={3}>
@@ -147,8 +149,6 @@ class ManageLotsDialog extends Component{
                         </Button>
                     </Grid>
                 </Grid>
-                {this.alertForLotsSentSuccesfully()}
-                {this.alertForError()}
             </>
 
         );
@@ -164,7 +164,8 @@ class ManageLotsDialog extends Component{
                                     +' '+luckApplicationObject.participant.surname;
         this.setState({
             luckyParticipantString: luckyParticipantString,
-            luckyParticipantObject: {...luckApplicationObject.participant}
+            luckyParticipantObject: {...luckApplicationObject.participant},
+            giftSentSuccessfully:false,
         });
     }
     getRandomInt = (min, max)=> {
@@ -186,22 +187,28 @@ class ManageLotsDialog extends Component{
     //*** Functions after submit lots result ***//
     submitLots = ()=>{
         if(!this.isValueEmpty(this.state.giftMessage) && !this.isValueEmpty(this.state.giftMessage)){
+
             let lotsDTO = this.createLotsDTO();
-            console.log("lotsDTO %O",lotsDTO);
             let headers = {
                 'Authorization': `Bearer ${getJwsToken()}`
             };
-            axios.post("/manageparticipant/drawinglots/"+this.state.openedEvent.uniqueName, lotsDTO, {
-                headers:headers
-            }).then((response) => {
-                let copyOpenedEvent = {...this.state.openedEvent};
-                copyOpenedEvent.lotsSet.push(response.data);
-                this.setState({
-                    giftSentSuccessfully:true,
-                    isSubmitClicked:true,
-                    openedEvent: copyOpenedEvent
-                });
-            }).catch(error => {});
+            this.setState({
+                isLoading:true
+            }, ()=>{
+                    axios.post("/manageparticipant/drawinglots/"+this.state.openedEvent.uniqueName, lotsDTO, {
+                        headers:headers
+                    }).then((response) => {
+                        let copyOpenedEvent = {...this.state.openedEvent};
+                        copyOpenedEvent.lotsSet.push(response.data);
+                        this.setState({
+                            giftSentSuccessfully:true,
+                            isSubmitClicked:true,
+                            openedEvent: copyOpenedEvent,
+                            isLoading:false
+                        });
+                    }).catch(error => {});
+            });
+
         }
     }
     createLotsDTO = ()=>{
@@ -222,17 +229,8 @@ class ManageLotsDialog extends Component{
     alertForLotsSentSuccesfully = ()=>{
         if(this.state.giftSentSuccessfully && this.state.isSubmitClicked)
             return(
-                <Alert severity="success">
+                <Alert severity="success" style={{marginTop:'20px',marginBottom:'20px'}}>
                     {'Hediye '+this.state.luckyParticipantString+' kullanıcısına mail ile bildirildi!'}
-                </Alert>
-            );
-    }
-
-    alertForError = ()=>{
-        if(!this.state.giftSentSuccessfully && this.state.isSubmitClicked)
-            return(
-                <Alert severity="error">
-                    {this.state.alertMessage}
                 </Alert>
             );
     }
@@ -278,9 +276,24 @@ class ManageLotsDialog extends Component{
                                 <Divider/>
                             </Grid>
                             <Grid item>
-                                <ManageLotsTable
-                                    event={this.state.openedEvent}
-                                />
+                                {this.state.isLoading
+                                    ?(<Grid container
+                                            direction={"column"}
+                                            justify="center"
+                                            alignItems="center"
+                                    >
+                                        <Grid item>
+                                            <CircularProgress/>
+                                        </Grid>
+                                    </Grid>)
+                                    :(  <>
+                                            {this.alertForLotsSentSuccesfully()}
+                                            <ManageLotsTable
+                                                event={this.state.openedEvent}
+                                            />
+                                        </>
+                                     )
+                                }
                             </Grid>
                         </Grid>
                     </DialogContent>

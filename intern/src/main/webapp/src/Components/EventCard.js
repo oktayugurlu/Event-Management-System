@@ -6,6 +6,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardMedia from '@material-ui/core/CardMedia';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 import Fab from '@material-ui/core/Fab';
 import Grid from "@material-ui/core/Grid";
@@ -30,7 +31,7 @@ import ManageLotsDialog from "./manageeventpage/ManageLotsDialog";
 import PlaceIcon from '@material-ui/icons/Place';
 import MapDialog from "./appliedeventspage/MapDialog"
 import AskQuestionDialog from "./appliedeventspage/AskQuestionDialog";
-import AskQuestionButton from "./appliedeventspage/AskQuestionButton";
+import AskQuestionAndLeftEventButton from "./appliedeventspage/AskQuestionAndLeftEventButton";
 import AreYouSureDialog from "./AreYouSureDialog";
 
 const useStyles = makeStyles((theme) => ({
@@ -156,10 +157,7 @@ export default function EventCard(props) {
                         </Tooltip>
                     </div>
                     <div className={classes.wrapper}>
-                        <Tooltip title={
-                            checkEndDateIsOutOfDate(new Date())
-                                ? "Anket, bitiş tarihinden sonra güncellenemez!"
-                                : "Anketi yönet"} aria-label="add"
+                        <Tooltip title={"Anketi yönet"} aria-label="add"
                         >
                             <Box component="span" display="block">
                                 <span>
@@ -168,7 +166,6 @@ export default function EventCard(props) {
                                         color="inherit"
                                         style={{colorInherit:"#FF7F00"}}
                                         onClick={()=>handleClickOpenManageSurveyButton()}
-                                        disabled={checkEndDateIsOutOfDate(new Date())}
                                     >
                                         <AssessmentIcon/>
                                     </Fab>
@@ -266,11 +263,13 @@ export default function EventCard(props) {
                             </Box>
                         </Tooltip>
                     </div>
-                    <AskQuestionButton
+
+                    <AskQuestionAndLeftEventButton
                         checkEndDateIsUpToDate={checkEndDateIsUpToDate}
                         checkStartDateIsNotUpToDate={checkStartDateIsNotUpToDate}
                         handleClickOpenAskQuestionDialogButton={handleClickOpenAskQuestionDialogButton}
                         classes={classes}
+                        openAreYouSureDialog={openAreYouSureDialog}
                     />
                 </Grid>
             );
@@ -368,9 +367,7 @@ export default function EventCard(props) {
     const checkEndDateIsUpToDate = (compareWith)=>{
         return props.eventObject.endDateTime > compareWith;
     }
-    const checkEndDateIsOutOfDate = (compareWith)=>{
-        return props.eventObject.endDateTime < compareWith;
-    }
+
 
 
     //********* ASK TO INSTRUCTOR DIALOG *************//
@@ -544,8 +541,38 @@ export default function EventCard(props) {
         setIsOpenAreYouSureDialog(false);
     }
     const handleClickSureButtonInAreYouSureDialog=()=>{
-        props.handleClickSureButtonToDeleteInFrontend({...props.eventObject});
+        if(props.whichPage === MANAGE_EVENT_PAGE){
+            props.handleClickSureButtonToDeleteInFrontend({...props.eventObject});
+        }
+        else if(props.whichPage === APPLIED_EVENTS_PAGE){
+            props.handleClickSureButtonToLeaveFromEventInFrontend({...props.eventObject});
+        }
+
         setIsOpenAreYouSureDialog(false);
+    }
+    const renderAreYouSureDialogByPage = ()=>{
+        if(props.whichPage === MANAGE_EVENT_PAGE){
+            return (
+                <AreYouSureDialog
+                    runThisFunctionIfYes={handleClickSureButtonInAreYouSureDialog}
+                    open={isOpenAreYouSureDialog}
+                    handleClose={closeAreYouSureDialog}
+                    event={props.eventObject}
+                    message={props.eventObject.title+" etkinliğini silmeyi onaylıyor musunuz?"}
+                />
+            );
+        }
+        else if(props.whichPage === APPLIED_EVENTS_PAGE){
+            return (
+                <AreYouSureDialog
+                    runThisFunctionIfYes={handleClickSureButtonInAreYouSureDialog}
+                    open={isOpenAreYouSureDialog}
+                    handleClose={closeAreYouSureDialog}
+                    event={props.eventObject}
+                    message={props.eventObject.title+" etkinlikten ayrılmayı onaylıyor musunuz?"}
+                />
+            );
+        }
     }
 
 
@@ -557,13 +584,7 @@ export default function EventCard(props) {
             {manageLotsDialogElement}
             {showMapDialogElement}
             {askQuestionDialogElement}
-            <AreYouSureDialog
-                runThisFunctionIfYes={handleClickSureButtonInAreYouSureDialog}
-                open={isOpenAreYouSureDialog}
-                handleClose={closeAreYouSureDialog}
-                event={props.eventObject}
-                message={props.eventObject.title+" etkinliğini silmeyi onaylıyor musunuz?"}
-            />
+            {renderAreYouSureDialogByPage()}
 
             <Grid
                 container

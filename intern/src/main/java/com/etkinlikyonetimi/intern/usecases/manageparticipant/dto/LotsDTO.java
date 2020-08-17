@@ -15,7 +15,7 @@ public class LotsDTO {
 
     @NotBlank(message = "Hediye boş olamaz!")
     @NotNull(message = "Hediye null olamaz!")
-    @Size(min = 1, max = 255, message = "Karakter sayısı 1 ile 255 arasında olmalı")
+    @Size(min = 1, max = 25, message = "Karakter sayısı 1 ile 25 arasında olmalı")
     private String giftMessage;
 
     private ParticipantDTO participant;

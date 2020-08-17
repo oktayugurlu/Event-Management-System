@@ -12,10 +12,11 @@ export function getUsername(){
     return localStorage.getItem("username");
 }
 
-/*
 export function setSSN(ssn){
     localStorage.setItem("ssn", ssn);
 }
 export function getSSN(){
     return localStorage.getItem("ssn");
-}*/
+}
+
+

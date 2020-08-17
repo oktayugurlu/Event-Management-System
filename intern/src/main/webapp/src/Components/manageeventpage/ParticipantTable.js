@@ -40,8 +40,8 @@ class ParticipantTable extends Component{
             rowsPerPage:10,
             rows:[],
             deletedParticipantSSN:'',
-            isDeletedSuccessfully:false,
-            isUpdatedSuccessfully:false,
+            isSuccess:false,
+            successMessage:'',
             updatedParticipant:{},
             updateParticipantDialogElement: (<></>),
             columns:[
@@ -95,6 +95,7 @@ class ParticipantTable extends Component{
         });
     }
     createRows = (applications)=>{
+        console.log("applications: %O",applications);
         let participantObjectList = this.participantRowArrayCreator(applications);
         this.setState({
             rows:[...participantObjectList],
@@ -210,7 +211,8 @@ class ParticipantTable extends Component{
     }
     closeAreYouSureDialog = ()=>{
         this.setState({
-            isOpenAreYouSureDialog:false
+            isOpenAreYouSureDialog:false,
+            isSuccess:false,
         });
     }
     handleClickSureButtonInAreYouSureDialog=()=>{
@@ -236,7 +238,8 @@ class ParticipantTable extends Component{
             this.setState({
                 isOpenAreYouSureDialog:false,
                 event: {...response.data},
-                isDeletedSuccessfully:true
+                isSuccess:true,
+                successMessage:this.state.deletedParticipantSSN+" TC'sine sahip kişi başarıyla silindi"
             },()=>this.createRows(this.state.event.appliedParticipantSet));
         }).catch(error => console.log(error));
     }
@@ -271,7 +274,8 @@ class ParticipantTable extends Component{
     }
     closeUpdateParticipantDialog = ()=>{
         this.setState({
-            updateParticipantDialogElement:<></>
+            updateParticipantDialogElement:<></>,
+            isSuccess:false,
         });
     }
     saveUpdatedParticipant = (participant)=>{
@@ -299,8 +303,9 @@ class ParticipantTable extends Component{
         }
         this.setState({
             event: {...copyEvent},
-            isUpdatedSuccessfully:true,
-            updateParticipantDialogElement:<></>
+            isSuccess:true,
+            updateParticipantDialogElement:<></>,
+            successMessage:this.state.updatedParticipant.ssn+" TC'sine sahip kişi başarıyla güncellendi"
         });
     }
 
@@ -365,15 +370,9 @@ class ParticipantTable extends Component{
                         onChangeRowsPerPage={this.handleChangeRowsPerPage}
                     />
                 </Paper>
-                {this.state.isDeletedSuccessfully
+                {this.state.isSuccess
                     ?(<Alert severity="success" style={{marginTop:'10px'}}>
-                        {this.state.deletedParticipantSSN+" TC'sine sahip kişi başarıyla silindi"}
-                    </Alert>)
-                    :''
-                }
-                {this.state.isUpdatedSuccessfully
-                    ?(<Alert severity="success" style={{marginTop:'10px'}}>
-                        {this.state.updatedParticipant.ssn+" TC'sine sahip kişi başarıyla güncellendi"}
+                        {this.state.successMessage}
                     </Alert>)
                     :''
                 }

@@ -139,6 +139,64 @@ public class ManageParticipantService {
         }
     }
 
+    @Transactional
+    public Lots drawingLots(Lots lots, String eventUniqueName) throws IOException, MessagingException {
+        Optional<Participant> participantFromDB = participantRepository.findParticipantBySsn(lots.getParticipant().getSsn());
+        Optional<Event> eventFromDB = eventRepository.findByUniqueName(eventUniqueName);
+        if(participantFromDB.isPresent() && eventFromDB.isPresent()){
+            if(!checkIfParticipantNotAssignSameEvent(participantFromDB.get(), eventFromDB.get())){
+                lots.setParticipant(participantFromDB.get());
+                lots.setEvent(eventFromDB.get());
+                final Lots lotsFromDatabase = lotsRepository.save(lots);
+                String contentOfMail = lots.getParticipant().getSsn()
+                        + " TC Kimlik no.su ile katıldigin "+lots.getEvent().getTitle().toLowerCase(new Locale("tr", "TR"))
+                        +" etkinligi cekilisinde "+ lots.getGiftMessage().toLowerCase()+" kazandin!";
+
+                String pathOfCongratImage = createCongratImage(lotsFromDatabase);
+                sendMail(pathOfCongratImage,
+                        participantFromDB.get().getMail(),
+                        "Katıldığınız "+ eventFromDB.get().getTitle()+" etkinliği hakkında",
+                        contentOfMail);
+                return lotsFromDatabase;
+            }else{
+                throw new EntityNotFoundException();
+            }
+        }else{
+            throw new EntityNotFoundException();
+        }
+
+    }
+
+    public String createCongratImage(Lots lots) throws IOException {
+
+        BufferedImage bufferedImage = null;
+        try {
+            File imageFile = new File("./src/main/resources/static/congratmultimedia/template.png");
+            InputStream inputStream = new FileInputStream(imageFile);
+            bufferedImage = ImageIO.read(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        String content = lots.getParticipant().getSsn() + " TC Kimlik no.su ile katıldığın "+lots.getEvent().getTitle();
+        String content2 =" etkinliği çekilişinde "+ lots.getGiftMessage().toLowerCase()+" kazandın!";
+        String congrat = "Tebrikler "+ lots.getParticipant().getName() +" "+lots.getParticipant().getSurname() +"!";
+        String title = "Etkinlik Yönetim Sistemi";
+
+        assert bufferedImage != null;
+        Graphics graphics = bufferedImage.getGraphics();
+        graphics.setColor(Color.BLACK);
+        graphics.setFont(new Font("Serif", Font.ITALIC, 50));
+        graphics.drawString(congrat, 540, 460);
+        graphics.drawString(content, 240, 540);
+        graphics.drawString(content2, 240, 600);
+        // graphics.drawString(string, 440, 520);
+        ImageIO.write(bufferedImage, "png", new File(
+                "./src/main/resources/static/congratmultimedia/"+lots.getId()+".png"));
+        return "./src/main/resources/static/congratmultimedia/"+lots.getId()+".png";
+    }
+
     public void sendMail(String fileName, String email, String subject, String content) throws IOException, MessagingException {
         Locale trlocale= new Locale("tr", "TR");
         mailSenderService.sendmail("etkinlikyonetimi1234@gmail.com",
@@ -174,59 +232,7 @@ public class ManageParticipantService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
-    public Lots drawingLots(Lots lots, String eventUniqueName) throws IOException, MessagingException {
-        Optional<Participant> participantFromDB = participantRepository.findParticipantBySsn(lots.getParticipant().getSsn());
-        Optional<Event> eventFromDB = eventRepository.findByUniqueName(eventUniqueName);
-        if(participantFromDB.isPresent() && eventFromDB.isPresent()){
-            if(!checkIfParticipantNotAssignSameEvent(participantFromDB.get(), eventFromDB.get())){
-                lots.setParticipant(participantFromDB.get());
-                lots.setEvent(eventFromDB.get());
-                sendMail(null,
-                        participantFromDB.get().getMail(),
-                        "Katıldığınız "+ eventFromDB.get().getTitle()+" etkinliği hakkında",
-                        "Tebrikler! ");
-                return lotsRepository.save(lots);
-            }else{
-                throw new EntityNotFoundException();
-            }
-        }else{
-            throw new EntityNotFoundException();
-        }
 
-    }
-
-    public void createCongratImage() throws IOException {
-        BufferedImage bufferedImage = null;
-        try {
-            File imageFile = new File("./src/main/resources/static/congratmultimedia/congrat.png");
-            InputStream inputStream = new FileInputStream(imageFile);
-
-            bufferedImage = ImageIO.read(inputStream);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        String key = "Tebrikler Oktay!";
-        String key1 = "Bizden Iphone kazandin";
-        /*BufferedImage bufferedImage = new BufferedImage(170, 30,
-                BufferedImage.TYPE_INT_RGB);*/
-
-        assert bufferedImage != null;
-        Graphics graphics = bufferedImage.getGraphics();
-        /* To add rectangular
-        Color transparant=new Color(0,0,0,0f );
-        graphics.setColor(transparant);
-        graphics.fillRect(125, 160, 200, 50);
-        */
-        graphics.setColor(Color.RED);
-        graphics.setFont(new Font("Serif", Font.ITALIC, 50));
-        graphics.drawString(key, 540, 460);
-        graphics.drawString(key1, 440, 520);
-        ImageIO.write(bufferedImage, "png", new File(
-                "./src/main/resources/static/congratmultimedia/hediye.png"));
-        System.out.println("Image Created");
-    }
 
     @Transactional
     public void addQuestionAskedByParticipant(List<QuestionAskedByParticipant> questionsAskedByParticipant, String eventUniqueName) {

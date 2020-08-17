@@ -42,13 +42,10 @@ public class MailSenderService {
         Multipart multipart = new MimeMultipart();
         multipart.addBodyPart(messageBodyPart);
 
-        if(qrCodePath != null){ // mail with a file
-            MimeBodyPart attachPart = new MimeBodyPart();
-            attachPart.attachFile(qrCodePath);
-            multipart.addBodyPart(attachPart);
-            msg.setContent(multipart);
-        }
-
+        MimeBodyPart attachPart = new MimeBodyPart();
+        attachPart.attachFile(qrCodePath);
+        multipart.addBodyPart(attachPart);
+        msg.setContent(multipart);
 
         Transport.send(msg);
     }
