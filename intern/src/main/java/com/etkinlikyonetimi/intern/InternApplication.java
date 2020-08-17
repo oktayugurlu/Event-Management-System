@@ -13,17 +13,6 @@ import java.io.IOException;
 @EnableJpaAuditing
 public class InternApplication {
 
-	@PostConstruct
-	public void init(){
-/*		// Setting Spring Boot SetTimeZone
-		TimeZone.setDefault(TimeZone.getTimeZone("Turkey"));
-		ObjectMapper om = new ObjectMapper();
-		JavaTimeModule module = new JavaTimeModule();
-		LocalDateTimeDeserializer deserializer = new LocalDateTimeDeserializer(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-		module.addDeserializer(LocalDateTime.class, deserializer);
-		om.registerModule(module);
-		System.out.println("Spring boot application running in UTC timezone :"+new Date());*/
-	}
 	public static void main(String[] args) throws IOException {
 	 	ApplicationContext context =  SpringApplication.run(InternApplication.class, args);
 		DatabasePopulator databasePopulator = (DatabasePopulator) context.getBean("databasePopulator");
@@ -32,4 +21,5 @@ public class InternApplication {
 		manageParticipantService.createCongratImage();
 	}
 
+	// To login website, username: "admin" password: "1234"
 }
