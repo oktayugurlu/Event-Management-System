@@ -10,11 +10,13 @@ import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import AreYouSureDialog from "../AreYouSureDialog";
 import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import {getJwsToken} from "../authentication/LocalStorageService";
 import axios from "axios";
 import {AppStateContext} from "../contexts/AppStateContext";
 import IconButton from "@material-ui/core/IconButton";
 import Alert from "@material-ui/lab/Alert";
+import UpdateParticipantDialog from "./UpdateParticipantDialog";
 
 const useStyles = makeStyles({
     root: {
@@ -39,10 +41,18 @@ class ParticipantTable extends Component{
             rows:[],
             deletedParticipantSSN:'',
             isDeletedSuccessfully:false,
+            isUpdatedSuccessfully:false,
+            updatedParticipant:{},
+            updateParticipantDialogElement: (<></>),
             columns:[
-                {   id: 'actions',
+                {   id: 'delete',
                     label:'Sil',
-                    minWidth: 50,
+                    minWidth: 20,
+                    align: 'center',
+                },
+                {   id: 'update',
+                    label:'Güncelle',
+                    minWidth: 20,
                     align: 'center',
                 },
                 {   id: 'name',
@@ -157,11 +167,25 @@ class ParticipantTable extends Component{
         return (
             <TableRow hover role="checkbox" tabIndex={-1} key={row.ssn}>
                 {this.state.columns.map((column) => {
-                    if(column.id ==='actions'){
+                    if(column.id ==='delete'){
                         return(
                             <TableCell key={'actions'}  align={'center'}>
                                 <IconButton aria-label="delete" onClick={()=>{this.openAreYouSureDialog(row.ssn)}} >
                                     <DeleteIcon style={{color:'red'}}/>
+                                </IconButton>
+
+                            </TableCell>
+                        );
+                    }
+                    else if(column.id ==='update'){
+                        return(
+                            <TableCell key={'update'}  align={'center'}>
+                                <IconButton
+                                    style={{marginLeft:'10px'}}
+                                    aria-label="edit"
+                                    onClick={()=>{this.openUpdateParticipantDialog(row.ssn)}}
+                                >
+                                    <EditIcon/>
                                 </IconButton>
                             </TableCell>
                         );
@@ -217,8 +241,72 @@ class ParticipantTable extends Component{
         }).catch(error => console.log(error));
     }
 
-    handleParticipantInformation = (value)=>{
 
+
+
+
+
+    //***** UPDATE PARTICIPANT DIALOG FUCNTIONS ******//
+    openUpdateParticipantDialog = (updatedParticipantSSN)=>{
+        let participant = this.findParticipantBySSN(updatedParticipantSSN);
+        this.setState({
+            updateParticipantDialogElement:(
+                <UpdateParticipantDialog
+                    updatedParticipant={participant}
+                    open={true}
+                    saveUpdatedParticipant={this.saveUpdatedParticipant}
+                    handleClose={this.closeUpdateParticipantDialog}
+                />
+            ),
+            updatedParticipant: {...participant}
+        });
+    }
+    findParticipantBySSN = (ssn)=>{
+        for(let i=0;i<this.state.event.appliedParticipantSet.length;i++){
+            let application = this.state.event.appliedParticipantSet[i];
+            if(application.participant.ssn === ssn){
+                return application.participant;
+            }
+        }
+    }
+    closeUpdateParticipantDialog = ()=>{
+        this.setState({
+            updateParticipantDialogElement:<></>
+        });
+    }
+    saveUpdatedParticipant = (participant)=>{
+        let headers = {
+            'Authorization': `Bearer ${getJwsToken()}`
+        };
+        axios.post("/manageparticipant/updateparticipant",
+            participant,
+            {
+                headers:headers
+            }
+        ).then((response) => {
+            this.updateApplicationList(response.data);
+            this.setState({
+            },()=>this.createRows(this.state.event.appliedParticipantSet));
+        }).catch(error => console.log(error));
+    }
+    updateApplicationList=(participant)=>{
+        let copyEvent = {...this.state.event};
+        for(let i=0;i<copyEvent.appliedParticipantSet.length;i++){
+            if(copyEvent.appliedParticipantSet[i].participant.ssn === participant.ssn){
+                copyEvent.appliedParticipantSet[i].participant = {...participant};
+                break;
+            }
+        }
+        this.setState({
+            event: {...copyEvent},
+            isUpdatedSuccessfully:true,
+            updateParticipantDialogElement:<></>
+        });
+    }
+
+
+
+    handleParticipantInformation = (value)=>{
         if(value === undefined){ //Question is not answered
             return "";
         }
@@ -240,6 +328,8 @@ class ParticipantTable extends Component{
                     event={this.props.eventObject}
                     message={this.state.deletedParticipantSSN+" TC'sine sahip kişi silinsin mi?"}
                 />
+
+                {this.state.updateParticipantDialogElement}
 
                 <Paper>
                     <TableContainer >
@@ -281,8 +371,13 @@ class ParticipantTable extends Component{
                     </Alert>)
                     :''
                 }
+                {this.state.isUpdatedSuccessfully
+                    ?(<Alert severity="success" style={{marginTop:'10px'}}>
+                        {this.state.updatedParticipant.ssn+" TC'sine sahip kişi başarıyla güncellendi"}
+                    </Alert>)
+                    :''
+                }
             </div>
-
         );
     }
 

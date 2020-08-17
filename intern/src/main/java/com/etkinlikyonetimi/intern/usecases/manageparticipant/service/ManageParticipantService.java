@@ -174,6 +174,7 @@ public class ManageParticipantService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public Lots drawingLots(Lots lots, String eventUniqueName) throws IOException, MessagingException {
         Optional<Participant> participantFromDB = participantRepository.findParticipantBySsn(lots.getParticipant().getSsn());
         Optional<Event> eventFromDB = eventRepository.findByUniqueName(eventUniqueName);
@@ -206,22 +207,28 @@ public class ManageParticipantService {
             e.printStackTrace();
         }
 
-        String key = "Tebrikler Oktay! Bizden Iphone kazandin";
+        String key = "Tebrikler Oktay!";
+        String key1 = "Bizden Iphone kazandin";
         /*BufferedImage bufferedImage = new BufferedImage(170, 30,
                 BufferedImage.TYPE_INT_RGB);*/
 
         assert bufferedImage != null;
         Graphics graphics = bufferedImage.getGraphics();
-        graphics.setColor(Color.LIGHT_GRAY);
-        graphics.fillRect(0, 0, 200, 50);
+        /* To add rectangular
+        Color transparant=new Color(0,0,0,0f );
+        graphics.setColor(transparant);
+        graphics.fillRect(125, 160, 200, 50);
+        */
         graphics.setColor(Color.RED);
-        graphics.setFont(new Font("Serif", Font.ITALIC, 60));
-        graphics.drawString(key, 125, 160);
+        graphics.setFont(new Font("Serif", Font.ITALIC, 50));
+        graphics.drawString(key, 540, 460);
+        graphics.drawString(key1, 440, 520);
         ImageIO.write(bufferedImage, "png", new File(
                 "./src/main/resources/static/congratmultimedia/hediye.png"));
         System.out.println("Image Created");
     }
 
+    @Transactional
     public void addQuestionAskedByParticipant(List<QuestionAskedByParticipant> questionsAskedByParticipant, String eventUniqueName) {
         Optional<Event> eventFromDB = eventRepository.findByUniqueName(eventUniqueName);
         Optional<Participant> participantFromDB =
@@ -267,7 +274,24 @@ public class ManageParticipantService {
                                 participant, question
                         )
         );
-
     }
 
+
+    public Participant updateParticipant(Participant participantFromRequest) {
+        Optional<Participant> participantFromDatabase =
+                participantRepository.findParticipantBySsn(participantFromRequest.getSsn());
+
+        if(participantFromDatabase.isPresent()){
+            updateParticipantFields(participantFromRequest, participantFromDatabase.get());
+            return participantRepository.save(participantFromDatabase.get());
+        }else{
+            throw new EntityNotFoundException();
+        }
+    }
+    private void updateParticipantFields(Participant participantFromRequest,
+                                         Participant participantFromDatabase){
+        participantFromDatabase.setName(participantFromRequest.getName());
+        participantFromDatabase.setSurname(participantFromRequest.getSurname());
+        participantFromDatabase.setMail(participantFromRequest.getMail());
+    }
 }

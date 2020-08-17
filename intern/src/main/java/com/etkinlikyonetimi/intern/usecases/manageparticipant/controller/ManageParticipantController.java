@@ -8,6 +8,7 @@ import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.LotsDTO;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.ParticipantDTO;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.dto.QuestionAskedByParticipantDTO;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Application;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.Participant;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.mapper.*;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.service.ManageParticipantService;
 import com.etkinlikyonetimi.intern.usecases.manageevent.mapper.EventMapper;
@@ -80,5 +81,12 @@ public class ManageParticipantController {
                                       @PathVariable @Size(max = 50, min = 1) String eventUniqueName){
         final Event event = manageParticipantService.deleteApplication(participantDTO.getSsn(), eventUniqueName);
         return eventMapper.mapToDto(event);
+    }
+
+    @PostMapping(value="/updateparticipant")
+    public ParticipantDTO deleteApplication(@RequestBody @Valid ParticipantDTO participantDTO){
+        final Participant participant = manageParticipantService
+                .updateParticipant(participantMapper.mapToEntity(participantDTO));
+        return participantMapper.mapToDto(participant);
     }
 }

@@ -42,7 +42,7 @@ export default class ParticipantsDetailDialog extends Component{
                 <Dialog
                     scroll={'paper'}
                     fullWidth={true}
-                    maxWidth={'md'}
+                    maxWidth={'lg'}
                     open={this.props.open}
                     TransitionComponent={Transition}
                     keepMounted
