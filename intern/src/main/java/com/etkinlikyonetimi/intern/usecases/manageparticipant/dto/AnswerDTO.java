@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnswerDTO {
-    @NotBlank
+
     @NotNull
     private String content;
 

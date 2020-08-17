@@ -59,12 +59,12 @@ public class Event extends BaseEntity {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<Question> questionSet;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "event")
     private Set<SurveyQuestion> surveyQuestionSet;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "event")
     private Set<Lots> lotsSet;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "event")
     private Set<QuestionAskedByParticipant> questionAskedByParticipantSet;
 }

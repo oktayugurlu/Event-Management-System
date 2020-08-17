@@ -16,9 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,7 +64,7 @@ public class ManageParticipantController {
 
     @PostMapping(value="/drawinglots/{eventUniqueName}")
     public LotsDTO drawingLots(@RequestBody @Valid LotsDTO lotsDTO,
-                               @PathVariable @Size(max = 50, min = 1) String eventUniqueName){
+                               @PathVariable @Size(max = 50, min = 1) String eventUniqueName) throws IOException, MessagingException {
         return lotsMapper.mapToDto(manageParticipantService.drawingLots(lotsMapper.mapToEntity(lotsDTO), eventUniqueName));
     }
 

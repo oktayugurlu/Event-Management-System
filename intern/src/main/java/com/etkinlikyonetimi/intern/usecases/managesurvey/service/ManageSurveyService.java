@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -54,22 +55,22 @@ public class ManageSurveyService {
                         .collect(Collectors.toList());
     }
 
-    private void deleteSurveyQuestionIfNotExistOnRequest(Event event, List<SurveyQuestion> surveyQuestions) {
-
+    @Transactional
+    public void deleteSurveyQuestionIfNotExistOnRequest(Event event, List<SurveyQuestion> surveyQuestions) {
         event.getSurveyQuestionSet()
                 .stream()
                 .filter(questionFromDatabase -> surveyQuestions
-                        .stream()
-                        .filter(questionFromRequest -> questionFromDatabase
+                        .stream().noneMatch(questionFromRequest -> questionFromDatabase
                                 .getContent()
                                 .equals(questionFromRequest.getContent()))
-                        .collect(Collectors.toList())
-                        .isEmpty()
-                ).forEach(surveyQuestionRepository::delete);
-
+                ).forEach(surveyQuestion->{
+                    System.out.println("surveyQuestion");
+                    System.out.println(surveyQuestion.getId());
+                    surveyQuestionRepository.deleteById(surveyQuestion.getId());
+        });
     }
-
-    private void saveQuestionIfNotExistOnDatabase(Event event, List<String> questionContentFromEvent, SurveyQuestion surveyQuestion) {
+    @Transactional
+    public void saveQuestionIfNotExistOnDatabase(Event event, List<String> questionContentFromEvent, SurveyQuestion surveyQuestion) {
         surveyQuestion.setEvent(event );
         if(!questionContentFromEvent.contains(surveyQuestion.getContent())){
             surveyQuestion.setEvent(event);
@@ -101,8 +102,8 @@ public class ManageSurveyService {
             throw new EntityNotFoundException();
         }
     }
-
-    private void setQuestionAnswerFieldsAndSave(SurveyAnswer surveyAnswer, Event event, Participant participant){
+    @Transactional
+    public void setQuestionAnswerFieldsAndSave(SurveyAnswer surveyAnswer, Event event, Participant participant){
         event.getSurveyQuestionSet()
                 .stream()
                 .filter(surveyQuestion->surveyQuestion.getContent()

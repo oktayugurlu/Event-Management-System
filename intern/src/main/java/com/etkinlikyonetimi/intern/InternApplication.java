@@ -1,23 +1,18 @@
 package com.etkinlikyonetimi.intern;
 
 import com.etkinlikyonetimi.intern.usecases.common.service.DatabasePopulator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.etkinlikyonetimi.intern.usecases.manageparticipant.service.ManageParticipantService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.TimeZone;
+import java.io.IOException;
 
 @SpringBootApplication
 @EnableJpaAuditing
 public class InternApplication {
+
 	@PostConstruct
 	public void init(){
 /*		// Setting Spring Boot SetTimeZone
@@ -29,10 +24,12 @@ public class InternApplication {
 		om.registerModule(module);
 		System.out.println("Spring boot application running in UTC timezone :"+new Date());*/
 	}
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 	 	ApplicationContext context =  SpringApplication.run(InternApplication.class, args);
 		DatabasePopulator databasePopulator = (DatabasePopulator) context.getBean("databasePopulator");
+		ManageParticipantService manageParticipantService = (ManageParticipantService) context.getBean("manageParticipantService");
 		databasePopulator.insertEvent();
+		manageParticipantService.createCongratImage();
 	}
 
 }

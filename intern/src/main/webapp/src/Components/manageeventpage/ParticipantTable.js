@@ -78,12 +78,16 @@ class ParticipantTable extends Component{
 
     createColumnsAndRows=(applications)=>{
         let columns=[...this.state.columns];
-        let participantObjectList = this.participantRowArrayCreator(applications);
-
+        this.createRows(applications);
         this.addQuestionToColumn(columns);
         this.setState({
-            rows:[...participantObjectList],
             columns:[...columns]
+        });
+    }
+    createRows = (applications)=>{
+        let participantObjectList = this.participantRowArrayCreator(applications);
+        this.setState({
+            rows:[...participantObjectList],
         });
     }
     participantRowArrayCreator = (applications)=>{
@@ -129,7 +133,7 @@ class ParticipantTable extends Component{
     }
 
     getParticipantAnswerOfQuestionIfExist=(application, questionContent)=>{
-        console.log(application.participant.answerSet);
+
         return application.participant.answerSet.filter(
             answer=>answer.question.content === questionContent
         )[0];
@@ -209,14 +213,12 @@ class ParticipantTable extends Component{
                 isOpenAreYouSureDialog:false,
                 event: {...response.data},
                 isDeletedSuccessfully:true
-            },()=>this.createColumnsAndRows(this.state.event.appliedParticipantSet));
-            /*this.context.snackbarOpen(this.state.deletedParticipantSSN+" TC'sine sahip kişi başarıyla silindi", "success"
-            );*/
+            },()=>this.createRows(this.state.event.appliedParticipantSet));
         }).catch(error => console.log(error));
     }
 
     handleParticipantInformation = (value)=>{
-        console.log("value: %O",value);
+
         if(value === undefined){ //Question is not answered
             return "";
         }
@@ -274,7 +276,7 @@ class ParticipantTable extends Component{
                     />
                 </Paper>
                 {this.state.isDeletedSuccessfully
-                    ?(<Alert severity="success">
+                    ?(<Alert severity="success" style={{marginTop:'10px'}}>
                         {this.state.deletedParticipantSSN+" TC'sine sahip kişi başarıyla silindi"}
                     </Alert>)
                     :''

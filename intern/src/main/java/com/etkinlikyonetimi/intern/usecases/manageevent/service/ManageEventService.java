@@ -99,8 +99,8 @@ public class ManageEventService {
         return false;
     }
     private boolean isQuestionExistOnDatabase(Question question, Event event){
-        Question foundQuestionByEventAndContentFromDatabase = questionRepository.findByEventAndContent(event, question.getContent());
-        return foundQuestionByEventAndContentFromDatabase != null;
+        Optional<Question> foundQuestionByEventAndContentFromDatabase = questionRepository.findByEventAndContent(event, question.getContent());
+        return foundQuestionByEventAndContentFromDatabase.isPresent();
     }
 
     public void updateEventFields(Event requestEvent, Event eventFromDatabase){

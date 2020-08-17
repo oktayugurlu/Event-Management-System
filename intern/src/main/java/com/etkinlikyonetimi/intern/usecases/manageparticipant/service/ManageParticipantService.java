@@ -1,5 +1,6 @@
 package com.etkinlikyonetimi.intern.usecases.manageparticipant.service;
 
+import com.etkinlikyonetimi.intern.usecases.manageevent.entity.Question;
 import com.etkinlikyonetimi.intern.usecases.manageparticipant.entity.*;
 import com.etkinlikyonetimi.intern.usecases.common.exception.QuotaIsFullException;
 import com.etkinlikyonetimi.intern.usecases.common.exception.SameTCIDException;
@@ -19,12 +20,12 @@ import javax.imageio.ImageIO;
 import javax.mail.MessagingException;
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,10 +87,12 @@ public class ManageParticipantService {
     public void saveAnswerBySettingQuestionAndOfAnswersOfParticipants(Participant participant, Event event, List<Answer> answers){
 
         answers.forEach(answer ->{
-            answer.setQuestion(questionRepository
-                    .findByEventAndContent(event, answer.getQuestion().getContent()));
-            answer.setParticipant(participant);
-            answerRepository.save(answer);
+            Optional<Question> questionFromDB = questionRepository.findByEventAndContent(event, answer.getQuestion().getContent());
+            if(questionFromDB.isPresent()){
+                answer.setQuestion(questionFromDB.get());
+                answer.setParticipant(participant);
+                answerRepository.save(answer);
+            }
         });
 
     }
@@ -101,7 +104,10 @@ public class ManageParticipantService {
             BufferedImage bufferedImage = QrCodeGeneratorService.generateQRCodeImage(qrContent);
             String fileName = "./src/main/resources/static/qrcodes/" + participant.getMail() + eventUniqueName + ".png";
             saveImageAsPng(bufferedImage, fileName);
-            sendMail(fileName, participant.getMail(), event.get().getTitle());
+            sendMail(fileName,
+                    participant.getMail(),
+                    "Katıldığınız "+ event.get().getTitle()+" etkinliği hakkında",
+                    "Bu QR kodu telefondan okutarak kayit bilgilerine erisebilirsiniz.");
             return bufferedImage;
         }
         else return null;
@@ -133,10 +139,8 @@ public class ManageParticipantService {
         }
     }
 
-    public void sendMail(String fileName, String email, String eventTitle) throws IOException, MessagingException {
+    public void sendMail(String fileName, String email, String subject, String content) throws IOException, MessagingException {
         Locale trlocale= new Locale("tr", "TR");
-        String subject = "Katıldığınız "+eventTitle+" etkinliği hakkında";
-        String content = "Bu QR kodu telefondan okutarak kayit bilgilerine erisebilirsiniz.";
         mailSenderService.sendmail("etkinlikyonetimi1234@gmail.com",
                 email,
                 String.format(trlocale, "%s",content),
@@ -170,13 +174,17 @@ public class ManageParticipantService {
                 .collect(Collectors.toList());
     }
 
-    public Lots drawingLots(Lots lots, String eventUniqueName) {
+    public Lots drawingLots(Lots lots, String eventUniqueName) throws IOException, MessagingException {
         Optional<Participant> participantFromDB = participantRepository.findParticipantBySsn(lots.getParticipant().getSsn());
         Optional<Event> eventFromDB = eventRepository.findByUniqueName(eventUniqueName);
         if(participantFromDB.isPresent() && eventFromDB.isPresent()){
             if(!checkIfParticipantNotAssignSameEvent(participantFromDB.get(), eventFromDB.get())){
                 lots.setParticipant(participantFromDB.get());
                 lots.setEvent(eventFromDB.get());
+                sendMail(null,
+                        participantFromDB.get().getMail(),
+                        "Katıldığınız "+ eventFromDB.get().getTitle()+" etkinliği hakkında",
+                        "Tebrikler! ");
                 return lotsRepository.save(lots);
             }else{
                 throw new EntityNotFoundException();
@@ -185,6 +193,33 @@ public class ManageParticipantService {
             throw new EntityNotFoundException();
         }
 
+    }
+
+    public void createCongratImage() throws IOException {
+        BufferedImage bufferedImage = null;
+        try {
+            File imageFile = new File("./src/main/resources/static/congratmultimedia/congrat.png");
+            InputStream inputStream = new FileInputStream(imageFile);
+
+            bufferedImage = ImageIO.read(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String key = "Tebrikler Oktay! Bizden Iphone kazandin";
+        /*BufferedImage bufferedImage = new BufferedImage(170, 30,
+                BufferedImage.TYPE_INT_RGB);*/
+
+        assert bufferedImage != null;
+        Graphics graphics = bufferedImage.getGraphics();
+        graphics.setColor(Color.LIGHT_GRAY);
+        graphics.fillRect(0, 0, 200, 50);
+        graphics.setColor(Color.RED);
+        graphics.setFont(new Font("Serif", Font.ITALIC, 60));
+        graphics.drawString(key, 125, 160);
+        ImageIO.write(bufferedImage, "png", new File(
+                "./src/main/resources/static/congratmultimedia/hediye.png"));
+        System.out.println("Image Created");
     }
 
     public void addQuestionAskedByParticipant(List<QuestionAskedByParticipant> questionsAskedByParticipant, String eventUniqueName) {
