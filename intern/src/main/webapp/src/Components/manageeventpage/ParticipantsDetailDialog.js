@@ -10,7 +10,6 @@ import ParticipantTable from "./ParticipantTable";
 import BarChart from "./BarChart";
 import Divider from "@material-ui/core/Divider";
 import Typography from "@material-ui/core/Typography";
-import Button from "@material-ui/core/Button";
 import QuestionAskedByParticipantTable from "./QuestionAskedByParticipantTable";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -27,10 +26,8 @@ export default class ParticipantsDetailDialog extends Component{
     }
 
     componentDidMount() {
-        console.log("QR COMPONENT AYAGA KALKTI!!!!");
     }
     componentWillUnmount() {
-        console.log("QR COMPONENT AYAGA KALKTI!!!!");
     }
 
 

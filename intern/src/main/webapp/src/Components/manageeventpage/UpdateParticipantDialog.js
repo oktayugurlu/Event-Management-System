@@ -11,7 +11,6 @@ export default class UpdateParticipantDialog extends Component{
 
     constructor(props) {
         super(props);
-        console.log("this.props.updatedParticipant %O",this.props.updatedParticipant);
         this.state = {
             participant:{
                 ssn:this.props.updatedParticipant.ssn,

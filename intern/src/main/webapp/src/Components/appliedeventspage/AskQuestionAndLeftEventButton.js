@@ -17,7 +17,6 @@ export default class AskQuestionAndLeftEventButton extends Component{
 
     componentDidMount(){
         let intervalId = setInterval(()=>{
-            console.log(new Date());
             if(this.props.checkEndDateIsUpToDate(new Date())
                 && this.props.checkStartDateIsNotUpToDate(new Date())){
                 this.setState({
@@ -36,8 +35,6 @@ export default class AskQuestionAndLeftEventButton extends Component{
     }
 
     componentWillUnmount() {
-        console.log("componentWillUnmount interval");
-
         clearInterval(this.state.intervalId);
     }
 

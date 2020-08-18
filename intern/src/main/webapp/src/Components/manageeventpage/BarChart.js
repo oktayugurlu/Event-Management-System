@@ -9,12 +9,11 @@ import {
     Tooltip,
 } from '@devexpress/dx-react-chart-material-ui';
 
-import {AreaSeries, EventTracker} from '@devexpress/dx-react-chart';
+import {EventTracker} from '@devexpress/dx-react-chart';
 import {AppStateContext} from "../contexts/AppStateContext";
 import { Animation } from '@devexpress/dx-react-chart';
 import axios from "axios";
 import {getJwsToken} from "../authentication/LocalStorageService";
-import Card from "@material-ui/core/Card";
 import {createRef} from "react";
 
 

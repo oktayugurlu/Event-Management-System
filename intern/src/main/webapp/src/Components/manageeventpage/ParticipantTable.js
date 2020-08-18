@@ -79,7 +79,7 @@ class ParticipantTable extends Component{
                 }
             ]
         };
-        console.log("CONSTRUCTOR CALISTI");
+
     }
 
     componentDidMount() {
@@ -95,7 +95,7 @@ class ParticipantTable extends Component{
         });
     }
     createRows = (applications)=>{
-        console.log("applications: %O",applications);
+
         let participantObjectList = this.participantRowArrayCreator(applications);
         this.setState({
             rows:[...participantObjectList],
@@ -234,7 +234,7 @@ class ParticipantTable extends Component{
                 headers:headers
             }
         ).then((response) => {
-            console.log(response.data);
+
             this.setState({
                 isOpenAreYouSureDialog:false,
                 event: {...response.data},

@@ -12,9 +12,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default class AreYouSureDialog extends Component{
-    constructor(props) {
-        super(props);
-    }
+
 
     render() {
         return (

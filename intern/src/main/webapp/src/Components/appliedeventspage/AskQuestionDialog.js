@@ -116,7 +116,7 @@ class CreateSurveyDialog extends Component{
         let questionSet = Object.keys(this.state.questionValueObject).map((key)=>{
             return this.createQuestionObject(this.state.questionValueObject[key]);
         });
-        console.log(questionSet);
+
         this.props.handleSubmit(questionSet);
     };
 

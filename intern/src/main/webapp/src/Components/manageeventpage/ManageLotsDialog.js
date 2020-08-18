@@ -62,7 +62,7 @@ class ManageLotsDialog extends Component{
 
 
     renderIfThereIsParticipant = ()=>{
-        console.log(this.state.openedEvent);
+
         if(this.state.openedEvent.appliedParticipantSet.length>0)
             return (
                 <>
@@ -212,7 +212,7 @@ class ManageLotsDialog extends Component{
         }
     }
     createLotsDTO = ()=>{
-        console.log();
+
         return {
             giftMessage: this.state.giftMessage,
             participant: {...this.state.luckyParticipantObject},

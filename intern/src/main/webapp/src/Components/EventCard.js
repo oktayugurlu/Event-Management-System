@@ -1,4 +1,4 @@
-import React, {Component, useContext, useEffect, useLayoutEffect, useRef} from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -6,7 +6,6 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import CardActionArea from '@material-ui/core/CardActionArea';
 import CardMedia from '@material-ui/core/CardMedia';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 import Fab from '@material-ui/core/Fab';
 import Grid from "@material-ui/core/Grid";
@@ -16,7 +15,6 @@ import AddIcon from '@material-ui/icons/Add';
 // Accept Button
 import {green} from '@material-ui/core/colors';
 import EditIcon from "@material-ui/icons/Edit";
-import DeleteIcon from "@material-ui/icons/Delete";
 import ParticipantsDetailDialog from "./manageeventpage/ParticipantsDetailDialog";
 import {AppStateContext} from "./contexts/AppStateContext";
 import AssessmentIcon from '@material-ui/icons/Assessment';
@@ -33,6 +31,7 @@ import MapDialog from "./appliedeventspage/MapDialog"
 import AskQuestionDialog from "./appliedeventspage/AskQuestionDialog";
 import AskQuestionAndLeftEventButton from "./appliedeventspage/AskQuestionAndLeftEventButton";
 import AreYouSureDialog from "./AreYouSureDialog";
+import DeleteEventButton from "./manageeventpage/DeleteEventButton";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -136,26 +135,12 @@ export default function EventCard(props) {
                             </Box>
                         </Tooltip>
                     </div>
-                    <div className={classes.wrapper}>
-                        <Tooltip title={
-                            checkStartDateIsNotUpToDate(new Date())
-                                ? "Etkinlik bitiş tarihinden sonra silinemez!"
-                                : "Sil"} aria-label="add"
-                        >
-                            <Box component="span" display="block">
-                                <span>
-                                    <Fab
-                                        aria-label="delete"
-                                        color="secondary"
-                                        onClick={openAreYouSureDialog}
-                                        disabled={checkStartDateIsNotUpToDate( new Date())}
-                                    >
-                                        <DeleteIcon/>
-                                    </Fab>
-                                </span>
-                            </Box>
-                        </Tooltip>
-                    </div>
+                    {<DeleteEventButton
+                        checkEndDateIsUpToDate={checkEndDateIsUpToDate}
+                        checkStartDateIsNotUpToDate={checkStartDateIsNotUpToDate}
+                        openAreYouSureDialog={openAreYouSureDialog}
+                        classes={classes}
+                    />}
                     <div className={classes.wrapper}>
                         <Tooltip title={"Anketi yönet"} aria-label="add"
                         >
@@ -569,7 +554,7 @@ export default function EventCard(props) {
                     open={isOpenAreYouSureDialog}
                     handleClose={closeAreYouSureDialog}
                     event={props.eventObject}
-                    message={props.eventObject.title+" etkinlikten ayrılmayı onaylıyor musunuz?"}
+                    message={props.eventObject.title+" etkinliğinden ayrılmayı onaylıyor musunuz?"}
                 />
             );
         }

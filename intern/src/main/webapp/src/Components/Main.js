@@ -538,7 +538,7 @@ class Main extends Component{
                           onClose={this.closeUndoSnackbar}
                           action={
                               <Button color="inherit" size="small" onClick={this.state.undoSnackbar.functionAfterClickedUndo}>
-                                  Undo
+                                  GERİ AL
                               </Button>
                           }
                           message={this.state.undoSnackbar.message}

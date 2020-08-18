@@ -73,13 +73,20 @@ public class ManageParticipantService {
     @Transactional
     public Participant setIfParticipantIsNotExist(Participant participantFromRequest){
         Optional<Participant> participantFromDB = participantRepository.findParticipantBySsn(participantFromRequest.getSsn());
-        return participantFromDB.orElseGet(() -> participantRepository.save(participantFromRequest));
+        if(participantFromDB.isPresent()){
+            updateParticipantFields(participantFromRequest, participantFromDB.get());
+            return participantRepository.save(participantFromDB.get());
+        }
+        return participantRepository.save(participantFromRequest);
     }
 
     private boolean checkIfParticipantNotAssignSameEvent(Participant participant, Event event){
         Optional<Participant> participantFromDB = participantRepository.findParticipantBySsn(participant.getSsn());
         return participantFromDB.map(value -> value.getAppliedEvents()
-                .stream().noneMatch(application -> application.getEvent().getUniqueName()
+                .stream()
+                .noneMatch(application -> application
+                        .getEvent()
+                        .getUniqueName()
                         .equals(event.getUniqueName()))).orElse(true);
     }
 
@@ -261,7 +268,9 @@ public class ManageParticipantService {
         Optional<Event> eventFromDB = eventRepository.findByUniqueName(eventUniqueName);
         Optional<Participant> participantFromDB =
                 participantRepository.findParticipantBySsn(ssn);
-        if(participantFromDB.isPresent() && eventFromDB.isPresent()){
+        if(participantFromDB.isPresent() && eventFromDB.isPresent()
+                && eventFromDB.get().getStartDateTime().isAfter(LocalDateTime.now())
+        ){
             applicationRepository.deleteByParticipantAndEvent(participantFromDB.get(), eventFromDB.get());
             deleteDeletedParticipantsRowsFromAnswerTables(participantFromDB.get(),eventFromDB.get());
             Optional<Event> updatedEvent = eventRepository.findByUniqueName(eventFromDB.get().getUniqueName());

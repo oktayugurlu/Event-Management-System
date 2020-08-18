@@ -85,11 +85,7 @@ public class ManageEventService {
         List<Question> questionListOnDatabase = questionRepository.findByEvent(updatedEvent);
         questionListOnDatabase.stream()
                 .filter(question -> !isQuestionContentExistOnEventField(question, requestEvent))
-                .forEach(question->{
-                    System.out.println("-------------------question---------------");
-                    System.out.println(question.getContent());
-                    questionRepository.delete(question);
-                });
+                .forEach(questionRepository::delete);
     }
     private boolean isQuestionContentExistOnEventField(Question questionFromEventField, Event requestEvent){
         for(Question question:requestEvent.getQuestionSet()){
@@ -117,7 +113,7 @@ public class ManageEventService {
 
     public String deleteEvent(String uniqueName){
         Optional<Event> deletedEvent = eventRepository.findByUniqueName(uniqueName);
-        if(deletedEvent.isEmpty() || deletedEvent.get().getEndDateTime().isBefore(LocalDateTime.now()))
+        if(deletedEvent.isEmpty() || deletedEvent.get().getStartDateTime().isBefore(LocalDateTime.now()))
             return "Geçersiz silme işlemi!";
         else{
             eventRepository.deleteById(deletedEvent.get().getId());

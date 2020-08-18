@@ -17,7 +17,6 @@ import {AppStateContext} from "./contexts/AppStateContext";
 import Typography from "@material-ui/core/Typography";
 import Alert from "@material-ui/lab/Alert";
 import AlertTitle from "@material-ui/lab/AlertTitle";
-import {BackdropContext} from "./contexts/BackdropContext";
 
 
 export default function EventsList(props) {
@@ -39,7 +38,6 @@ export default function EventsList(props) {
     const ALL_EVENTS_NUMBER_OF_PARTICIPANTS=0;
     //BARCHART CONSTANTS
 
-    const backdropContext = useContext(BackdropContext);
     const mainStatesContext = useContext(AppStateContext);
 
 
@@ -269,7 +267,7 @@ export default function EventsList(props) {
         let headers = {
             'Authorization': `Bearer ${getJwsToken()}`
         };
-        console.log(deletedEvent);
+
         axios.post("/manageevent/deleteevent/"+deletedEvent.uniqueName,{},{
             headers:headers
         })

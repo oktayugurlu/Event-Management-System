@@ -39,7 +39,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/managesurvey/createsurvey").authenticated()
                 .antMatchers("/managesurvey/getsurvey/*").authenticated()
                 .antMatchers("/manageparticipant/drawinglots/*").authenticated()
-                .antMatchers("/manageparticipant/deleteapplication/*").authenticated()
                 .antMatchers("/manageparticipant/updateparticipant").authenticated()
                 .and()
                 .sessionManagement()

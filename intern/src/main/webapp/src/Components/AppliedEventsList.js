@@ -9,18 +9,26 @@ import Card from "@material-ui/core/Card";
 import Button from "@material-ui/core/Button";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
-import Alert from "@material-ui/lab/Alert";
 import Typography from "@material-ui/core/Typography";
 import Divider from "@material-ui/core/Divider";
 import Pagination from "@material-ui/lab/Pagination";
 import axios from "axios";
-import {getJwsToken, getSSN, setSSN} from "./authentication/LocalStorageService";
+import { getSSN, setSSN} from "./authentication/LocalStorageService";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Link from "@material-ui/core/Link";
+import {AppStateContext} from "./contexts/AppStateContext";
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
 
 const ITEMS_PER_PAGE = 5;
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export default class EventsList extends Component{
 
+    static contextType = AppStateContext;
     APPLIED_EVENTS_PAGE=3;
     CARD_IMAGE_URL='https://images.all-free-download.com/images/graphiclarge/team_meeting_background_table_stationery_gathering_people_icons_6838493.jpg';
     state={
@@ -29,10 +37,20 @@ export default class EventsList extends Component{
         isParticipantExist:false,
         page:0,
         isSubmitSSNClicked:false,
-        appliedEvents:[]
+        appliedEvents:[],
+        undoSnackbar:{
+            message:'',
+            isOpen:false,
+            functionAfterClickedUndo:()=>{}
+        },
+        snackbar: [{
+            isOpen: false,
+            message: "",
+            severity: ""
+        }],
     }
     componentDidMount() {
-        if(getSSN()!=='' && getSSN()!==null){
+        if(getSSN()!=='' && getSSN()!==null && getSSN()!==undefined){
             this.findParticipantAndAppliedEventsBySSN();
         }
     }
@@ -130,44 +148,46 @@ export default class EventsList extends Component{
 
     };
 
-    //******* DELETE EVENT functions start ********//
-   /* handleDeleteEventFromBackend = (deletedEvent)=>{
-        let headers = {
-            'Authorization': `Bearer ${getJwsToken()}`
-        };
-        console.log(deletedEvent);
-        axios.post("/manageevent/deleteevent/"+deletedEvent.uniqueName,{},{
-            headers:headers
-        })
-            .then((response) => {
-                mainStatesContext.getAllEvents();
-            })
-            .catch(error => {
-                console.log(error);
-                if (error.response.status === 400) {
-                    props.snackbarOpen(error.response.data.errors[0].defaultMessage, "error");
-                }
-            })
-    }
+
+
+
+
+    //******* DELETE APPLICATION functions start ********//
     handleClickSureButtonToLeaveFromEventInFrontend = (deletedEvent)=>{
         let deletedIndex = -1;
-        let copyCreatedEvents = [...this.state.appliedEvents];
-        copyCreatedEvents.forEach((event,index)=>{
-            if(deletedEvent.uniqueName === event.uniqueName)
+        let copyAppliedEvents = [...this.state.appliedEvents];
+        copyAppliedEvents.forEach((event,index)=>{
+            if(deletedEvent.uniqueName === event.uniqueName ){
                 deletedIndex=index;
+            }
         });
-        copyCreatedEvents.splice(deletedIndex, 1);
-        mainStatesContext.setCreatedEvents(copyCreatedEvents);
-        let timeOutToDeleteFromBackend = setTimeout(()=>handleDeleteEventFromBackend(deletedEvent), 6000);
-        mainStatesContext.openSnackbarToUndo(deletedEvent.title+" başarıyla silindi!",()=> {
-            clearTimeout(timeOutToDeleteFromBackend);
-            mainStatesContext.getAllEvents();
-            mainStatesContext.closeUndoSnackbar();
-            props.snackbarOpen(deletedEvent.title+" etkinliği başarıyla geri alındı", "success");
-        });
-    }*/
+        copyAppliedEvents.splice(deletedIndex, 1);
 
-    //******* DELETE EVENT functions end ********//
+        this.setState({
+            appliedEvents:[...copyAppliedEvents]
+        },()=> this.openSnackbarAndSetTimeToDeleteFromBackend(deletedEvent));
+    }
+    openSnackbarAndSetTimeToDeleteFromBackend = (deletedEvent)=>{
+        this.openSnackbarToUndo(deletedEvent.title+" etkinliğinden başarıyla ayrılındı!",()=> {
+            let timeOutToDeleteFromBackend = setTimeout(()=>this.handleDeleteApplicationFromBackend(deletedEvent), 6000);
+            clearTimeout(timeOutToDeleteFromBackend);
+            this.findParticipantAndAppliedEventsBySSN();
+            this.closeUndoSnackbar();
+            this.snackbarOpen(deletedEvent.title+" işlem başarıyla geri alındı", "success");
+        });
+    }
+    handleDeleteApplicationFromBackend = (deletedEvent)=>{
+
+        axios.post("/manageparticipant/deleteapplication/"+deletedEvent.uniqueName,
+            this.state.participant
+        ).then((response) => {
+        }).catch(error => console.log(error));
+    }
+    //******* DELETE APPLICATION functions end ********//
+
+
+
+
 
     renderSubmitSSNCard = ()=>{
         return(
@@ -232,7 +252,7 @@ export default class EventsList extends Component{
         }
         axios.post("/manageparticipant/getappliedevents",participant)
             .then(response =>{
-                let applications=response.data;
+                 
                 this.setAppliedEventsAndParticipantFromApplication(response.data);
             })
             .catch(error => {
@@ -252,7 +272,7 @@ export default class EventsList extends Component{
             }
         );
         setSSN(participantFromBackend!=={} ? participantFromBackend.ssn:'');
-        console.log(participantFromBackend);
+
         this.setState({
             isParticipantExist:participantFromBackend!=={},
             appliedEvents:[...appliedEvents],
@@ -261,6 +281,43 @@ export default class EventsList extends Component{
         });
     }
 
+    // SNACK BAR FUNCTIONS START
+    snackbarOpen = (message, severity) => {
+        this.setState(prevState => {
+            let snackbar = {...prevState.snackbar};
+            snackbar.isOpen = true;
+            snackbar.message = message;
+            snackbar.severity = severity;
+            return {snackbar};
+        })
+    }
+    snackbarClose = () => {
+        this.setState(prevState => {
+            let snackbar = {...prevState.snackbar};
+            snackbar.isOpen = false;
+            snackbar.message = "";
+            snackbar.severity = "";
+            return {snackbar};
+        })
+    }
+    openSnackbarToUndo = (message, functionAfterClickedUndo)=>{
+        this.setState(prevState=>{
+            let undoSnackbar = {...prevState.undoSnackbar};
+            undoSnackbar.isOpen = true;
+            undoSnackbar.message = message;
+            undoSnackbar.functionAfterClickedUndo = functionAfterClickedUndo;
+            return {undoSnackbar};
+        });
+    }
+    closeUndoSnackbar = ()=>{
+        this.setState(prevState=>{
+            let undoSnackbar = {...prevState.undoSnackbar};
+            undoSnackbar.isOpen = false;
+            undoSnackbar.message = "";
+            return {undoSnackbar};
+        });
+    }
+    // SNACK BAR FUNCTIONS END
 
 
     handleOnChangeSSNInput = (event)=>{
@@ -302,6 +359,21 @@ export default class EventsList extends Component{
                     </Breadcrumbs>
                     {this.renderAppliedEventsPage()}
                 </Grid>
+                <Snackbar open={this.state.undoSnackbar.isOpen}
+                          autoHideDuration={6000}
+                          onClose={this.closeUndoSnackbar}
+                          action={
+                              <Button color="inherit" size="small" onClick={this.state.undoSnackbar.functionAfterClickedUndo}>
+                                  GERİ AL
+                              </Button>
+                          }
+                          message={this.state.undoSnackbar.message}
+                />
+                <Snackbar open={this.state.snackbar.isOpen} autoHideDuration={2500} onClose={this.snackbarClose}>
+                    <Alert onClose={this.snackbarClose} severity={this.state.snackbar.severity}>
+                        {this.state.snackbar.message}
+                    </Alert>
+                </Snackbar>
             </>
         );
     }
