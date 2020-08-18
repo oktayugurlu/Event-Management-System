@@ -31,6 +31,6 @@ public class LoginService {
 		} catch (AuthenticationException e) {
 			e.printStackTrace();
 		}
-		return new LoginResponse("Username or password is not correct!");
+		return new LoginResponse("Kullanıcı adı veya şifre yanlış!");
 	}
 }

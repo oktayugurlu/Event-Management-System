@@ -88,7 +88,8 @@ class Main extends Component{
             },
             openSnackbarToUndo:this.openSnackbarToUndo,
             closeUndoSnackbar:this.closeUndoSnackbar,
-            snackbarOpen:this.snackbarOpen
+            snackbarOpen:this.snackbarOpen,
+            connectWebSocket:this.connectWebSocket
         };
     }
 
@@ -534,7 +535,7 @@ class Main extends Component{
 
                 {/*snackbar to undo deletion*/}
                 <Snackbar open={this.state.undoSnackbar.isOpen}
-                          autoHideDuration={6000}
+                          autoHideDuration={10000}
                           onClose={this.closeUndoSnackbar}
                           action={
                               <Button color="inherit" size="small" onClick={this.state.undoSnackbar.functionAfterClickedUndo}>

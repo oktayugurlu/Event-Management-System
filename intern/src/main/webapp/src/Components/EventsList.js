@@ -290,7 +290,7 @@ export default function EventsList(props) {
         });
         copyCreatedEvents.splice(deletedIndex, 1);
         mainStatesContext.setCreatedEvents(copyCreatedEvents);
-        let timeOutToDeleteFromBackend = setTimeout(()=>handleDeleteEventFromBackend(deletedEvent), 6000);
+        let timeOutToDeleteFromBackend = setTimeout(()=>handleDeleteEventFromBackend(deletedEvent), 10000);
         mainStatesContext.openSnackbarToUndo(deletedEvent.title+" başarıyla silindi!",()=> {
             clearTimeout(timeOutToDeleteFromBackend);
             mainStatesContext.getAllEvents();

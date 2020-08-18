@@ -27,9 +27,9 @@ public class DatabasePopulator {
     public void insertEvent(){
         if(corporateUserRepository.findAll().isEmpty()){
             CorporateUser corporateUser =new CorporateUser("admin", "1234",Set.of());
-            CorporateUser corporateUser1 =new CorporateUser("admin1", "admin",Set.of());
-            CorporateUser corporateUser2 =new CorporateUser("admin2", "admin",Set.of());
-            CorporateUser corporateUser3 =new CorporateUser("admin3", "admin",Set.of());
+            CorporateUser corporateUser1 =new CorporateUser("admin1", "1234",Set.of());
+            CorporateUser corporateUser2 =new CorporateUser("admin2", "1234",Set.of());
+            CorporateUser corporateUser3 =new CorporateUser("admin3", "1234",Set.of());
 
             customUserDetailsManager.createUser(corporateUser);
             customUserDetailsManager.createUser(corporateUser1);

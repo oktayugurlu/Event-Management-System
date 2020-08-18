@@ -169,7 +169,7 @@ export default class EventsList extends Component{
     }
     openSnackbarAndSetTimeToDeleteFromBackend = (deletedEvent)=>{
         this.openSnackbarToUndo(deletedEvent.title+" etkinliğinden başarıyla ayrılındı!",()=> {
-            let timeOutToDeleteFromBackend = setTimeout(()=>this.handleDeleteApplicationFromBackend(deletedEvent), 6000);
+            let timeOutToDeleteFromBackend = setTimeout(()=>this.handleDeleteApplicationFromBackend(deletedEvent), 10000);
             clearTimeout(timeOutToDeleteFromBackend);
             this.findParticipantAndAppliedEventsBySSN();
             this.closeUndoSnackbar();
@@ -252,7 +252,7 @@ export default class EventsList extends Component{
         }
         axios.post("/manageparticipant/getappliedevents",participant)
             .then(response =>{
-                 
+
                 this.setAppliedEventsAndParticipantFromApplication(response.data);
             })
             .catch(error => {
@@ -360,7 +360,7 @@ export default class EventsList extends Component{
                     {this.renderAppliedEventsPage()}
                 </Grid>
                 <Snackbar open={this.state.undoSnackbar.isOpen}
-                          autoHideDuration={6000}
+                          autoHideDuration={10000}
                           onClose={this.closeUndoSnackbar}
                           action={
                               <Button color="inherit" size="small" onClick={this.state.undoSnackbar.functionAfterClickedUndo}>

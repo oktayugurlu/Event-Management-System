@@ -41,8 +41,9 @@ class Login extends Component {
         };
 
         axios.post(endpoint, body).then(response => {
+            console.log("error: %O",response);
             this.checkValidCredentials(response);
-            return this.redirectManageEventPage();
+        }).catch(error=>{
         });
     };
 
@@ -53,6 +54,7 @@ class Login extends Component {
             setUsername(this.state.username);
             setJwsToken(response.data.token);
             this.props.snackbarOpen('Giriş başarılı', "success");
+            this.redirectManageEventPage();
         }
         else
             this.props.snackbarOpen(response.data.token, "error");
@@ -66,6 +68,7 @@ class Login extends Component {
         }).then((response) => {
             this.context.setCreatedEvents(response.data);
             this.props.history.push("/manageevents");
+            this.context.connectWebSocket();
         });
     }
 
