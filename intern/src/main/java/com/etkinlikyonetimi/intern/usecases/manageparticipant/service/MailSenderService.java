@@ -1,5 +1,7 @@
 package com.etkinlikyonetimi.intern.usecases.manageparticipant.service;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.mail.*;
@@ -9,7 +11,14 @@ import java.util.Date;
 import java.util.Properties;
 
 @Service
+@RequiredArgsConstructor
 public class MailSenderService {
+
+    @Value(value = "${spring.mail.username}")
+    private String mailAddress;
+
+    @Value(value = "${spring.mail.password}")
+    private String password;
 
     public void sendmail(String from,
                          String to,
@@ -24,7 +33,7 @@ public class MailSenderService {
 
         Session session = Session.getInstance(props, new javax.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("etkinlikyonetimi1234@gmail.com", "sF;'pe;a,3942@#$dFG%GT7kj");
+                return new PasswordAuthentication(mailAddress, password);
             }
         });
         Message msg = new MimeMessage(session);

@@ -325,7 +325,7 @@ class Main extends Component{
 
 
     getAddAndManageEventButtonIfAuthorized() {
-        if(this.state.isAuthorized)
+        if(this.state.isAuthorized){
             return (
                 <>
                     <Divider/>
@@ -346,17 +346,20 @@ class Main extends Component{
                     </ListItem>
                 </>
             );
+        }
         else
             return '';
     }
 
     routeManageEventPageIfAuthorized=()=>{
-        if (!this.state.isAuthorized)
+        if (!this.state.isAuthorized){
             return (<Login
                 snackbarOpen={this.snackbarOpen}
                 setCreatedEvents={this.setCreatedEvents}
             />);
-        else
+        }
+
+        else{
             return (<EventsList
                 allEvents={this.state.allEvents}
                 snackbarOpen={this.snackbarOpen}
@@ -365,6 +368,8 @@ class Main extends Component{
                 getAllEvents={this.getAllEvents}
                 pageTitle={'Etkinlikleri Yönet'}
             />);
+        }
+
     }
 
     setCreatedEvents = (newEvents)=>{

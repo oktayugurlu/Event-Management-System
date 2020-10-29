@@ -308,7 +308,6 @@ export default function EventsList(props) {
               style={{ minHeight: '100vh'}}
         >
             {qrCodeDialogElement}
-
             <Typography style={titleStyle} variant="h3" gutterBottom>
                 {props.pageTitle}
             </Typography>
