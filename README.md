@@ -7,7 +7,7 @@ This full-stack project includes both backend and frontend folders.
 - Frontend: React.js - Material UI
 
 You can see found source code for these technologies in the project:
-- Websocket
+- Websocket for notification
 - PNG file editing
 - QR Code creation
 - Mail service
