@@ -1,6 +1,6 @@
 # Event-Management-System
 
-## This application can be used to prepare events such as conference, concert, meeting etc. The project is a full-stack project includes both backend and frontend folders.
+This application can be used to prepare events such as conference, concert, meeting etc. The project is a full-stack project includes both backend and frontend folders.
 
 - Database: PostgreSQL 12
 - Backend: Spring Boot
