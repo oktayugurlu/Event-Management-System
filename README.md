@@ -8,7 +8,12 @@ This full-stack project includes both backend and frontend folders.
 
 You can see found source code for these technologies in the project:
 - Websocket for notification
+- Authentication
 - PNG file editing
 - QR Code creation
 - Mail service
 - React Google Maps API
+
+
+ 
+
