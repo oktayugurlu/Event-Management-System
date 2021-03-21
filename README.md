@@ -10,7 +10,7 @@ You can see found source code for these technologies in the project:
 - Websocket for notification
 - Authentication with Spring Security
 - PNG file editing 
-- QR Code creation
+- QR Code
 - Mail service
 - React Google Maps API
 
